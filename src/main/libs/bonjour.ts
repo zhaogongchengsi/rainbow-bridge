@@ -11,15 +11,9 @@ export { Service, Browser }
 
 export function bonjourInit() {
   logger.info('Bonjour service is initializing.')
-  instance = new Bonjour(
-    {
-      name: BONJOUR_SERVICE_NAME,
-      type: BONJOUR_SERVICE_TYPE
-    },
-    () => {
-      logger.error('Failed to initialize Bonjour service.')
-    }
-  )
+  instance = new Bonjour({}, () => {
+    logger.error('Failed to initialize Bonjour service.')
+  })
   browser = instance.find({ type: BONJOUR_SERVICE_TYPE })
 }
 
