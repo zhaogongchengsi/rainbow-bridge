@@ -14,9 +14,19 @@ export function bonjourInit() {
     port: BONJOUR_SERVICE_PORT, // optional, can also be set via updatePort() before advertising
     txt: {
       // optional
-      key: 'value'
+      id: '12123 zhaozunhong'
     }
   })
+
+  service.on('hostname-change', () => {
+    logger.info('Bonjour hostname change.')
+  })
+
+  service.on('name-change', (name) => {
+    logger.info('Bonjour name change.', name)
+  })
+
+  logger.info('Ciao service state is', service.serviceState)
 }
 
 export function getBonjour() {
