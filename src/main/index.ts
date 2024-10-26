@@ -2,7 +2,7 @@ import { app, BrowserWindow } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { createWindow } from './window'
 import { initStore } from './libs/store'
-import { bonjourInit } from './libs/bonjour'
+import { bonjourInit, bonjourPublish, getBonjourBrowser } from './libs/bonjour'
 
 if (!app.requestSingleInstanceLock()) {
   app.quit()
@@ -12,6 +12,7 @@ app.whenReady().then(async () => {
   electronApp.setAppUserModelId('com.electron')
 
   await initStore()
+
   bonjourInit()
 
   app.on('browser-window-created', (_, window) => {
@@ -19,6 +20,18 @@ app.whenReady().then(async () => {
   })
 
   createWindow()
+
+  bonjourPublish()
+
+  const browser = getBonjourBrowser()
+
+  browser.on('up', (service) => {
+    console.log('up', service)
+  })
+
+  browser.on('down', (service) => {
+    console.log('down', service)
+  })
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
