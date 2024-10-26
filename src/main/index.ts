@@ -2,7 +2,7 @@ import { app, BrowserWindow } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { createWindow } from './window'
 import { initStore } from './libs/store'
-import { bonjourInit, bonjourPublish, getBonjourBrowser } from './libs/bonjour'
+import { bonjourInit, bonjourPublish, getBonjourBrowser, Service } from './libs/bonjour'
 
 if (!app.requestSingleInstanceLock()) {
   app.quit()
@@ -25,11 +25,11 @@ app.whenReady().then(async () => {
 
   const browser = getBonjourBrowser()
 
-  browser.on('up', (service) => {
+  browser.on('up', (service: Service) => {
     console.log('up', service)
   })
 
-  browser.on('down', (service) => {
+  browser.on('down', (service: Service) => {
     console.log('down', service)
   })
 

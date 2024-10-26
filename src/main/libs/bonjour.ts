@@ -1,4 +1,4 @@
-import { Bonjour, type Browser } from 'bonjour-service'
+import { Bonjour, type Browser, Service } from 'bonjour-service'
 import { logger } from './logger'
 
 const BONJOUR_SERVICE_NAME = 'rainbow-bridge'
@@ -7,9 +7,19 @@ const BONJOUR_SERVICE_TYPE = 'http'
 let instance: Bonjour | null = null
 let browser: Browser | null = null
 
+export { Service, Browser }
+
 export function bonjourInit() {
   logger.info('Bonjour service is initializing.')
-  instance = new Bonjour()
+  instance = new Bonjour(
+    {
+      name: BONJOUR_SERVICE_NAME,
+      type: BONJOUR_SERVICE_TYPE
+    },
+    () => {
+      logger.error('Failed to initialize Bonjour service.')
+    }
+  )
   browser = instance.find({ type: BONJOUR_SERVICE_TYPE })
 }
 
