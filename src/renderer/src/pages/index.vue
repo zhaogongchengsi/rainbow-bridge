@@ -1,9 +1,7 @@
-<script setup lang='ts'>
-
+<script setup lang="ts">
+console.log('home')
 </script>
 
 <template>
-   <div>
-        home
-   </div>
+  <div>home</div>
 </template>
