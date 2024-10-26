@@ -34,7 +34,7 @@ export default defineConfig({
         dts: 'components.d.ts'
       }),
       AutoImport({
-        imports: ['vue', '@vueuse/core', VueRouterAutoImports],
+        imports: ['vue', '@vueuse/core', VueRouterAutoImports, 'pinia'],
         dirs: ['src/renderer/src/composables/**', 'src/renderer/src/utils/**']
       }),
       UnoCSS()
