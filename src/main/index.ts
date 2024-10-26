@@ -2,7 +2,8 @@ import { app, BrowserWindow } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { createWindow } from './window'
 import { initStore } from './libs/store'
-import { bonjourInit, bonjourPublish, getBonjourBrowser, Service } from './libs/bonjour'
+import { bonjourInit, bonjourPublish } from './libs/ciao'
+import { logger } from './libs/logger'
 
 if (!app.requestSingleInstanceLock()) {
   app.quit()
@@ -21,23 +22,15 @@ app.whenReady().then(async () => {
 
   createWindow()
 
-  bonjourPublish()
-
-  const browser = getBonjourBrowser()
-
-  browser.on('up', (service: Service) => {
-    console.log('up', service)
-  })
-
-  browser.on('down', (service: Service) => {
-    console.log('down', service)
-  })
-
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
+
+  await bonjourPublish()
+
+  logger.info('bonjour service is published.')
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common
