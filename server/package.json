@@ -1,0 +1,19 @@
+{
+  "name": "rainbow-bridge-server",
+  "version": "0.0.0",
+  "description": "",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "dev": "esno index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "peer": "^1.0.2"
+  },
+  "devDependencies": {
+    "esno": "^4.8.0"
+  }
+}
