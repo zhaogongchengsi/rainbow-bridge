@@ -9,14 +9,15 @@ export interface Store {
     width: number
     height: number
   }
+  theme: 'light' | 'dark' | 'system'
 }
 
-// Read or create db.json
 const defaultData: Store = {
   window: {
     width: 900,
     height: 670
-  }
+  },
+  theme: 'system'
 }
 
 let db: Low<Store> | null = null
@@ -37,23 +38,14 @@ export function getStore() {
 }
 
 export function saveStore() {
-  if (!db) {
-    throw new Error('Store is not initialized.')
-  }
-  return db.write()
+  return getStore().write()
 }
 
-export function get(key: keyof Store) {
-  if (!db) {
-    throw new Error('Store is not initialized.')
-  }
-  return db.data[key]
+export function get<K extends keyof Store>(key: K): Store[K] {
+  return getStore().data[key]
 }
 
-export function set(key: keyof Store, value: Store[keyof Store]) {
-  if (!db) {
-    throw new Error('Store is not initialized.')
-  }
-  db.data[key] = value
+export function set<K extends keyof Store>(key: K, value: Store[K]) {
+  getStore().data[key] = value
   return saveStore()
 }

@@ -10,7 +10,7 @@ let mainWindow: BrowserWindow | null = null
 export function createWindow() {
   logger.info('Main window is creating.')
   const { width, height } = get('window')
-  // Create the browser window.
+  const theme = get('theme')
   mainWindow = new BrowserWindow({
     width: width ?? 900,
     height: height ?? 670,
@@ -19,7 +19,8 @@ export function createWindow() {
     show: false,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
-    backgroundColor: '#fff',
+    backgroundColor: theme === 'dark' ? '#000' : '#fff',
+    darkTheme: theme === 'dark',
     webPreferences: {
       preload: join(__dirname, '../preload/index.mjs'),
       sandbox: false,
