@@ -14,9 +14,12 @@ export function createWindow() {
   mainWindow = new BrowserWindow({
     width: width ?? 900,
     height: height ?? 670,
+    minWidth: 500,
+    minHeight: 500,
     show: false,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
+    backgroundColor: '#fff',
     webPreferences: {
       preload: join(__dirname, '../preload/index.mjs'),
       sandbox: false,

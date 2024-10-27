@@ -112,11 +112,20 @@ importers:
         specifier: ^2.0.22
         version: 2.1.6(typescript@5.6.3)
 
+  packages/share:
+    dependencies:
+      std-env:
+        specifier: ^3.7.0
+        version: 3.7.0
+
   server:
     dependencies:
       peer:
         specifier: ^1.0.2
         version: 1.0.2
+      std-env:
+        specifier: ^3.7.0
+        version: 3.7.0
     devDependencies:
       esno:
         specifier: ^4.8.0
@@ -2673,6 +2682,9 @@ packages:
   statuses@2.0.1:
     resolution: {integrity: sha512-RwNA9Z/7PrK06rYLIzFMlaF+l73iwpzsqRIFgbMLbTcLD6cOao82TaWefPXQvB2fOC4AjuYSEndS7N/mTCbkdQ==}
     engines: {node: '>= 0.8'}
+
+  std-env@3.7.0:
+    resolution: {integrity: sha512-JPbdCEQLj1w5GilpiHAx3qJvFndqybBysA3qUOnznweH4QbNYUsW/ea8QzSrnh0vNsezMMw5bcVool8lM0gwzg==}
 
   steno@4.0.2:
     resolution: {integrity: sha512-yhPIQXjrlt1xv7dyPQg2P17URmXbuM5pdGkpiMB3RenprfiBlvK415Lctfe0eshk90oA7/tNq7WEiMK8RSP39A==}
@@ -5882,6 +5894,8 @@ snapshots:
   stat-mode@1.0.0: {}
 
   statuses@2.0.1: {}
+
+  std-env@3.7.0: {}
 
   steno@4.0.2: {}
 

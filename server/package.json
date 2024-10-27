@@ -11,7 +11,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "peer": "^1.0.2"
+    "peer": "^1.0.2",
+    "std-env": "^3.7.0"
   },
   "devDependencies": {
     "esno": "^4.8.0"
