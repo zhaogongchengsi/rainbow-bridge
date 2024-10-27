@@ -3,5 +3,5 @@ console.log('home')
 </script>
 
 <template>
-  <div>home</div>
+  <div class="w-full h-screen">home</div>
 </template>

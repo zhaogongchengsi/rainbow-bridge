@@ -1,0 +1,6 @@
+html,
+body,
+#app {
+  width: var(--rainbow-width);
+  height: var(--rainbow-height);
+}

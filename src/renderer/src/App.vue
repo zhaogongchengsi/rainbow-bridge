@@ -2,7 +2,7 @@
 </script>
 
 <template>
-  <div>
+  <div class="w-full h-screen">
     <RouterView />
   </div>
 </template>
