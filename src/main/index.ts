@@ -3,10 +3,14 @@ import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { createWindow } from './window'
 import { initStore } from './libs/store'
 import { logger } from './libs/logger'
+import { registerHandlers } from './libs/register'
 
 if (!app.requestSingleInstanceLock()) {
   app.quit()
 }
+
+const handles = import.meta.glob('./handles/*.ts')
+const events = import.meta.glob('./events/*.ts')
 
 app.whenReady().then(async () => {
   logger.silly('App is ready.')
@@ -14,6 +18,8 @@ app.whenReady().then(async () => {
   electronApp.setAppUserModelId('com.electron')
 
   await initStore()
+  await registerHandlers(handles)
+  await registerHandlers(events)
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)

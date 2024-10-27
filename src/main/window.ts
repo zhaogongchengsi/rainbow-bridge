@@ -20,7 +20,6 @@ export function createWindow() {
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     backgroundColor: theme === 'dark' ? '#000' : '#fff',
-    darkTheme: theme === 'dark',
     webPreferences: {
       preload: join(__dirname, '../preload/index.mjs'),
       sandbox: false,
