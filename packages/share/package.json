@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@primevue/themes": "^4.1.1",
+    "dexie": "^4.0.9",
     "std-env": "^3.7.0"
   },
   "devDependencies": {

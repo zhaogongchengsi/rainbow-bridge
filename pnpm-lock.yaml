@@ -117,6 +117,9 @@ importers:
       '@primevue/themes':
         specifier: ^4.1.1
         version: 4.1.1
+      dexie:
+        specifier: ^4.0.9
+        version: 4.0.9
       std-env:
         specifier: ^3.7.0
         version: 3.7.0
@@ -130,6 +133,9 @@ importers:
       '@primevue/themes':
         specifier: ^4.1.1
         version: 4.1.1
+      dexie:
+        specifier: ^4.0.9
+        version: 4.0.9
       peer:
         specifier: ^1.0.2
         version: 1.0.2
@@ -1636,6 +1642,9 @@ packages:
 
   detect-node@2.1.0:
     resolution: {integrity: sha512-T0NIuQpnTvFDATNuHN5roPwSBG83rFsuO+MXXH9/3N1eFbn4wcPjttvjMLEPWJ0RGUYgQE7cGgS3tNxbqCGM7g==}
+
+  dexie@4.0.9:
+    resolution: {integrity: sha512-VQG1huEVSAdDZssb9Bb9mFy+d3jAE0PT4d1nIRYlT46ip1fzbs1tXi0SlUayRDgV3tTbJG8ZRqAo2um49gtynA==}
 
   dir-compare@3.3.0:
     resolution: {integrity: sha512-J7/et3WlGUCxjdnD3HAAzQ6nsnc0WL6DD7WcwJb7c39iH1+AWfg+9OqzJNaI6PkBwBvm1mhZNL9iY/nRiZXlPg==}
@@ -4984,6 +4993,8 @@ snapshots:
 
   detect-node@2.1.0:
     optional: true
+
+  dexie@4.0.9: {}
 
   dir-compare@3.3.0:
     dependencies:
