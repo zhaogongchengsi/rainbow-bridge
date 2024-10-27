@@ -16,6 +16,7 @@
     "std-env": "^3.7.0"
   },
   "devDependencies": {
-    "esno": "^4.8.0"
+    "esno": "^4.8.0",
+    "vite-plugin-vue-devtools": "^7.5.4"
   }
 }

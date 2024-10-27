@@ -6,6 +6,7 @@ import Components from 'unplugin-vue-components/vite'
 import AutoImport from 'unplugin-auto-import/vite'
 import { VueRouterAutoImports } from 'unplugin-vue-router'
 import UnoCSS from 'unocss/vite'
+import vueDevTools from 'vite-plugin-vue-devtools'
 
 export default defineConfig({
   main: {
@@ -26,6 +27,10 @@ export default defineConfig({
         routesFolder: [
           {
             src: 'src/renderer/src/pages'
+          },
+          {
+            src: 'src/renderer/src/welcome',
+            path: 'welcome/'
           }
         ],
         dts: 'src/renderer/typed-router.d.ts'
@@ -37,7 +42,8 @@ export default defineConfig({
         imports: ['vue', '@vueuse/core', VueRouterAutoImports, 'pinia'],
         dirs: ['src/renderer/src/composables/**', 'src/renderer/src/utils/**']
       }),
-      UnoCSS()
+      UnoCSS(),
+      vueDevTools()
     ]
   }
 })

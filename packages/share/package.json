@@ -13,5 +13,8 @@
   "dependencies": {
     "@primevue/themes": "^4.1.1",
     "std-env": "^3.7.0"
+  },
+  "devDependencies": {
+    "vite-plugin-vue-devtools": "^7.5.4"
   }
 }
