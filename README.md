@@ -1,6 +1,6 @@
-# rainbow-bridge
+# Rainbow Bridge
 
-An Electron application with Vue and TypeScript
+end-to-end file synchronization
 
 ## Recommended IDE Setup
 

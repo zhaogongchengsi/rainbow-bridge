@@ -1,11 +1,11 @@
 {
   "name": "rainbow-bridge",
   "version": "0.0.0",
-  "description": "An Electron application with Vue and TypeScript",
+  "description": "end-to-end file synchronization",
   "main": "./out/main/index.js",
   "type": "module",
   "author": "zhaozunhong",
-  "homepage": "https://github.com/zhaogongchengsi",
+  "homepage": "https://github.com/zhaogongchengsi/rainbow-bridge",
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts,.vue --fix",
