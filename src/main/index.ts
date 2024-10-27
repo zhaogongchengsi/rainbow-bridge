@@ -3,7 +3,7 @@ import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { createWindow } from './window'
 import { initStore } from './libs/store'
 import { logger } from './libs/logger'
-import { registerHandlers } from './libs/register'
+import { registerHandlers, registerEvents } from './libs/register'
 
 if (!app.requestSingleInstanceLock()) {
   app.quit()
@@ -19,7 +19,7 @@ app.whenReady().then(async () => {
 
   await initStore()
   await registerHandlers(handles)
-  await registerHandlers(events)
+  await registerEvents(events)
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
