@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { toggleDark } from '@renderer/composables/dark';
+import { toggleDark } from '@renderer/composables/dark'
 import Button from 'primevue/button'
 import Menu from 'primevue/menu'
 
@@ -10,12 +10,21 @@ const toggle = (event: MouseEvent) => {
 
 const icon = ref('pi pi-sun')
 
+onMounted(async () => {
+  const theme = await window.system.getTheme()
+  if (theme === 'dark') {
+    icon.value = 'pi pi-moon'
+    toggleDark(true)
+  } else if (theme === 'system') {
+    icon.value = 'pi pi-cog'
+  }
+})
+
 const items = [
   {
     label: 'Light',
     icon: 'pi pi-sun',
     command: () => {
-      console.log('Light')
       icon.value = 'pi pi-sun'
       toggleDark(false)
       window.system.setTheme('light')
@@ -25,7 +34,6 @@ const items = [
     label: 'Dark',
     icon: 'pi pi-moon',
     command: () => {
-      console.log('Dark')
       icon.value = 'pi pi-moon'
       toggleDark(true)
       window.system.setTheme('dark')
@@ -35,7 +43,6 @@ const items = [
     label: 'System',
     icon: 'pi pi-cog',
     command: () => {
-      console.log('System')
       icon.value = 'pi pi-cog'
       window.system.setTheme('system')
     }

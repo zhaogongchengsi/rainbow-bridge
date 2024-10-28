@@ -39,7 +39,7 @@ const backgroundStyle = computed(() => {
 <template>
   <div
     :class="[
-      'group relative flex w-full h-full overflow-hidden rounded-xl bg-neutral-100 dark:bg-neutral-900 border text-black dark:text-white',
+      'group relative flex w-full h-full overflow-hidden rounded-xl bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-black dark:text-white',
       $props.class
     ]"
     @mousemove="handleMouseMove"

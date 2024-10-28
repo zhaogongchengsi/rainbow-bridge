@@ -14,11 +14,13 @@
     "@primevue/themes": "^4.1.1",
     "@vueuse/motion": "^2.2.6",
     "dexie": "^4.0.9",
+    "lodash": "^4.17.21",
     "peer": "^1.0.2",
     "primeicons": "^7.0.0",
     "std-env": "^3.7.0"
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.12",
     "esno": "^4.8.0",
     "vite-plugin-vue-devtools": "^7.5.4"
   }

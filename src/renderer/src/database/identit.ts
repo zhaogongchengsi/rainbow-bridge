@@ -1,4 +1,5 @@
-import { RainbowBridgeDatabase, Identity } from './base'
+import { RainbowBridgeDatabase } from './base'
+import { Identity } from './types/identit'
 
 class IdentityDatabase extends RainbowBridgeDatabase {
   constructor() {
