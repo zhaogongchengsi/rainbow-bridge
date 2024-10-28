@@ -2,4 +2,9 @@
 :root {
   --rainbow-height: 100vh;
   --rainbow-width: 100vw;
+  --rainbow-background: #f0f0f0;
+}
+
+.dark {
+  --rainbow-background: rgb(23 23 23 / 1);
 }

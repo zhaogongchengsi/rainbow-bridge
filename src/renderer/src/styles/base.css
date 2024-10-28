@@ -3,4 +3,5 @@ body,
 #app {
   width: var(--rainbow-width);
   height: var(--rainbow-height);
+  background-color: var(--rainbow-background);
 }

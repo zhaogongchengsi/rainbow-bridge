@@ -10,6 +10,7 @@ import './styles/config.css'
 import 'virtual:uno.css'
 import '@unocss/reset/tailwind.css'
 import './styles/base.css'
+import 'primeicons/primeicons.css'
 
 const app = createApp(App)
 
@@ -24,10 +25,7 @@ app.use(router)
 app.use(pinia)
 app.use(PrimeVue, {
   theme: {
-    preset: Aura,
-    options: {
-      darkModeSelector: 'system'
-    }
+    preset: Aura
   }
 })
 

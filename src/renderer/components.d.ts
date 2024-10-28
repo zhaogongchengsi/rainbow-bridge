@@ -7,6 +7,11 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AnimatedList: typeof import('./src/components/ui/animated-list.vue')['default']
+    CardSpotlight: typeof import('./src/components/ui/card-spotlight.vue')['default']
+    DarkSelect: typeof import('./src/components/dark-select.vue')['default']
+    'Identity-': typeof import('./src/components/ui/identity-.vue')['default']
+    IdentityPanel: typeof import('./src/components/ui/identity-panel.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

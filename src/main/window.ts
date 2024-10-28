@@ -23,7 +23,8 @@ export function createWindow() {
     webPreferences: {
       preload: join(__dirname, '../preload/index.mjs'),
       sandbox: false,
-      partition: 'persist:main'
+      partition: 'persist:main',
+      zoomFactor: 1
     }
   })
 
