@@ -1,5 +1,6 @@
 import Dexie, { type EntityTable } from 'dexie'
 import { Identity } from './types/identit'
+
 export class RainbowBridgeDatabase extends Dexie {
   identitys!: EntityTable<Identity, 'id'>
   constructor() {

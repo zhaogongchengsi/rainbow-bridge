@@ -1,4 +1,4 @@
-import { identityDatabase } from '@renderer/database/identit'
+import { identityDatabase, IdentityOption } from '@renderer/database/identit'
 import { Identity } from '@renderer/database/types/identit'
 import once from 'lodash/once'
 
@@ -14,8 +14,17 @@ export const useIdentity = defineStore('identity', () => {
     })
   )
 
+  function createIdentity(identity: IdentityOption) {
+    if (identitys.value.length >= max_identity_count) {
+      throw new Error('The number of identities exceeds the maximum limit')
+    }
+    return identityDatabase.addIdentity(identity)
+  }
+
   return {
     currentIdentity,
-    identitys
+    identitys,
+
+    createIdentity
   }
 })

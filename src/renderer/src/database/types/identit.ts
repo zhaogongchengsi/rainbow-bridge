@@ -1,5 +1,6 @@
 export interface Identity {
   id: number
+  uuid: string
   name: string
   email?: string
   avatar: string
