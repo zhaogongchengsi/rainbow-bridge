@@ -4,6 +4,7 @@ import { is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { get, set } from './libs/store'
 import { logger } from './libs/logger'
+import { PROTOCOL_NAME } from './libs/constant'
 
 let mainWindow: BrowserWindow | null = null
 
@@ -24,7 +25,8 @@ export function createWindow() {
       preload: join(__dirname, '../preload/index.mjs'),
       sandbox: false,
       partition: 'persist:main',
-      zoomFactor: 1
+      zoomFactor: 1,
+      webSecurity: false
     }
   })
 
@@ -35,6 +37,13 @@ export function createWindow() {
   mainWindow.on('resize', () => {
     const [width, height] = mainWindow?.getSize() ?? [900, 670]
     set('window', { width, height })
+  })
+
+  mainWindow.webContents.session.protocol.handle(PROTOCOL_NAME, async (request: Request) => {
+    console.log(request)
+    return new Response('<h1>hello, world</h1>', {
+      headers: { 'content-type': 'text/html' }
+    })
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {

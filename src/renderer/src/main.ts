@@ -34,3 +34,10 @@ app.use(PrimeVue, {
 app.mount('#app')
 
 logger.info('Renderer process is started.')
+
+window.fetch('rainbow://test/asdasd/asdasd')
+  .then(async (res) => {
+    console.log(res)
+    return await res.text()
+  })
+  .then(console.log)

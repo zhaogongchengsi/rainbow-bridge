@@ -1,9 +1,10 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, protocol } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { createWindow } from './window'
-import { initStore } from './libs/store'
+import { initFileStore, initStore } from './libs/store'
 import { logger } from './libs/logger'
 import { registerHandlers, registerEvents } from './libs/register'
+import { PROTOCOL_NAME } from './libs/constant'
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 
@@ -14,6 +15,19 @@ if (!app.requestSingleInstanceLock()) {
 const handles = import.meta.glob('./handles/*.ts')
 const events = import.meta.glob('./events/*.ts')
 
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: PROTOCOL_NAME,
+    privileges: {
+      standard: true,
+      secure: true,
+      supportFetchAPI: true,
+      bypassCSP: true,
+      stream: true
+    }
+  }
+])
+
 app.whenReady().then(async () => {
   logger.silly('App is ready.')
 
@@ -22,6 +36,7 @@ app.whenReady().then(async () => {
   await initStore()
   await registerHandlers(handles)
   await registerEvents(events)
+  await initFileStore()
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)

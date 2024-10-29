@@ -1,9 +1,10 @@
 import { app } from 'electron'
 import { Low } from 'lowdb/lib'
 import { JSONFilePreset } from 'lowdb/node'
-import { join } from 'path'
 import { logger } from './logger'
-
+import { FILE_STORE_NAME } from './constant'
+import { ensureDir, outputFile, WriteFileOptions, copy } from 'fs-extra'
+import { parse, join } from 'pathe'
 export interface Store {
   window: {
     width: number
@@ -21,6 +22,7 @@ const defaultData: Store = {
 }
 
 let db: Low<Store> | null = null
+let fileStorePath: string | null = null
 
 export async function initStore() {
   logger.info('Store is initializing.')
@@ -48,4 +50,29 @@ export function get<K extends keyof Store>(key: K): Store[K] {
 export function set<K extends keyof Store>(key: K, value: Store[K]) {
   getStore().data[key] = value
   return saveStore()
+}
+
+export async function initFileStore() {
+  fileStorePath = join(app.getPath('appData'), FILE_STORE_NAME)
+  return await ensureDir(fileStorePath)
+}
+
+export function getFileStorePath() {
+  if (!fileStorePath) {
+    throw new Error('File store is not initialized.')
+  }
+  return fileStorePath
+}
+
+export async function writeFileToStore(
+  data: string | Buffer,
+  options?: WriteFileOptions | BufferEncoding | string
+) {
+  return await outputFile(getFileStorePath(), data, options)
+}
+
+export async function copyFileToStore(path: string) {
+  const { name } = parse(path)
+  await copy(path, getFileStorePath())
+  return join(getFileStorePath(), name)
 }

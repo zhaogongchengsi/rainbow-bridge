@@ -126,9 +126,15 @@ importers:
       dexie:
         specifier: ^4.0.9
         version: 4.0.9
+      fs-extra:
+        specifier: ^11.2.0
+        version: 11.2.0
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
+      pathe:
+        specifier: ^1.1.2
+        version: 1.1.2
       primeicons:
         specifier: ^7.0.0
         version: 7.0.0
@@ -160,9 +166,15 @@ importers:
       dexie:
         specifier: ^4.0.9
         version: 4.0.9
+      fs-extra:
+        specifier: ^11.2.0
+        version: 11.2.0
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
+      pathe:
+        specifier: ^1.1.2
+        version: 1.1.2
       peer:
         specifier: ^1.0.2
         version: 1.0.2
