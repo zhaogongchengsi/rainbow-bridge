@@ -13,6 +13,7 @@
   "dependencies": {
     "@primevue/themes": "^4.1.1",
     "@vueuse/motion": "^2.2.6",
+    "dayjs": "^1.11.13",
     "dexie": "^4.0.9",
     "lodash": "^4.17.21",
     "primeicons": "^7.0.0",

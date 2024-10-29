@@ -5,6 +5,8 @@ import { initStore } from './libs/store'
 import { logger } from './libs/logger'
 import { registerHandlers, registerEvents } from './libs/register'
 
+process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
+
 if (!app.requestSingleInstanceLock()) {
   app.quit()
 }

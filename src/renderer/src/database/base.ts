@@ -6,7 +6,7 @@ export class RainbowBridgeDatabase extends Dexie {
   constructor() {
     super('rainbow-bridge-db')
     this.version(1).stores({
-      identitys: '++id, name, email, avatar, comment, lastLoginTime'
+      identitys: '++id, uuid, name, email, avatar, comment, lastLoginTime'
     })
   }
 }
