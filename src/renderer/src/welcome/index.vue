@@ -5,10 +5,14 @@ import { isDark } from '@renderer/composables/dark'
 import { useIdentity } from '@renderer/store/identity'
 import { dateFromNow } from '@renderer/utils/date'
 import Button from 'primevue/button'
+import Dialog from 'primevue/dialog'
+import InputText from 'primevue/inputText'
 
 const identity = useIdentity()
 
 console.log(identity.identitys)
+
+const visible = ref(false)
 </script>
 
 <template>
@@ -49,8 +53,28 @@ console.log(identity.identitys)
       </CardSpotlight>
     </div>
     <div class="w-100 flex flex-col gap-4 items-center">
-      <Button class="w-full" label="Create a new identity" severity="contrast" outlined />
+      <Button
+        class="w-full"
+        label="Create a new identity"
+        severity="contrast"
+        outlined
+        @click="visible = true"
+      />
       <Theme />
     </div>
+    <Dialog v-model:visible="visible" modal header="Edit Profile" class="w-150">
+      <div class="flex flex-col gap-4 mb-4">
+        <label for="username" class="font-semibold w-24">Username</label>
+        <InputText id="username" class="flex-auto" autocomplete="off" />
+      </div>
+      <div class="flex flex-col gap-4 mb-8">
+        <label for="email" class="font-semibold w-24">Email</label>
+        <InputText id="email" class="flex-auto" autocomplete="off" />
+      </div>
+      <div class="flex justify-end gap-2">
+        <Button type="button" label="Cancel" severity="secondary" @click="visible = false"></Button>
+        <Button type="button" label="Save" @click="visible = false"></Button>
+      </div>
+    </Dialog>
   </div>
 </template>
