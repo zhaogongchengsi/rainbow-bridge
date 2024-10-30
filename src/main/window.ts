@@ -4,11 +4,11 @@ import { is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { get, set } from './libs/store'
 import { logger } from './libs/logger'
-import { PROTOCOL_NAME } from './libs/constant'
+import { AppRouter } from './libs/router'
 
 let mainWindow: BrowserWindow | null = null
 
-export function createWindow() {
+export function createWindow(router?: AppRouter) {
   logger.info('Main window is creating.')
   const { width, height } = get('window')
   const theme = get('theme')
@@ -38,12 +38,9 @@ export function createWindow() {
     set('window', { width, height })
   })
 
-  mainWindow.webContents.session.protocol.handle(PROTOCOL_NAME, async (request: Request) => {
-    console.log(request)
-    return new Response('<h1>hello, world</h1>', {
-      headers: { 'content-type': 'text/html' }
-    })
-  })
+  if (router) {
+    router.listen(mainWindow.webContents.session)
+  }
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)

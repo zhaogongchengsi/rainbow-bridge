@@ -1,9 +1,10 @@
-import { app, BrowserWindow, protocol } from 'electron'
+import { app, BrowserWindow } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { createWindow } from './window'
 import { initFileStore, initStore } from './libs/store'
 import { logger } from './libs/logger'
 import { registerHandlers, registerEvents } from './libs/register'
+import { createAppRouter } from './router'
 import { PROTOCOL_NAME } from './libs/constant'
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
@@ -15,18 +16,7 @@ if (!app.requestSingleInstanceLock()) {
 const handles = import.meta.glob('./handles/*.ts')
 const events = import.meta.glob('./events/*.ts')
 
-protocol.registerSchemesAsPrivileged([
-  {
-    scheme: PROTOCOL_NAME,
-    privileges: {
-      standard: true,
-      secure: true,
-      supportFetchAPI: true,
-      bypassCSP: true,
-      stream: true
-    }
-  }
-])
+const router = createAppRouter(PROTOCOL_NAME)
 
 app.whenReady().then(async () => {
   logger.silly('App is ready.')
@@ -42,7 +32,7 @@ app.whenReady().then(async () => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  createWindow()
+  createWindow(router)
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the

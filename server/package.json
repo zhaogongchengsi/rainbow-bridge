@@ -13,6 +13,7 @@
   "dependencies": {
     "@primevue/themes": "^4.1.1",
     "@vueuse/motion": "^2.2.6",
+    "@zunh/onion": "0.1.1-beta.1",
     "dayjs": "^1.11.13",
     "dexie": "^4.0.9",
     "fs-extra": "^11.2.0",
