@@ -25,8 +25,7 @@ export function createWindow() {
       preload: join(__dirname, '../preload/index.mjs'),
       sandbox: false,
       partition: 'persist:main',
-      zoomFactor: 1,
-      webSecurity: false
+      zoomFactor: 1
     }
   })
 
