@@ -1,7 +1,8 @@
 import { createRouter, RadixRouter } from 'radix3'
 import { Session } from 'electron'
 
-export type AppRouterHandler = (req: AppRouterContext) => Response | Promise<Response>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type AppRouterHandler = (req: AppRouterContext) => any | Promise<any>
 export type AppRouterMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'OPTIONS'
 
 export type AppRouterConfig = {
@@ -63,7 +64,11 @@ export class AppRouter {
       }
       const ctx = new AppRouterContext(request, handler ? handler.params : undefined)
       try {
-        return await Promise.resolve(handler.handle(ctx))
+        const response = await Promise.resolve(handler.handle(ctx))
+        return new Response(response, {
+          status: 200,
+          statusText: 'OK'
+        })
       } catch {
         return new Response('Internal Server Error', { status: 500 })
       }
@@ -71,7 +76,7 @@ export class AppRouter {
   }
 }
 
-class AppRouterContext {
+export class AppRouterContext {
   req: Request
   params?: Record<string, unknown>
   constructor(req: Request, params?: Record<string, unknown> | undefined) {

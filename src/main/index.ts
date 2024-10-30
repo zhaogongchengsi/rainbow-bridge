@@ -4,8 +4,9 @@ import { createWindow } from './window'
 import { initFileStore, initStore } from './libs/store'
 import { logger } from './libs/logger'
 import { registerHandlers, registerEvents } from './libs/register'
-import { createAppRouter } from './router'
+import { createAppRouter } from './router/init'
 import { PROTOCOL_NAME } from './libs/constant'
+import { registerRouter } from './router'
 
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 
@@ -26,6 +27,7 @@ app.whenReady().then(async () => {
   await initStore()
   await registerHandlers(handles)
   await registerEvents(events)
+  registerRouter(router)
   await initFileStore()
 
   app.on('browser-window-created', (_, window) => {

@@ -3,15 +3,17 @@ import Avatar from 'primevue/avatar'
 import Theme from '@renderer/views/theme.vue'
 import { isDark } from '@renderer/composables/dark'
 import { useIdentity } from '@renderer/store/identity'
+import { useAppStore } from '@renderer/store/store'
 import { dateFromNow } from '@renderer/utils/date'
 import Button from 'primevue/button'
 import Dialog from 'primevue/dialog'
 import InputText from 'primevue/inputText'
 
+const username = ref('')
+const email = ref('')
+
 const identity = useIdentity()
-
-console.log(identity.identitys)
-
+const appStore = useAppStore()
 const visible = ref(false)
 </script>
 
@@ -63,13 +65,29 @@ const visible = ref(false)
       <Theme />
     </div>
     <Dialog v-model:visible="visible" modal header="Edit Profile" class="w-150">
+      <div class="flex justify-center">
+        <button
+          v-if="!appStore.avatarPreview"
+          class="w-20 h-20 rounded-full border"
+          @click="appStore.chooseAvatar()"
+        >
+          <i class="pi pi-upload" style="color: slateblue"></i>
+        </button>
+        <Avatar
+          v-else
+          class="w-20! h-20!"
+          :image="appStore.avatarPreview"
+          size="xlarge"
+          shape="circle"
+        />
+      </div>
       <div class="flex flex-col gap-4 mb-4">
         <label for="username" class="font-semibold w-24">Username</label>
-        <InputText id="username" class="flex-auto" autocomplete="off" />
+        <InputText id="username" v-model="username" class="flex-auto" autocomplete="off" />
       </div>
       <div class="flex flex-col gap-4 mb-8">
         <label for="email" class="font-semibold w-24">Email</label>
-        <InputText id="email" class="flex-auto" autocomplete="off" />
+        <InputText id="email" v-model="email" class="flex-auto" autocomplete="off" />
       </div>
       <div class="flex justify-end gap-2">
         <Button type="button" label="Cancel" severity="secondary" @click="visible = false"></Button>

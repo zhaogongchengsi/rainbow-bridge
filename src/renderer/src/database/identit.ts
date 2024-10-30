@@ -2,7 +2,7 @@ import { RainbowBridgeDatabase } from './base'
 import { Identity } from './types/identit'
 import { randomUUID } from 'uncrypto'
 
-export type IdentityOption = Omit<Identity, 'id' | 'uuid'>
+export type IdentityOption = Omit<Identity, 'id' | 'uuid' | 'create_by'>
 
 class IdentityDatabase extends RainbowBridgeDatabase {
   constructor() {
@@ -13,12 +13,14 @@ class IdentityDatabase extends RainbowBridgeDatabase {
     const uuid = randomUUID()
     return this.identitys.add({
       ...identity,
-      uuid
+      uuid,
+      create_by: Date.now()
     })
   }
 
   async getIdentitys() {
-    return await this.identitys.toArray()
+    // Sort by create time
+    return (await this.identitys.toArray()).sort((a, b) => b.create_by - a.create_by)
   }
 }
 
