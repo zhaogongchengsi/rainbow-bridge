@@ -1,12 +1,12 @@
-import { routes } from 'vue-router/auto-routes'
-import { createRouter, createWebHashHistory } from 'vue-router'
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
-import App from './App.vue'
-import PrimeVue from 'primevue/config'
 import Aura from '@primevue/themes/aura'
-import ToastService from 'primevue/toastservice'
 import { MotionPlugin } from '@vueuse/motion'
+import { createPinia } from 'pinia'
+import PrimeVue from 'primevue/config'
+import ToastService from 'primevue/toastservice'
+import { createApp } from 'vue'
+import { createRouter, createWebHashHistory } from 'vue-router'
+import { routes } from 'vue-router/auto-routes'
+import App from './App.vue'
 import { logger } from './utils/logger'
 import './styles/config.css'
 import 'virtual:uno.css'
@@ -18,7 +18,7 @@ const app = createApp(App)
 
 const router = createRouter({
   history: createWebHashHistory(),
-  routes
+  routes,
 })
 
 const pinia = createPinia()
@@ -28,8 +28,8 @@ app.use(pinia)
 app.use(MotionPlugin)
 app.use(PrimeVue, {
   theme: {
-    preset: Aura
-  }
+    preset: Aura,
+  },
 })
 app.use(ToastService)
 

@@ -11,11 +11,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@antfu/eslint-config": "^3.8.0",
     "@primevue/themes": "^4.1.1",
     "@vueuse/motion": "^2.2.6",
     "@zunh/onion": "0.1.1-beta.1",
     "dayjs": "^1.11.13",
     "dexie": "^4.0.9",
+    "eslint-plugin-format": "^0.1.2",
     "fs-extra": "^11.2.0",
     "ky": "^1.7.2",
     "lodash": "^4.17.21",
@@ -28,6 +30,7 @@
   },
   "devDependencies": {
     "@types/lodash": "^4.17.12",
+    "@unocss/eslint-config": "^0.63.6",
     "esno": "^4.8.0",
     "vite-plugin-vue-devtools": "^7.5.4"
   }

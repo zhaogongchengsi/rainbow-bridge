@@ -1,10 +1,11 @@
+import type { Low } from 'lowdb/lib'
 import { app } from 'electron'
-import { Low } from 'lowdb/lib'
-import { JSONFilePreset } from 'lowdb/node'
-import { logger } from './logger'
-import { FILE_STORE_NAME } from './constant'
 import { ensureDir } from 'fs-extra'
+import { JSONFilePreset } from 'lowdb/node'
 import { join } from 'pathe'
+import { FILE_STORE_NAME } from './constant'
+import { logger } from './logger'
+
 export interface Store {
   window: {
     width: number
@@ -16,9 +17,9 @@ export interface Store {
 const defaultData: Store = {
   window: {
     width: 900,
-    height: 670
+    height: 670,
   },
-  theme: 'system'
+  theme: 'system',
 }
 
 let db: Low<Store> | null = null
@@ -28,7 +29,7 @@ export async function initStore() {
   logger.info('Store is initializing.')
   db = await JSONFilePreset(
     join(app.getPath('userData'), 'rainbow-bridge-config.json'),
-    defaultData
+    defaultData,
   )
 }
 

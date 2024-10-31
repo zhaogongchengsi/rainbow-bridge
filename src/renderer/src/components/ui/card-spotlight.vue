@@ -4,20 +4,20 @@ const props = defineProps({
   gradientColor: { type: String, default: '#262626' },
   gradientOpacity: { type: Number, default: 0.8 },
   class: { type: String, default: '' },
-  slotClass: String
+  slotClass: String,
 })
 
 const mouseX = ref(-props.gradientSize * 10)
 const mouseY = ref(-props.gradientSize * 10)
 
-const handleMouseMove = (e: MouseEvent) => {
+function handleMouseMove(e: MouseEvent) {
   const target = e.currentTarget as HTMLElement
   const rect = target.getBoundingClientRect()
   mouseX.value = e.clientX - rect.left
   mouseY.value = e.clientY - rect.top
 }
 
-const handleMouseLeave = () => {
+function handleMouseLeave() {
   mouseX.value = -props.gradientSize * 10
   mouseY.value = -props.gradientSize * 10
 }
@@ -38,22 +38,21 @@ const backgroundStyle = computed(() => {
 
 <template>
   <div
-    :class="[
-      'group relative flex w-full h-full overflow-hidden rounded-xl bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-black dark:text-white',
-      $props.class
+    class="group relative h-full w-full flex overflow-hidden border border-neutral-200 rounded-xl bg-neutral-100 text-black dark:border-neutral-700 dark:bg-neutral-900 dark:text-white" :class="[
+      $props.class,
     ]"
     @mousemove="handleMouseMove"
     @mouseleave="handleMouseLeave"
   >
-    <div :class="['relative z-10', props.slotClass]">
-      <slot></slot>
+    <div class="relative z-10" :class="[props.slotClass]">
+      <slot />
     </div>
     <div
       class="pointer-events-none absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
       :style="{
         background: backgroundStyle,
-        opacity: gradientOpacity
+        opacity: gradientOpacity,
       }"
-    ></div>
+    />
   </div>
 </template>

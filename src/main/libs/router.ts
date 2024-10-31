@@ -1,11 +1,11 @@
-import { createRouter, RadixRouter } from 'radix3'
-import { BrowserWindow } from 'electron'
+import type { BrowserWindow } from 'electron'
+import type { RadixRouter } from 'radix3'
+import { createRouter } from 'radix3'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AppRouterHandler = (req: AppRouterContext) => any | Promise<any>
 export type AppRouterMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'OPTIONS'
 
-export type AppRouterConfig = {
+export interface AppRouterConfig {
   handle: AppRouterHandler
   method?: AppRouterMethod
 }
@@ -67,9 +67,10 @@ export class AppRouter {
         const response = await Promise.resolve(handler.handle(ctx))
         return new Response(JSON.stringify(response), {
           status: 200,
-          statusText: 'OK'
+          statusText: 'OK',
         })
-      } catch {
+      }
+      catch {
         return new Response('Internal Server Error', { status: 500 })
       }
     })

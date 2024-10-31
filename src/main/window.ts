@@ -1,10 +1,11 @@
-import { shell, BrowserWindow } from 'electron'
-import { join } from 'path'
+import type { AppRouter } from './libs/router'
+import { join } from 'node:path'
+import process from 'node:process'
 import { is } from '@electron-toolkit/utils'
+import { BrowserWindow, shell } from 'electron'
 import icon from '../../resources/icon.png?asset'
-import { get, set } from './libs/store'
 import { logger } from './libs/logger'
-import { AppRouter } from './libs/router'
+import { get, set } from './libs/store'
 
 let mainWindow: BrowserWindow | null = null
 
@@ -26,8 +27,8 @@ export function createWindow(router?: AppRouter) {
       sandbox: false,
       partition: 'persist:main',
       zoomFactor: 1,
-      webSecurity: false
-    }
+      webSecurity: false,
+    },
   })
 
   mainWindow.on('ready-to-show', () => {
@@ -50,9 +51,10 @@ export function createWindow(router?: AppRouter) {
 
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
-  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'] + '#/welcome')
-  } else {
+  if (is.dev && process.env.ELECTRON_RENDERER_URL) {
+    mainWindow.loadURL(`${process.env.ELECTRON_RENDERER_URL}#/welcome`)
+  }
+  else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html/#/welcome'))
   }
 

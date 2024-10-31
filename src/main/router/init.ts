@@ -5,15 +5,15 @@ export function createAppRouter(scheme: string) {
   const router = new AppRouter(scheme, 'app')
   protocol.registerSchemesAsPrivileged([
     {
-      scheme: scheme,
+      scheme,
       privileges: {
         standard: true,
         secure: true,
         supportFetchAPI: true,
         bypassCSP: true,
-        stream: true
-      }
-    }
+        stream: true,
+      },
+    },
   ])
   return router
 }

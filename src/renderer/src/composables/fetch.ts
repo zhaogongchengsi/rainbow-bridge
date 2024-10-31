@@ -4,11 +4,11 @@ import ky from 'ky'
 const baseUrl = 'rainbow://app/'
 
 export const useAppFetch = createFetch({
-  baseUrl
+  baseUrl,
 })
 
 const original = ky.create({
-  prefixUrl: baseUrl
+  prefixUrl: baseUrl,
 })
 
 export const useKy = () => original

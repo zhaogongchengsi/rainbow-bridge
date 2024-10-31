@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ElectronHandle<T> = (...args: any[]) => T | Promise<T>
 
 export interface HandleConfig {
@@ -23,63 +22,63 @@ export interface ElectronEventConfig<T> {
 
 const defineHandleConfig: HandleConfig = {
   useCache: true,
-  useEvent: false
+  useEvent: false,
 }
 
 const defineEventConfig: EventConfig = {
   once: false,
-  useEvent: false
+  useEvent: false,
 }
 
 export function defineHandle<T>(
   handle: ElectronHandle<T>,
-  config: Omit<HandleConfig, 'once'> = {}
+  config: Omit<HandleConfig, 'once'> = {},
 ): ElectronHandleConfig<T> {
   return {
     handle,
     config: {
       ...defineHandleConfig,
-      ...config
-    }
+      ...config,
+    },
   }
 }
 
 export function defineOnceHandle<T>(
   handle: ElectronHandle<T>,
-  config: Omit<HandleConfig, 'once'> = {}
+  config: Omit<HandleConfig, 'once'> = {},
 ): ElectronHandleConfig<T> {
   return {
     handle,
     config: {
       ...defineHandleConfig,
-      ...config
-    }
+      ...config,
+    },
   }
 }
 
 export function defineEventHandle<T>(
   handle: ElectronHandle<T>,
-  config: Omit<HandleConfig, 'once'> = {}
-): ElectronEventConfig<T> {
-  return {
-    handle,
-    config: {
-      ...defineEventConfig,
-      ...config
-    }
-  }
-}
-
-export function defineOnceEventHandle<T>(
-  handle: ElectronHandle<T>,
-  config: Omit<HandleConfig, 'once'> = {}
+  config: Omit<HandleConfig, 'once'> = {},
 ): ElectronEventConfig<T> {
   return {
     handle,
     config: {
       ...defineEventConfig,
       ...config,
-      once: true
-    }
+    },
+  }
+}
+
+export function defineOnceEventHandle<T>(
+  handle: ElectronHandle<T>,
+  config: Omit<HandleConfig, 'once'> = {},
+): ElectronEventConfig<T> {
+  return {
+    handle,
+    config: {
+      ...defineEventConfig,
+      ...config,
+      once: true,
+    },
   }
 }

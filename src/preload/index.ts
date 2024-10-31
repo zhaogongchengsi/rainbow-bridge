@@ -1,17 +1,19 @@
-import { contextBridge } from 'electron'
+/* eslint-disable node/prefer-global/process */
+/* eslint-disable ts/ban-ts-comment */
 import { electronAPI } from '@electron-toolkit/preload'
-import { isMacOS, isLinux, isWindows } from 'std-env'
+import { contextBridge } from 'electron'
+import { isLinux, isMacOS, isWindows } from 'std-env'
 
 const is = {
   isMacOS,
   isLinux,
-  isWindows
+  isWindows,
 }
 
 const system = {
   setTheme: (theme: 'light' | 'dark' | 'system'): Promise<void> =>
     electronAPI.ipcRenderer.invoke('setTheme', theme),
-  getTheme: (): Promise<'light' | 'dark' | 'system'> => electronAPI.ipcRenderer.invoke('getTheme')
+  getTheme: (): Promise<'light' | 'dark' | 'system'> => electronAPI.ipcRenderer.invoke('getTheme'),
 }
 
 if (process.contextIsolated) {
@@ -19,10 +21,12 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('electron', electronAPI)
     contextBridge.exposeInMainWorld('is', is)
     contextBridge.exposeInMainWorld('system', system)
-  } catch (error) {
+  }
+  catch (error) {
     console.error(error)
   }
-} else {
+}
+else {
   // @ts-ignore (define in dts)
   window.electron = electronAPI
   // @ts-ignore (define in dts)

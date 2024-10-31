@@ -1,13 +1,12 @@
 {
   "name": "rainbow-bridge",
+  "type": "module",
   "version": "0.0.0",
   "description": "end-to-end file synchronization",
-  "main": "./out/main/index.js",
-  "type": "module",
   "author": "zhaozunhong",
   "homepage": "https://github.com/zhaogongchengsi/rainbow-bridge",
+  "main": "./out/main/index.js",
   "scripts": {
-    "format": "prettier --write .",
     "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts,.vue --fix",
     "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
     "typecheck:web": "vue-tsc --noEmit -p tsconfig.web.json --composite false",

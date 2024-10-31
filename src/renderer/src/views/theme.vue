@@ -4,7 +4,7 @@ import Button from 'primevue/button'
 import Menu from 'primevue/menu'
 
 const menu = ref<InstanceType<typeof Menu> | null>(null)
-const toggle = (event: MouseEvent) => {
+function toggle(event: MouseEvent) {
   menu.value?.toggle(event)
 }
 
@@ -15,7 +15,8 @@ onMounted(async () => {
   if (theme === 'dark') {
     icon.value = 'pi pi-moon'
     toggleDark(true)
-  } else if (theme === 'system') {
+  }
+  else if (theme === 'system') {
     icon.value = 'pi pi-cog'
   }
 })
@@ -28,7 +29,7 @@ const items = [
       icon.value = 'pi pi-sun'
       toggleDark(false)
       window.system.setTheme('light')
-    }
+    },
   },
   {
     label: 'Dark',
@@ -37,7 +38,7 @@ const items = [
       icon.value = 'pi pi-moon'
       toggleDark(true)
       window.system.setTheme('dark')
-    }
+    },
   },
   {
     label: 'System',
@@ -45,8 +46,8 @@ const items = [
     command: () => {
       icon.value = 'pi pi-cog'
       window.system.setTheme('system')
-    }
-  }
+    },
+  },
 ]
 </script>
 
