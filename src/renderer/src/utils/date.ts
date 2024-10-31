@@ -1,4 +1,5 @@
-import dayjs, { ConfigType } from 'dayjs'
+import type { ConfigType } from 'dayjs'
+import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 
 dayjs.extend(relativeTime)

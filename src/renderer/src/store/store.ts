@@ -7,13 +7,14 @@ export const useAppStore = defineStore('app-store', () => {
   const { open, onChange } = useFileDialog({
     accept: 'image/*', // Set to accept only image files
     directory: false,
-    multiple: false
+    multiple: false,
   })
 
   const ky = useKy()
 
   onChange((files: FileList | null) => {
-    if (!files || files.length === 0) return
+    if (!files || files.length === 0)
+      return
     const file = files[0]
     avatarPreview.value = URL.createObjectURL(file)
     avatarFile.value = file
@@ -31,7 +32,8 @@ export const useAppStore = defineStore('app-store', () => {
   }
 
   async function uploadAvatar() {
-    if (!avatarFile.value) return
+    if (!avatarFile.value)
+      return
     const [avatar] = await uploadStoreFiles([avatarFile.value])
     avatarPreview.value = `file://${avatar}`
     return avatar
@@ -46,6 +48,6 @@ export const useAppStore = defineStore('app-store', () => {
     chooseAvatar: open,
     uploadAvatar,
     avatarPreview,
-    clearAvatar
+    clearAvatar,
   }
 })

@@ -1,5 +1,6 @@
-import { identityDatabase, IdentityOption } from '@renderer/database/identit'
-import { Identity } from '@renderer/database/types/identit'
+import type { IdentityOption } from '@renderer/database/identit'
+import type { Identity } from '@renderer/database/types/identit'
+import { identityDatabase } from '@renderer/database/identit'
 import once from 'lodash/once'
 
 const max_identity_count = 10
@@ -31,6 +32,6 @@ export const useIdentity = defineStore('identity', () => {
 
     createIdentity,
     canCreateIdentity,
-    reset: init
+    reset: init,
   }
 })
