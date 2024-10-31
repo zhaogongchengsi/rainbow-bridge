@@ -25,7 +25,8 @@ export function createWindow(router?: AppRouter) {
       preload: join(__dirname, '../preload/index.mjs'),
       sandbox: false,
       partition: 'persist:main',
-      zoomFactor: 1
+      zoomFactor: 1,
+      webSecurity: false
     }
   })
 
@@ -39,7 +40,7 @@ export function createWindow(router?: AppRouter) {
   })
 
   if (router) {
-    router.listen(mainWindow.webContents.session)
+    router.listen(mainWindow)
   }
 
   mainWindow.webContents.setWindowOpenHandler((details) => {

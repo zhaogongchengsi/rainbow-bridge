@@ -8,11 +8,15 @@ export const useIdentity = defineStore('identity', () => {
   const currentIdentity = useStorage<Identity | null>('current-identity', null)
   const identitys = ref<Identity[]>([])
 
-  onMounted(
-    once(async () => {
-      identitys.value = await identityDatabase.getIdentitys()
-    })
-  )
+  async function init() {
+    identitys.value = await identityDatabase.getIdentitys()
+  }
+
+  onMounted(once(init))
+
+  function canCreateIdentity() {
+    return identitys.value.length < max_identity_count
+  }
 
   function createIdentity(identity: IdentityOption) {
     if (identitys.value.length >= max_identity_count) {
@@ -25,6 +29,8 @@ export const useIdentity = defineStore('identity', () => {
     currentIdentity,
     identitys,
 
-    createIdentity
+    createIdentity,
+    canCreateIdentity,
+    reset: init
   }
 })

@@ -1,5 +1,5 @@
 import { createRouter, RadixRouter } from 'radix3'
-import { Session } from 'electron'
+import { BrowserWindow } from 'electron'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type AppRouterHandler = (req: AppRouterContext) => any | Promise<any>
@@ -48,9 +48,9 @@ export class AppRouter {
     this.addRoute(path, 'OPTIONS', handler)
   }
 
-  listen(session: Session) {
+  listen(window: BrowserWindow) {
     const scheme = this.scheme
-    session.protocol.handle(scheme, async (request: Request) => {
+    window.webContents.session.protocol.handle(scheme, async (request: Request) => {
       const { host, pathname } = new URL(request.url)
       if (host !== this.host) {
         return new Response('Not Found', { status: 404 })
@@ -62,10 +62,10 @@ export class AppRouter {
       if (handler && handler.method !== request.method) {
         return new Response('Method Not Allowed', { status: 405 })
       }
-      const ctx = new AppRouterContext(request, handler ? handler.params : undefined)
+      const ctx = new AppRouterContext(request, window, handler ? handler.params : undefined)
       try {
         const response = await Promise.resolve(handler.handle(ctx))
-        return new Response(response, {
+        return new Response(JSON.stringify(response), {
           status: 200,
           statusText: 'OK'
         })
@@ -79,8 +79,14 @@ export class AppRouter {
 export class AppRouterContext {
   req: Request
   params?: Record<string, unknown>
-  constructor(req: Request, params?: Record<string, unknown> | undefined) {
+  window: BrowserWindow | null = null
+  constructor(req: Request, window: BrowserWindow, params?: Record<string, unknown> | undefined) {
     this.req = req
     this.params = params
+    this.window = window
+  }
+
+  readFromData() {
+    return this.req.formData()
   }
 }

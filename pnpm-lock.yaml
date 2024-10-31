@@ -126,6 +126,9 @@ importers:
       fs-extra:
         specifier: ^11.2.0
         version: 11.2.0
+      ky:
+        specifier: ^1.7.2
+        version: 1.7.2
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -172,6 +175,9 @@ importers:
       fs-extra:
         specifier: ^11.2.0
         version: 11.2.0
+      ky:
+        specifier: ^1.7.2
+        version: 1.7.2
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -2422,6 +2428,10 @@ packages:
 
   kolorist@1.8.0:
     resolution: {integrity: sha512-Y+60/zizpJ3HRH8DCss+q95yr6145JXZo46OTpFvDZWLfRCE4qChOyk1b26nMaNpfHHgxagk9dXT5OP0Tfe+dQ==}
+
+  ky@1.7.2:
+    resolution: {integrity: sha512-OzIvbHKKDpi60TnF9t7UUVAF1B4mcqc02z5PIvrm08Wyb+yOcz63GRvEuVxNT18a9E1SrNouhB4W2NNLeD7Ykg==}
+    engines: {node: '>=18'}
 
   lazy-val@1.0.5:
     resolution: {integrity: sha512-0/BnGCCfyUMkBpeDgWihanIAF9JmZhHBgUhEqzvf+adhNGLoP6TaiI5oF8oyb3I45P+PcnrqihSf01M0l0G5+Q==}
@@ -6130,6 +6140,8 @@ snapshots:
     optional: true
 
   kolorist@1.8.0: {}
+
+  ky@1.7.2: {}
 
   lazy-val@1.0.5: {}
 

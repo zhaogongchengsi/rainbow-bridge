@@ -5,6 +5,7 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import PrimeVue from 'primevue/config'
 import Aura from '@primevue/themes/aura'
+import ToastService from 'primevue/toastservice'
 import { MotionPlugin } from '@vueuse/motion'
 import { logger } from './utils/logger'
 import './styles/config.css'
@@ -30,6 +31,7 @@ app.use(PrimeVue, {
     preset: Aura
   }
 })
+app.use(ToastService)
 
 app.mount('#app')
 
