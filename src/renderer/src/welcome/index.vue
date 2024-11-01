@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Identity } from '@renderer/database/types/identit'
 import { isDark } from '@renderer/composables/dark'
 import { useIdentity } from '@renderer/store/identity'
 import { useAppStore } from '@renderer/store/store'
@@ -17,6 +18,7 @@ const comment = ref('')
 const toast = useToast()
 const identity = useIdentity()
 const appStore = useAppStore()
+const router = useRouter()
 const visible = ref(false)
 
 function onError(content: string) {
@@ -73,6 +75,11 @@ async function onSave() {
     visible.value = false
   }
 }
+
+function onIdentitClick(identit: Identity) {
+  identity.setCurrentIdentity(identit)
+  router.push('/')
+}
 </script>
 
 <template>
@@ -94,6 +101,7 @@ async function onSave() {
       <CardSpotlight
         v-for="identit in identity.identitys" v-else :key="identit.id" class="cursor-pointer"
         :gradient-color="isDark ? '#363636' : '#C9C9C9'" slot-class="w-100 h-25"
+        @click="onIdentitClick(identit)"
       >
         <div class="h-full w-full flex items-center gap-5 px-4 py-2">
           <Avatar
@@ -103,9 +111,7 @@ async function onSave() {
           <div class="h-full min-w-0 flex flex-1 flex-col justify-around">
             <div class="flex items-center">
               <span class="text-sm font-bold sm:text-lg">{{ identit.name }}</span>
-              <span class="ml-auto text-xs text-gray-500">{{
-                dateFromNow(identit.lastLoginTime)
-              }}</span>
+              <span class="ml-auto text-xs text-gray-500">{{ dateFromNow(identit.lastLoginTime) }}</span>
             </div>
             <p class="text-sm font-normal dark:text-white/60">
               {{ identit.comment }}

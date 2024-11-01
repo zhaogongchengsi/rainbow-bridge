@@ -26,12 +26,17 @@ export const useIdentity = defineStore('identity', () => {
     return identityDatabase.addIdentity(identity)
   }
 
+  function setCurrentIdentity(identity: Identity) {
+    currentIdentity.value = identity
+  }
+
   return {
     currentIdentity,
     identitys,
 
     createIdentity,
     canCreateIdentity,
+    setCurrentIdentity,
     reset: init,
   }
 })
