@@ -2,6 +2,7 @@ import Aura from '@primevue/themes/aura'
 import { MotionPlugin } from '@vueuse/motion'
 import { createPinia } from 'pinia'
 import PrimeVue from 'primevue/config'
+import ConfirmationService from 'primevue/confirmationservice'
 import ToastService from 'primevue/toastservice'
 import { createApp } from 'vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
@@ -32,6 +33,7 @@ app.use(PrimeVue, {
   },
 })
 app.use(ToastService)
+app.use(ConfirmationService)
 
 app.mount('#app')
 

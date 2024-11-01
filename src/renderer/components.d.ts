@@ -14,5 +14,9 @@ declare module 'vue' {
     IdentityPanel: typeof import('./src/components/ui/identity-panel.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SystemClose: typeof import('@renderer/views/system/system-close.vue')['default']
+    SystemFullscreen: typeof import('@renderer/views/system/system-fullscreen.vue')['default']
+    SystemFullscreenExit: typeof import('@renderer/views/system/system-fullscreen-exit.vue')['default']
+    SystemZoomOut: typeof import('@renderer/views/system/system-zoom-out.vue')['default']
   }
 }

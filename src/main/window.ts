@@ -2,18 +2,19 @@ import type { AppRouter } from './libs/router'
 import { join } from 'node:path'
 import process from 'node:process'
 import { is } from '@electron-toolkit/utils'
-import { BrowserWindow, shell } from 'electron'
+import { shell } from 'electron'
 import icon from '../../resources/icon.png?asset'
 import { logger } from './libs/logger'
 import { get, set } from './libs/store'
+import { AppWindow } from './libs/window'
 
-let mainWindow: BrowserWindow | null = null
+let mainWindow: AppWindow | null = null
 
 export function createWindow(router?: AppRouter) {
   logger.info('Main window is creating.')
   const { width, height } = get('window')
   const theme = get('theme')
-  mainWindow = new BrowserWindow({
+  mainWindow = new AppWindow({
     width: width ?? 900,
     height: height ?? 670,
     minWidth: 500,

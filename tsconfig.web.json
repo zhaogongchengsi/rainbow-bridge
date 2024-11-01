@@ -1,5 +1,21 @@
 {
   "extends": "@electron-toolkit/tsconfig/tsconfig.web.json",
+  "compilerOptions": {
+    "composite": true,
+    "baseUrl": ".",
+    "moduleResolution": "Bundler",
+    "paths": {
+      "@renderer/*": [
+        "src/renderer/src/*"
+      ],
+      "@common-types/*": [
+        "src/types/*"
+      ],
+      "@shared/*": [
+        "src/shared/*"
+      ]
+    }
+  },
   "include": [
     "src/renderer/src/env.d.ts",
     "src/renderer/src/**/*",
@@ -8,15 +24,5 @@
     "src/renderer/typed-router.d.ts",
     "src/renderer/components.d.ts",
     "src/renderer/auto-imports.d.ts"
-  ],
-  "compilerOptions": {
-    "composite": true,
-    "baseUrl": ".",
-    "paths": {
-      "@renderer/*": [
-        "src/renderer/src/*"
-      ]
-    },
-    "moduleResolution": "Bundler",
-  }
+  ]
 }

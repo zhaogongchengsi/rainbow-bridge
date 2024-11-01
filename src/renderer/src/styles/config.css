@@ -3,6 +3,7 @@
   --rainbow-height: 100vh;
   --rainbow-width: 100vw;
   --rainbow-background: #f0f0f0;
+  --rainbow-tabbar-button-size: 35px;
 }
 
 .dark {
