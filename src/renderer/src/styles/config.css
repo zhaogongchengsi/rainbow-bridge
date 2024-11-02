@@ -9,12 +9,17 @@
   --system-container-box-height: calc(var(--rainbow-height) - var(--rainbow-tabbar-height));
   --system-aside-bar-width: 60px;
   --system-aside-bar-right-border: 1px solid var(--raindow-broder-color);
+  --system-aside-bar-item-height: 40px;
+  --system-aside-bar-item-button-size: 40px;
+  --system-aside-bar-item-button-hover: #e0e0e0;
   --rainbow-tabbar-button-size: 40px;
   --rainbow-tabbar-button-hover: #e0e0e0;
+  --system-aside-bar-item-button-active: #e0e0e0;
 }
 
 .dark {
   --rainbow-background: rgb(23 23 23 / 1);
   --rainbow-tabbar-button-hover: #333;
   --raindow-broder-color: #333;
+  --system-aside-bar-item-button-hover: #333;
 }
