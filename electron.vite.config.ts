@@ -9,17 +9,32 @@ import VueRouter from 'unplugin-vue-router/vite'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
 export default defineConfig(() => {
+  const alias = {
+    '@common-types': resolve('src/types'),
+  }
+
   return {
     main: {
       plugins: [externalizeDepsPlugin()],
+      resolve: {
+        alias: {
+          ...alias,
+        },
+      },
     },
     preload: {
       plugins: [externalizeDepsPlugin()],
+      resolve: {
+        alias: {
+          ...alias,
+        },
+      },
     },
     renderer: {
       resolve: {
         alias: {
           '@renderer': resolve('src/renderer/src'),
+          ...alias,
         },
       },
       plugins: [
@@ -28,10 +43,6 @@ export default defineConfig(() => {
           routesFolder: [
             {
               src: 'src/renderer/src/pages',
-            },
-            {
-              src: 'src/renderer/src/welcome',
-              path: 'welcome/',
             },
           ],
           dts: 'src/renderer/typed-router.d.ts',

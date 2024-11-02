@@ -6,6 +6,39 @@ body,
   background-color: var(--rainbow-background);
 }
 
+.draggable {
+  -webkit-app-region: drag;
+}
+
+.not-draggable {
+  -webkit-app-region: no-drag;
+}
+
+.system-top-bar {
+  height: var(--rainbow-tabbar-height);
+  border-bottom: var(--system-top-bar-bottom-border);
+}
+
+.system-container-box {
+  height: var(--system-container-box-height);
+  display: flex;
+  flex-direction: row;
+}
+
+.system-aside-bar {
+  width: var(--system-aside-bar-width);
+  height: var(--system-container-box-height);
+  border-right: var(--system-aside-bar-right-border);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.system-main {
+  height: var(--system-container-box-height);
+  width: calc(var(--rainbow-width) - var(--system-aside-bar-width));
+}
+
 .system-top-button {
   width: var(--rainbow-tabbar-button-size);
   height: var(--rainbow-tabbar-button-size);
@@ -14,8 +47,13 @@ body,
   align-items: center;
   cursor: pointer;
   font-size: 1.5rem;
+  -webkit-app-region: no-drag;
 }
 
 .system-top-button:hover {
+  background-color: var(--rainbow-tabbar-button-hover);
+}
+
+.system-top-button-danger:hover {
   background-color: #d51212;
 }

@@ -1,3 +1,4 @@
+import type { WebHandlers } from '@common-types/web/handle'
 import type { IpcRendererEvent } from 'electron'
 import { off, on, once, send } from '@renderer/utils/ipc'
 import { logger } from '@renderer/utils/logger'
@@ -16,6 +17,7 @@ export interface WebHandleConfig {
   id: string
   args: any[]
   method: string
+  forcedResponse?: boolean
 }
 
 export function createGlobalHandle() {
@@ -38,8 +40,11 @@ export function createGlobalHandle() {
     const { id, args, method } = c
     const handle = handlers.get(method)
     if (!handle) {
-      console.error(`[handle] ${method} not found`)
-      send('handle-response', { id, result: null, error: `[handle] ${method} not found` })
+      console.warn(`[handle] ${method} not found`)
+      if (c.forcedResponse) {
+        send('handle-response', { id, result: null, error: `[handle-response] ${method} not found` })
+      }
+      return undefined
     }
     else {
       try {
@@ -68,7 +73,7 @@ export function createGlobalHandle() {
 }
 
 export function useDefineHandle(
-  name: string,
+  name: keyof WebHandlers,
   handler: WebAppHandle,
   config: {
     needEvent?: boolean

@@ -23,6 +23,12 @@ export function createWindow(router?: AppRouter) {
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     backgroundColor: theme === 'dark' ? '#000' : '#fff',
+    frame: true,
+    titleBarStyle: 'hidden',
+    trafficLightPosition: {
+      x: 10,
+      y: 10,
+    },
     webPreferences: {
       preload: join(__dirname, '../preload/index.mjs'),
       sandbox: false,
@@ -53,10 +59,10 @@ export function createWindow(router?: AppRouter) {
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env.ELECTRON_RENDERER_URL) {
-    mainWindow.loadURL(`${process.env.ELECTRON_RENDERER_URL}#/welcome`)
+    mainWindow.loadURL(`${process.env.ELECTRON_RENDERER_URL}`)
   }
   else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html/#/welcome'))
+    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
 
   return mainWindow

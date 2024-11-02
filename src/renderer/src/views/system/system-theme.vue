@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { toggleDark } from '@renderer/composables/dark'
-import Button from 'primevue/button'
 import Menu from 'primevue/menu'
 
 const menu = ref<InstanceType<typeof Menu> | null>(null)
@@ -52,6 +51,8 @@ const items = [
 </script>
 
 <template>
-  <Button :icon="icon" severity="secondary" aria-label="Theme" outlined @click="toggle" />
+  <button class="system-top-button" @click="toggle">
+    <i class="block" :class="icon" />
+  </button>
   <Menu ref="menu" :model="items" :popup="true" />
 </template>

@@ -1,3 +1,4 @@
+import type { WebHandlers } from '@common-types/web/handle'
 import type { BrowserWindowConstructorOptions } from 'electron'
 import { app, BrowserWindow, ipcMain } from 'electron'
 import { logger } from './logger'
@@ -19,6 +20,24 @@ export class AppWindow extends BrowserWindow {
       await this.closeWindow()
       app.quit()
     })
+    ipcMain.handle('app:toggle-fullscreen', async () => {
+      logger.info('App is toggling fullscreen.')
+      this.isMaximized() ? this.unmaximize() : this.maximize()
+    })
+    ipcMain.handle('app:minimize', async () => {
+      logger.info('App is maximizing.')
+      this.minimize()
+    })
+    this.on('maximize', async () => {
+      await this.invoke('app:maximize')
+    })
+    this.on('unmaximize', async () => {
+      await this.invoke('app:unmaximize')
+    })
+  }
+
+  sendToWindow(name: string, ...args: any[]) {
+    this.webContents.send(name, ...args)
   }
 
   closeWindow() {
@@ -32,17 +51,17 @@ export class AppWindow extends BrowserWindow {
 
   onHandleResponse(response: WebHandleResponse) {
     const { id, result, error } = response
-    const promiser = this.methodMap.get(id)
+    const promised = this.methodMap.get(id)
 
-    if (promiser) {
-      promiser.promise.finally(() => {
+    if (promised) {
+      promised.promise.finally(() => {
         this.methodMap.delete(id)
       })
       if (error) {
-        promiser.reject(new Error(error))
+        promised.reject(new Error(error))
       }
       else {
-        promiser.resolve(result)
+        promised.resolve(result)
       }
     }
   }
@@ -64,7 +83,7 @@ export class AppWindow extends BrowserWindow {
    * @param method
    * @param args
    */
-  invoke<T>(method: string, ...args: any[]) {
+  invoke<T>(method: keyof WebHandlers, ...args: any[]) {
     const id = this.randomString(10)
     const promiser = Promise.withResolvers<T>()
     this.methodMap.set(id, promiser)

@@ -31,7 +31,7 @@ function onClose() {
 </script>
 
 <template>
-  <button class="system-top-button" @click="onClose">
+  <button class="system-top-button system-top-button-danger" @click="onClose">
     <i class="i-ic-outline-close block" />
   </button>
   <ConfirmDialog group="templating">
