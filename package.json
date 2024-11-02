@@ -46,7 +46,6 @@
     "electron-vite": "^2.3.0",
     "eslint": "^8.57.0",
     "eslint-plugin-vue": "^9.26.0",
-    "prettier": "^3.3.2",
     "typescript": "^5.5.2",
     "unocss": "^0.63.6",
     "unplugin-auto-import": "^0.18.3",

@@ -87,12 +87,14 @@ export function useDefineHandle(
 
   config = Object.assign({ needEvent: false, once: false }, config)
 
-  handlerConfigInjecting?.defineHandle(name, {
-    ...config,
-    handler,
+  onMounted(() => {
+    handlerConfigInjecting?.defineHandle(name, {
+      ...config,
+      handler,
+    })
   })
 
-  onUnmounted(() => {
+  onBeforeMount(() => {
     handlerConfigInjecting?.removeHandle(name)
   })
 }
@@ -107,7 +109,7 @@ export function useRendererEvent(name: string, handler: WebAppHandle, isOnce: bo
   on(name, (e, ...args) => {
     handler(e, ...args)
   })
-  onUnmounted(() => {
+  onBeforeMount(() => {
     off(name, handler)
   })
 }

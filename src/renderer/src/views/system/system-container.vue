@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SystemAside from '@renderer/views/system/system-aside.vue'
 import SystemTabbar from '@renderer/views/system/system-tabbar.vue'
 </script>
 
@@ -6,9 +7,7 @@ import SystemTabbar from '@renderer/views/system/system-tabbar.vue'
   <section class="system-container">
     <SystemTabbar />
     <section class="system-container-box">
-      <aside class="system-aside-bar">
-        aside
-      </aside>
+      <SystemAside />
       <main class="system-main">
         <slot />
       </main>
