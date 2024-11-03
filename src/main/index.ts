@@ -1,13 +1,14 @@
-import { app, BrowserWindow } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
-import { createWindow } from './window'
-import { initFileStore, initStore } from './libs/store'
-import { logger } from './libs/logger'
-import { registerHandlers, registerEvents } from './libs/register'
-import { createAppRouter } from './router/init'
+import { app, BrowserWindow } from 'electron'
 import { PROTOCOL_NAME } from './libs/constant'
+import { logger } from './libs/logger'
+import { registerEvents, registerHandlers } from './libs/register'
+import { initFileStore, initStore } from './libs/store'
 import { registerRouter } from './router'
+import { createAppRouter } from './router/init'
+import { createWindow } from './window'
 
+// eslint-disable-next-line node/prefer-global/process
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 
 if (!app.requestSingleInstanceLock()) {
@@ -36,10 +37,11 @@ app.whenReady().then(async () => {
 
   createWindow(router)
 
-  app.on('activate', function () {
+  app.on('activate', () => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+    if (BrowserWindow.getAllWindows().length === 0)
+      createWindow()
   })
 })
 

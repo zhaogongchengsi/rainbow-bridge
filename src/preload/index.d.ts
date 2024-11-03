@@ -11,6 +11,7 @@ declare global {
     system: {
       setTheme: (theme: 'light' | 'dark' | 'system') => Promise<void>
       getTheme: () => Promise<'light' | 'dark' | 'system'>
+      getID: () => Promise<string>
     }
   }
 }
