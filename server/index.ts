@@ -1,11 +1,18 @@
+import { consola } from 'consola'
 import { PeerServer } from 'peer'
 
-const peerServer = PeerServer({ port: 9000, path: '/bridge' })
+function bootstrap() {
+  consola.info('server started')
 
-peerServer.on('connection', (client) => {
-  console.log('client connected:', client.getId())
-})
+  const peerServer = PeerServer({ port: 9000, path: '/bridge' })
 
-peerServer.on('disconnect', (client) => {
-  console.log('client disconnected:', client.getId())
-})
+  peerServer.on('connection', (client) => {
+    consola.info('client connected:', client.getId())
+  })
+
+  peerServer.on('disconnect', (client) => {
+    consola.info('client disconnected:', client.getId())
+  })
+}
+
+bootstrap()
