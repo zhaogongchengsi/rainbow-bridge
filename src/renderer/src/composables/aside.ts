@@ -11,10 +11,12 @@ export const useAsideMenu = defineStore('app-aside-menu', () => {
     {
       id: 'chat',
       icon: 'pi pi-comment',
+      route: '/main/chat',
     },
     {
       id: 'folder',
       icon: 'pi pi-folder',
+      route: '/main/folder',
     },
   ])
 

@@ -1,6 +1,11 @@
 <script setup lang="ts">
+
 </script>
 
 <template>
-  <div>main</div>
+  <div>folder</div>
 </template>
+
+<style scoped>
+
+</style>

@@ -82,10 +82,20 @@ body,
   border-radius: 6px;
 }
 
+.system-aside-bar-item-button-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .system-aside-bar-item-button:hover {
   background-color: var(--system-aside-bar-item-button-hover);
 }
 
 .system-aside-bar-item-button-active {
   background-color: var(--system-aside-bar-item-button-active);
+}
+
+.router-link-active {
+  background-color: var(--system-aside-bar-item-button-hover);
 }
