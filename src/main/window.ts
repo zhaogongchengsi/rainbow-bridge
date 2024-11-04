@@ -2,8 +2,8 @@ import type { AppRouter } from './libs/router'
 import { join } from 'node:path'
 import process from 'node:process'
 import { is } from '@electron-toolkit/utils'
-import { shell } from 'electron'
-import icon from '../../resources/icon.png?asset'
+import { nativeImage, shell } from 'electron'
+import icon from '../../resources/icon@3x.png?asset'
 import { logger } from './libs/logger'
 import { get, set } from './libs/store'
 import { AppWindow } from './libs/window'
@@ -21,7 +21,7 @@ export function createWindow(router?: AppRouter) {
     minHeight: 500,
     show: false,
     autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
+    icon: nativeImage.createFromPath(icon),
     backgroundColor: theme === 'dark' ? '#000' : '#fff',
     frame: true,
     titleBarStyle: 'hidden',
