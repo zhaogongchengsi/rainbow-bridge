@@ -5,8 +5,15 @@ export class Bridge {
   id: string
   peer: Peer
   peerId: string | null = null
+  connecting: boolean = false
 
-  constructor(id: string, options?: PeerOptions) {
+  constructor(id: string) {
+    const options: PeerOptions = {
+      port: Number(import.meta.env.RENDERER_VITE_PEER_PORT),
+      path: import.meta.env.RENDERER_VITE_PEER_PATH,
+      key: import.meta.env.RENDERER_VITE_PEER_KEY,
+      host: import.meta.env.RENDERER_VITE_PEER_URL,
+    }
     this.id = id
     this.peer = new Peer(id, options)
     this.peer.on('open', this.open.bind(this))
@@ -15,6 +22,7 @@ export class Bridge {
   }
 
   private open(id: string) {
+    this.connecting = false
     this.peerId = id
   }
 
