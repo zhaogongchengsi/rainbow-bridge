@@ -3,7 +3,19 @@
 
 declare module '*.vue' {
   import type { DefineComponent } from 'vue'
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/ban-types
-  const component: DefineComponent<{}, {}, any>
+
+  const component: DefineComponent<object, object, any>
   export default component
+}
+
+interface ImportMetaEnv {
+  readonly RENDERER_VITE_PEER_PORT: string
+  readonly RENDERER_VITE_PEER_PATH: string
+  readonly RENDERER_VITE_PEER_KEY: string
+  readonly RENDERER_VITE_PEER_URL: string
+  // more env variables...
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv
 }
