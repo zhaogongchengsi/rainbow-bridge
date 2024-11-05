@@ -1,6 +1,6 @@
-import { ElectronEventConfig, ElectronHandleConfig } from './define'
-import { logger } from './logger'
+import type { ElectronEventConfig, ElectronHandleConfig } from './define'
 import { ipcMain } from 'electron'
+import { logger } from './logger'
 
 export async function registerHandlers(handles: Record<string, () => Promise<unknown>>) {
   logger.silly('Registering handlers.')
@@ -22,17 +22,20 @@ async function baseRegisterHandlers(id: string, modules: () => Promise<unknown>)
     for (const [name, handlerConfig] of Object.entries(module)) {
       const { handle, config } = handlerConfig
       const needEvent = config?.useEvent ?? false
+      logger.silly(`Registering handler ${id}:${name}.`)
       ipcMain.handle(name, async (event, ...args) => {
         try {
           logger.silly(`Handling ${id}:${name} with args:`, args)
           return needEvent ? await handle(event, ...args) : await handle(...args)
-        } catch (error) {
+        }
+        catch (error) {
           logger.error(`Failed to handle ${id}:${name}.`, error)
           throw error
         }
       })
     }
-  } catch (error) {
+  }
+  catch (error) {
     logger.error(`Failed to register handler ${id}.`, error)
   }
 }
@@ -50,7 +53,8 @@ async function baseRegisterEvents(id: string, modules: () => Promise<unknown>) {
           try {
             logger.silly(`Handling ${id}:${name} with args:`, args)
             return needEvent ? await handle(event, ...args) : await handle(...args)
-          } catch (error) {
+          }
+          catch (error) {
             logger.error(`Failed to handle ${id}:${name}.`, error)
             throw error
           }
@@ -61,13 +65,15 @@ async function baseRegisterEvents(id: string, modules: () => Promise<unknown>) {
         try {
           logger.silly(`Handling ${id}:${name} with args:`, args)
           return needEvent ? await handle(event, ...args) : await handle(...args)
-        } catch (error) {
+        }
+        catch (error) {
           logger.error(`Failed to handle ${id}:${name}.`, error)
           throw error
         }
       })
     }
-  } catch (error) {
+  }
+  catch (error) {
     logger.error(`Failed to register event ${id}.`, error)
   }
 }

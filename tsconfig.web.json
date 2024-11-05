@@ -13,7 +13,10 @@
       ],
       "@shared/*": [
         "src/shared/*"
-      ]
+      ],
+      "@client/*": [
+        "src/client/*"
+      ],
     },
   },
   "include": [

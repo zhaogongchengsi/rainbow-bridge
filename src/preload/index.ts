@@ -14,7 +14,7 @@ const system = {
   setTheme: (theme: 'light' | 'dark' | 'system'): Promise<void> =>
     electronAPI.ipcRenderer.invoke('setTheme', theme),
   getTheme: (): Promise<'light' | 'dark' | 'system'> => electronAPI.ipcRenderer.invoke('getTheme'),
-  getID: (): Promise<string> => electronAPI.ipcRenderer.invoke('getID'),
+  getID: (): Promise<string> => electronAPI.ipcRenderer.invoke('getId'),
 }
 
 if (process.contextIsolated) {

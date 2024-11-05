@@ -8,6 +8,8 @@ function bootstrap() {
 
   peerServer.on('connection', (client) => {
     consola.info('client connected:', client.getId())
+    consola.info('client info:', client.getToken())
+    consola.info('client info:', client)
   })
 
   peerServer.on('disconnect', (client) => {
