@@ -1,0 +1,1 @@
+export const APP_PEER_PROVIDER = Symbol('APP_PEER_PROVIDER')

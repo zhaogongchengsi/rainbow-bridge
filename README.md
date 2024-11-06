@@ -1,4 +1,4 @@
-# Rainbow Bridge
+# Rainbow Client
 
 end-to-end file synchronization
 

@@ -34,7 +34,6 @@ export default defineConfig(() => {
       resolve: {
         alias: {
           '@renderer': resolve('src/renderer/src'),
-          '@client': resolve('src/client'),
           ...alias,
         },
       },
