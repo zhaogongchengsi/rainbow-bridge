@@ -6,6 +6,8 @@ onMounted(async () => {
   const id = await window.system.getID()
 
   const client = new Bridge(id)
+
+  console.log(client)
 })
 </script>
 
