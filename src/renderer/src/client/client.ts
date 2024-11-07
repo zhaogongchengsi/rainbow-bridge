@@ -23,6 +23,7 @@ export function createClientSingle() {
   const event = shallowRef(createEvent())
   const connecting = ref<boolean>(false)
   const connected = ref<boolean>(false)
+  const connectError = ref<boolean>(false)
 
   const { data, execute } = useFetch<string[]>(
     `http://${peerOptions.value.host}:${peerOptions.value.port}${peerOptions.value.path}/${peerOptions.value.key}/peers`,
@@ -55,6 +56,7 @@ export function createClientSingle() {
     logger.error('[peer] error', `${error.type}: ${error.message}`)
     connecting.value = false
     connected.value = false
+    connectError.value = true
     if (
       retryCount.value < maxRetries
       && ['socket-error', 'server-error', 'network'].includes(error.type)
