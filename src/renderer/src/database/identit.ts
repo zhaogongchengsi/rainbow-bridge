@@ -1,7 +1,7 @@
 import type { Identity } from './types/identit'
 import { RainbowBridgeDatabase } from './base'
 
-export type IdentityOption = Omit<Identity, 'id' | 'uuid' | 'create_by'>
+export type IdentityOption = Omit<Identity, 'id' | 'uuid' | 'create_by' | 'chats'>
 
 class IdentityDatabase extends RainbowBridgeDatabase {
   constructor() {

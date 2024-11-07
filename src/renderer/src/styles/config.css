@@ -3,23 +3,26 @@
   --rainbow-height: 100vh;
   --rainbow-width: 100vw;
   --rainbow-background: #f0f0f0;
-  --raindow-broder-color: #e0e0e0;
+  --rainbow-background-secondary: rgb(241, 241, 241) ;
+  --rainbow-border-color: #e0e0e0;
   --rainbow-tabbar-height: 40px;
-  --system-top-bar-bottom-border: 1px solid var(--raindow-broder-color);
+  --system-top-bar-bottom-border: 1px solid var(--rainbow-border-color);
   --system-container-box-height: calc(var(--rainbow-height) - var(--rainbow-tabbar-height));
   --system-aside-bar-width: 60px;
-  --system-aside-bar-right-border: 1px solid var(--raindow-broder-color);
+  --system-aside-bar-right-border: 1px solid var(--rainbow-border-color);
   --system-aside-bar-item-height: 40px;
   --system-aside-bar-item-button-size: 40px;
   --system-aside-bar-item-button-hover: #e0e0e0;
   --rainbow-tabbar-button-size: 40px;
   --rainbow-tabbar-button-hover: #e0e0e0;
   --system-aside-bar-item-button-active: #e0e0e0;
+  --rainbow-border-radius: 6px;
 }
 
 .dark {
   --rainbow-background: rgb(23 23 23 / 1);
   --rainbow-tabbar-button-hover: #333;
-  --raindow-broder-color: #333;
+  --rainbow-border-color: #333;
   --system-aside-bar-item-button-hover: #333;
+  --rainbow-background-secondary: rgb(33 33 33 / 1);
 }

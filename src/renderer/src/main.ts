@@ -14,6 +14,7 @@ import 'virtual:uno.css'
 import '@unocss/reset/tailwind.css'
 import './styles/base.css'
 import 'primeicons/primeicons.css'
+import 'splitpanes/dist/splitpanes.css'
 
 const app = createApp(App)
 

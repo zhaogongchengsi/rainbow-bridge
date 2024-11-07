@@ -99,3 +99,8 @@ body,
 .router-link-active {
   background-color: var(--system-aside-bar-item-button-hover);
 }
+
+.splitpanes__splitter {
+  background-color: var(--raindow-broder-color);
+}
+

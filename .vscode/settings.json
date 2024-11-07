@@ -70,5 +70,8 @@
     "scss",
     "pcss",
     "postcss"
+  ],
+  "cSpell.words": [
+    "Splitpanes"
   ]
 }
