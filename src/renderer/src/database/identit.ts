@@ -1,5 +1,4 @@
 import type { Identity } from './types/identit'
-import { randomUUID } from 'uncrypto'
 import { RainbowBridgeDatabase } from './base'
 
 export type IdentityOption = Omit<Identity, 'id' | 'uuid' | 'create_by'>
@@ -10,11 +9,12 @@ class IdentityDatabase extends RainbowBridgeDatabase {
   }
 
   async addIdentity(identity: IdentityOption) {
-    const uuid = randomUUID()
+    const uuid = this.createUUID()
     return this.identitys.add({
       ...identity,
       uuid,
       create_by: Date.now(),
+      chats: [],
     })
   }
 

@@ -7,4 +7,5 @@ export interface Identity {
   lastLoginTime?: number
   create_by: number
   avatar: string
+  chats: string[]
 }
