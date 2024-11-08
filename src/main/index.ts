@@ -1,3 +1,4 @@
+import process from 'node:process'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { app, BrowserWindow } from 'electron'
 import { PROTOCOL_NAME } from './libs/constant'
@@ -8,7 +9,6 @@ import { registerRouter } from './router'
 import { createAppRouter } from './router/init'
 import { createWindow } from './window'
 
-// eslint-disable-next-line node/prefer-global/process
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true'
 
 if (!app.requestSingleInstanceLock()) {

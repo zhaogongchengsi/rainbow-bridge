@@ -1,21 +1,28 @@
-import type { Identity } from './types/identit'
-import type { Message } from './types/message'
-import Dexie, { type EntityTable } from 'dexie'
+import Dexie from 'dexie'
+import flatMap from 'lodash/flatMap'
+import union from 'lodash/union'
 import { randomUUID } from 'uncrypto'
 
 export class RainbowBridgeDatabase extends Dexie {
-  identitys!: EntityTable<Identity, 'id'>
-  messages!: EntityTable<Message, 'id'>
   constructor() {
     super('rainbow-bridge-db')
-    this.version(1).stores({
-      identitys: '++id, uuid, create_by, name, email, avatar, comment, lastLoginTime, chats',
-      messages: 'id, senderId, receiverId, content, timestamp, status, sequence',
-      chats: 'chatId, type, participants, messages, createdAt, updatedAt',
-    })
   }
 
   createUUID() {
     return randomUUID()
+  }
+
+  generateDexieStoreString(searchableKeys: string[], notSearchableKeys: string[] = []): string {
+    const isPrimaryKey = (key: string) => key.startsWith('++') ? key.replace('++', '') : key
+
+    const combinations = flatMap(searchableKeys, (key, index) => {
+      return searchableKeys.slice(index + 1).map((otherKey) => {
+        return `[${isPrimaryKey(key)}+${otherKey}]`
+      })
+    })
+
+    const searchKeys = searchableKeys.map(key => `[${isPrimaryKey(key)}]`)
+
+    return union([...searchableKeys, ...notSearchableKeys, ...searchKeys, ...combinations]).join(', ')
   }
 }

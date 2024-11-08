@@ -1,6 +1,7 @@
 import type { BrowserWindow } from 'electron'
 import type { RadixRouter } from 'radix3'
 import { createRouter } from 'radix3'
+import { logger } from './logger'
 
 export type AppRouterHandler = (req: AppRouterContext) => any | Promise<any>
 export type AppRouterMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'OPTIONS'
@@ -64,11 +65,8 @@ export class AppRouter {
       }
       const ctx = new AppRouterContext(request, window, handler ? handler.params : undefined)
       try {
-        const response = await Promise.resolve(handler.handle(ctx))
-        return new Response(JSON.stringify(response), {
-          status: 200,
-          statusText: 'OK',
-        })
+        await Promise.resolve(handler.handle(ctx))
+        return ctx.readRequest()
       }
       catch {
         return new Response('Internal Server Error', { status: 500 })
@@ -79,12 +77,51 @@ export class AppRouter {
 
 export class AppRouterContext {
   req: Request
-  params?: Record<string, unknown>
+  params?: Record<string, any>
   window: BrowserWindow | null = null
-  constructor(req: Request, window: BrowserWindow, params?: Record<string, unknown> | undefined) {
+  response: Response | null = null
+  constructor(req: Request, window: BrowserWindow, params?: Record<string, any> | undefined) {
     this.req = req
     this.params = params
     this.window = window
+  }
+
+  sendJson(data: any) {
+    this.response = new Response(JSON.stringify(data), {
+      status: 200,
+      statusText: 'OK',
+    })
+  }
+
+  readRequest() {
+    if (!this.response) {
+      logger.warn('No response has been sent')
+      return new Response(null, {
+        status: 204,
+        statusText: 'No Content',
+      })
+    }
+    return this.response
+  }
+
+  sendImage(imageBuffer: ArrayBuffer, contentType: string) {
+    this.response = new Response(imageBuffer, {
+      status: 200,
+      statusText: 'OK',
+      headers: {
+        'Content-Type': contentType,
+      },
+    })
+  }
+
+  sendError(message: string, status: number) {
+    this.response = new Response(JSON.stringify({ error: message }), {
+      status,
+      statusText: 'Error',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
   }
 
   readFromData() {

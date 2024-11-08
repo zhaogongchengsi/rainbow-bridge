@@ -11,6 +11,7 @@ export function createAppRouter(scheme: string) {
         secure: true,
         supportFetchAPI: true,
         bypassCSP: true,
+        corsEnabled: true,
         stream: true,
       },
     },

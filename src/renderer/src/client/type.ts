@@ -12,4 +12,6 @@ export interface ClientProvider {
   retryCount: Ref<number>
   connectionIds: Ref<string[] | null>
   destroy: () => void
+  getServerConnections: () => Promise<string[]>
+  hasServerConnection: (id: string) => Promise<boolean>
 }

@@ -7,7 +7,7 @@ import { getFileStorePath } from '../libs/store'
 
 export async function uploadFileToStore(ctx: AppRouterContext) {
   const fromData = await ctx.readFromData()
-  return Promise.all(
+  const data = await Promise.all(
     fromData
       .values()
       .filter(v => typeof v !== 'string')
@@ -21,4 +21,6 @@ export async function uploadFileToStore(ctx: AppRouterContext) {
         return filePath
       }),
   )
+
+  ctx.sendJson(data)
 }

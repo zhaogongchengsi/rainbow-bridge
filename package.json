@@ -28,6 +28,7 @@
     "@vueuse/core": "^11.1.0",
     "electron-log": "^5.2.0",
     "electron-updater": "^6.1.7",
+    "jdenticon": "^3.3.0",
     "lowdb": "^7.0.1",
     "mitt": "^3.0.1",
     "pinia": "^2.2.4",

@@ -26,6 +26,9 @@ importers:
       electron-updater:
         specifier: ^6.1.7
         version: 6.3.9
+      jdenticon:
+        specifier: ^3.3.0
+        version: 3.3.0
       lowdb:
         specifier: ^7.0.1
         version: 7.0.1
@@ -1896,6 +1899,9 @@ packages:
   caniuse-lite@1.0.30001671:
     resolution: {integrity: sha512-jocyVaSSfXg2faluE6hrWkMgDOiULBMca4QLtDT39hw1YxaIPHWc1CcTCKkPmHgGH6tKji6ZNbMSmUAvENf2/A==}
 
+  canvas-renderer@2.2.1:
+    resolution: {integrity: sha512-RrBgVL5qCEDIXpJ6NrzyRNoTnXxYarqm/cS/W6ERhUJts5UQtt/XPEosGN3rqUkZ4fjBArlnCbsISJ+KCFnIAg==}
+
   ccount@2.0.1:
     resolution: {integrity: sha512-eyrF0jiFpY+3drT6383f1qhkbGsLSifNAjA61IUjZjmLCWjItY6LB9ft9YhoDgwfmclB2zhu51Lc7+95b8NRAg==}
 
@@ -3059,6 +3065,11 @@ packages:
   jake@10.9.2:
     resolution: {integrity: sha512-2P4SQ0HrLQ+fw6llpLnOaGAvN2Zu6778SJMrCUwns4fOoG9ayrTiZk3VV8sCPkVZF8ab0zksVpS8FDY5pRCNBA==}
     engines: {node: '>=10'}
+    hasBin: true
+
+  jdenticon@3.3.0:
+    resolution: {integrity: sha512-DhuBRNRIybGPeAjMjdHbkIfiwZCCmf8ggu7C49jhp6aJ7DYsZfudnvnTY5/1vgUhrGA7JaDAx1WevnpjCPvaGg==}
+    engines: {node: '>=6.4.0'}
     hasBin: true
 
   jiti@1.21.6:
@@ -6794,6 +6805,10 @@ snapshots:
 
   caniuse-lite@1.0.30001671: {}
 
+  canvas-renderer@2.2.1:
+    dependencies:
+      '@types/node': 20.17.1
+
   ccount@2.0.1: {}
 
   chai@5.1.2:
@@ -8166,6 +8181,10 @@ snapshots:
       chalk: 4.1.2
       filelist: 1.0.4
       minimatch: 3.1.2
+
+  jdenticon@3.3.0:
+    dependencies:
+      canvas-renderer: 2.2.1
 
   jiti@1.21.6: {}
 

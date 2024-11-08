@@ -20,7 +20,7 @@ export const useAppStore = defineStore('app-store', () => {
     avatarFile.value = file
   })
 
-  function uploadStoreFiles(files: FileList | File[]) {
+  async function uploadStoreFiles(files: FileList | File[]) {
     if (isEmpty(files)) {
       return Promise.resolve([])
     }
@@ -28,12 +28,12 @@ export const useAppStore = defineStore('app-store', () => {
     Array.from(files).forEach((file) => {
       data.append(file.name, file)
     })
-    return ky.post<string[]>('store/file/upload', { body: data }).json()
+    return await ky.post<string[]>('store/file/upload', { body: data }).json()
   }
 
   async function uploadAvatar() {
     if (!avatarFile.value)
-      return
+      return undefined
     const [avatar] = await uploadStoreFiles([avatarFile.value])
     avatarPreview.value = `file://${avatar}`
     return avatar

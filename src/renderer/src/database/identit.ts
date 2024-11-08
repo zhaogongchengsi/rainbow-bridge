@@ -1,11 +1,30 @@
-import type { Identity } from './types/identit'
+import type { EntityTable } from 'dexie'
 import { RainbowBridgeDatabase } from './base'
 
 export type IdentityOption = Omit<Identity, 'id' | 'uuid' | 'create_by' | 'chats'>
 
+export interface Identity {
+  id: number
+  uuid: string
+  name: string
+  email?: string
+  comment?: string
+  lastLoginTime?: number
+  create_by: number
+  avatar: string
+  chats: string[]
+}
+
 class IdentityDatabase extends RainbowBridgeDatabase {
+  identitys!: EntityTable<Identity, 'id'>
   constructor() {
     super()
+    this.version(1).stores({
+      identitys: this.generateDexieStoreString(
+        ['++id', 'uuid', 'name', 'email'],
+        ['chats', 'comment', 'lastLoginTime', 'create_by', 'avatar'],
+      ),
+    })
   }
 
   async addIdentity(identity: IdentityOption) {

@@ -1,21 +1,30 @@
 import type { PeerError, PeerErrorType, PeerOptions } from 'peerjs'
+
 import type { ClientProvider } from './type'
 import { APP_PEER_PROVIDER } from '@renderer/client/constant'
 import { createEvent } from '@renderer/client/event'
+import { useKy } from '@renderer/composables/fetch'
 import { logger } from '@renderer/utils/logger'
+import ky from 'ky'
 import Peer from 'peerjs'
 
+const peer_options = {
+  port: Number(import.meta.env.RENDERER_VITE_PEER_PORT),
+  path: import.meta.env.RENDERER_VITE_PEER_PATH,
+  key: import.meta.env.RENDERER_VITE_PEER_KEY,
+  host: import.meta.env.RENDERER_VITE_PEER_URL,
+}
+
+const server_base_url = `http://${peer_options.host}:${peer_options.port}${peer_options.path}/${peer_options.key}`
+
 export function createClientSingle() {
+  logger.info(`[peer] create client server url: ${server_base_url}`)
+
   const id = ref<string>()
   const peerId = ref<string>()
   const client = shallowRef<Peer>()
 
-  const peerOptions = ref<PeerOptions>({
-    port: Number(import.meta.env.RENDERER_VITE_PEER_PORT),
-    path: import.meta.env.RENDERER_VITE_PEER_PATH,
-    key: import.meta.env.RENDERER_VITE_PEER_KEY,
-    host: import.meta.env.RENDERER_VITE_PEER_URL,
-  })
+  const peerOptions = ref<PeerOptions>(peer_options)
 
   const retryCount = ref<number>(0)
   const maxRetries = 5
@@ -26,7 +35,7 @@ export function createClientSingle() {
   const connectError = ref<boolean>(false)
 
   const { data, execute } = useFetch<string[]>(
-    `http://${peerOptions.value.host}:${peerOptions.value.port}${peerOptions.value.path}/${peerOptions.value.key}/peers`,
+    `${server_base_url}/peers`,
     { immediate: false },
   ).json()
 
@@ -34,6 +43,25 @@ export function createClientSingle() {
     if (client.value) {
       client.value.destroy()
     }
+  }
+
+  /**
+   * Fetches the list of server connections (peers) from the specified server base URL.
+   *
+   * @returns {Promise<string[]>} A promise that resolves to an array of server connection strings.
+   */
+  function getServerConnections() {
+    return ky.get<string[]>(`${server_base_url}/peers`).json()
+  }
+
+  /**
+   * Checks if there is a server connection with the given ID.
+   *
+   * @param id - The ID of the server connection to check.
+   * @returns A promise that resolves to a boolean indicating whether the server connection exists.
+   */
+  async function hasServerConnection(id: string) {
+    return (await getServerConnections()).includes(id)
   }
 
   async function connect() {
@@ -91,6 +119,9 @@ export function createClientSingle() {
     retryCount,
     connectionIds: data,
     destroy,
+    connectError,
+    getServerConnections,
+    hasServerConnection,
   })
 
   onMounted(connect)

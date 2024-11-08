@@ -1,5 +1,4 @@
-import type { IdentityOption } from '@renderer/database/identit'
-import type { Identity } from '@renderer/database/types/identit'
+import type { Identity, IdentityOption } from '@renderer/database/identit'
 import { identityDatabase } from '@renderer/database/identit'
 import once from 'lodash/once'
 

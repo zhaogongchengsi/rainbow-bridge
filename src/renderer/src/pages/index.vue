@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Identity } from '@renderer/database/types/identit'
+import type { Identity } from '@renderer/database/identit'
 import { isDark } from '@renderer/composables/dark'
 import { useIdentity } from '@renderer/store/identity'
 import { useAppStore } from '@renderer/store/store'
@@ -112,22 +112,14 @@ function onIdentityClick(identit: Identity) {
         </p>
       </div>
       <CardSpotlight
-        v-for="identit in identity.identitys"
-        v-else
-        :key="identit.id"
-        class="cursor-pointer"
-        :gradient-color="isDark ? '#363636' : '#C9C9C9'"
-        slot-class="w-100 h-25"
-        @click="onIdentityClick(identit)"
+        v-for="identit in identity.identitys" v-else :key="identit.id" class="cursor-pointer"
+        :gradient-color="isDark ? '#363636' : '#C9C9C9'" slot-class="w-100 h-25" @click="onIdentityClick(identit)"
       >
         <div class="h-full w-full flex items-center gap-5 px-4 py-2">
           <Avatar
             :image="
               identit.avatar.startsWith('file://') ? identit.avatar : `file://${identit.avatar}`
-            "
-            :label="identit.avatar ? undefined : identit.name.at(0)"
-            size="xlarge"
-            shape="circle"
+            " :label="identit.avatar ? undefined : identit.name.at(0)" size="xlarge" shape="circle"
           />
           <div class="h-full min-w-0 flex flex-1 flex-col justify-around">
             <div class="flex items-center">
@@ -144,22 +136,13 @@ function onIdentityClick(identit: Identity) {
       </CardSpotlight>
     </div>
     <div class="w-100 flex flex-col items-center gap-4">
-      <Button
-        class="w-full"
-        label="Create a new identity"
-        severity="contrast"
-        outlined
-        @click="showDialog"
-      />
+      <Button class="w-full" label="Create a new identity" severity="contrast" outlined @click="showDialog" />
     </div>
     <Dialog v-model:visible="visible" modal header="Edit Profile" class="w-150">
       <div class="flex justify-center">
         <button class="h-20 w-20 border rounded-full" @click="appStore.chooseAvatar()">
           <Avatar
-            v-if="appStore.avatarPreview"
-            class="h-20! w-20!"
-            :image="appStore.avatarPreview"
-            size="xlarge"
+            v-if="appStore.avatarPreview" class="h-20! w-20!" :image="appStore.avatarPreview" size="xlarge"
             shape="circle"
           />
           <i v-else class="pi pi-upload" style="color: slateblue" />
