@@ -4,12 +4,14 @@ import SystemFullscreen from '@renderer/views/system/system-fullscreen.vue'
 import Theme from '@renderer/views/system/system-theme.vue'
 import SystemTopbarLeft from '@renderer/views/system/system-topbar-left.vue'
 import SystemZoomOut from '@renderer/views/system/system-zoom-out.vue'
+
+const isMacos = window.is.isMacOS
 </script>
 
 <template>
   <div class="system-top-bar draggable flex">
     <SystemTopbarLeft />
-    <div class="ml-auto inline-flex items-center gap-2">
+    <div v-if="!isMacos" class="ml-auto inline-flex items-center gap-2">
       <Theme />
       <SystemZoomOut />
       <SystemFullscreen />
