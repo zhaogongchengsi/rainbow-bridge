@@ -4,7 +4,6 @@ import { useAsideMenu } from '@renderer/composables/aside'
 import { useIdentity } from '@renderer/store/identity'
 import { useAppStore } from '@renderer/store/store'
 import { debounce } from 'perfect-debounce'
-import Divider from 'primevue/divider'
 
 const menuStore = useAsideMenu()
 const appIdentity = useIdentity()

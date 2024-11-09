@@ -1,8 +1,28 @@
 <script setup lang="ts">
+import { usePeerClient } from '@renderer/client/use'
 import Menu from 'primevue/menu'
 
+const peerClient = usePeerClient()
+
 const menu = ref<InstanceType<typeof Menu> | null>(null)
+const visible = ref(false)
+
 const value = ref('')
+const friendId = ref('')
+const friendIdDebounced = refDebounced(friendId, 1000)
+
+watchEffect(() => {
+  if (!friendIdDebounced.value) {
+    return
+  }
+
+  console.log(friendIdDebounced.value)
+
+  const res = peerClient.searchFriend(friendIdDebounced.value)
+
+  console.log(res)
+})
+
 const items = [
   {
     label: 'Create Group',
@@ -15,7 +35,7 @@ const items = [
     label: 'Add friend',
     icon: 'pi pi-user',
     command: () => {
-      console.log('Dark')
+      visible.value = true
     },
   },
 ]
@@ -31,6 +51,18 @@ function toggle(event: MouseEvent) {
       <i class="pi pi-plus" />
     </button>
     <Menu ref="menu" :model="items" :popup="true" />
+    <Dialog v-model:visible="visible" modal header="Search friend">
+      <div class="h-100 w-150">
+        <IconField class="w-full">
+          <InputIcon class="pi pi-search" />
+          <InputText v-model="friendId" class="w-full" placeholder="Search" />
+        </IconField>
+        <Divider />
+        <div>
+          asd
+        </div>
+      </div>
+    </Dialog>
   </div>
 </template>
 

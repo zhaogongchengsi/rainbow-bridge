@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import { invoke } from '@renderer/utils/ipc'
 import { logger } from '@renderer/utils/logger'
-import Button from 'primevue/button'
-import Checkbox from 'primevue/checkbox'
-import ConfirmDialog from 'primevue/confirmdialog'
 import { useConfirm } from 'primevue/useconfirm'
 
 const confirm = useConfirm()

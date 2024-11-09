@@ -1,4 +1,5 @@
 import { resolve } from 'node:path'
+import { PrimeVueResolver } from '@primevue/auto-import-resolver'
 import vue from '@vitejs/plugin-vue'
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
 import UnoCSS from 'unocss/vite'
@@ -49,6 +50,7 @@ export default defineConfig(() => {
         }),
         Components({
           dts: 'components.d.ts',
+          resolvers: [PrimeVueResolver()],
         }),
         AutoImport({
           imports: ['vue', '@vueuse/core', VueRouterAutoImports, 'pinia'],

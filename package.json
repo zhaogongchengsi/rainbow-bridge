@@ -24,6 +24,7 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.0",
     "@electron-toolkit/utils": "^3.0.0",
+    "@primevue/auto-import-resolver": "^4.2.1",
     "@unocss/reset": "^0.63.6",
     "@vueuse/core": "^11.1.0",
     "electron-log": "^5.2.0",
