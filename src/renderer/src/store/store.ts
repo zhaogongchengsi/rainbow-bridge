@@ -2,6 +2,12 @@ import { useKy } from '@renderer/composables/fetch'
 import isEmpty from 'lodash/isEmpty'
 
 export const useAppStore = defineStore('app-store', () => {
+  const id = ref<string>()
+
+  onMounted(async () => {
+    id.value = await window.system.getID()
+  })
+
   const avatarPreview = ref<string>()
   const avatarFile = shallowRef<File>()
   const { open, onChange } = useFileDialog({
@@ -49,5 +55,6 @@ export const useAppStore = defineStore('app-store', () => {
     uploadAvatar,
     avatarPreview,
     clearAvatar,
+    id,
   }
 })

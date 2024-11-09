@@ -76,6 +76,10 @@ body,
   font-size: 1.5rem;
 }
 
+.system-aside-footer {
+  height: var(--system-aside-footer-height);
+}
+
 .system-aside-bar-item-button {
   width: var(--system-aside-bar-item-button-size);
   height: var(--system-aside-bar-item-button-size);
@@ -104,3 +108,14 @@ body,
   background-color: var(--rainbow-border-color);
 }
 
+
+.v-popper--theme-app-menu .v-popper__inner {
+  background-color: var(--rainbow-popper-background);
+  border: 1px solid var(--rainbow-border-color);
+  border-radius: var(--rainbow-border-radius);
+}
+
+.v-popper--theme-app-menu .v-popper__arrow-container .v-popper__arrow-outer,
+.v-popper--theme-app-menu .v-popper__arrow-container .v-popper__arrow-inner {
+  border-color: var(--rainbow-popper-background);
+}

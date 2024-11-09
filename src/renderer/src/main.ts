@@ -1,5 +1,6 @@
 import Aura from '@primevue/themes/aura'
 import { MotionPlugin } from '@vueuse/motion'
+import FloatingVue from 'floating-vue'
 import { createPinia } from 'pinia'
 import PrimeVue from 'primevue/config'
 import ConfirmationService from 'primevue/confirmationservice'
@@ -12,9 +13,10 @@ import { logger } from './utils/logger'
 import './styles/config.css'
 import 'virtual:uno.css'
 import '@unocss/reset/tailwind.css'
-import './styles/base.css'
 import 'primeicons/primeicons.css'
 import 'splitpanes/dist/splitpanes.css'
+import 'floating-vue/dist/style.css'
+import './styles/base.css'
 
 const app = createApp(App)
 
@@ -35,6 +37,14 @@ app.use(PrimeVue, {
 })
 app.use(ToastService)
 app.use(ConfirmationService)
+app.use(FloatingVue, {
+  themes: {
+    'app-menu': {
+      $extend: 'menu',
+      $resetCss: true,
+    },
+  },
+})
 
 app.mount('#app')
 

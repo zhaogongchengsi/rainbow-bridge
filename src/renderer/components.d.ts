@@ -8,6 +8,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AnimatedList: typeof import('./src/components/ui/animated-list.vue')['default']
+    Avatar: typeof import('./src/components/ui/avatar.vue')['default']
     CardSpotlight: typeof import('./src/components/ui/card-spotlight.vue')['default']
     DarkSelect: typeof import('./src/components/dark-select.vue')['default']
     'Identity-': typeof import('./src/components/ui/identity-.vue')['default']
@@ -18,5 +19,6 @@ declare module 'vue' {
     SystemFullscreen: typeof import('@renderer/views/system/system-fullscreen.vue')['default']
     SystemFullscreenExit: typeof import('@renderer/views/system/system-fullscreen-exit.vue')['default']
     SystemZoomOut: typeof import('@renderer/views/system/system-zoom-out.vue')['default']
+    UiAvatar: typeof import('./src/components/ui/ui-avatar.vue')['default']
   }
 }

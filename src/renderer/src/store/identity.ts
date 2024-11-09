@@ -5,7 +5,7 @@ import once from 'lodash/once'
 const max_identity_count = 10
 
 export const useIdentity = defineStore('identity', () => {
-  const currentIdentity = useStorage<Identity | null>('current-identity', null)
+  const currentIdentityId = useStorage<Identity['uuid']>('current-identity', null)
   const identitys = ref<Identity[]>([])
 
   async function init() {
@@ -26,10 +26,15 @@ export const useIdentity = defineStore('identity', () => {
   }
 
   function setCurrentIdentity(identity: Identity) {
-    currentIdentity.value = identity
+    currentIdentityId.value = identity.uuid
   }
 
+  const currentIdentity = computed(() => {
+    return identitys.value.find(identity => identity.uuid === currentIdentityId.value)
+  })
+
   return {
+    currentIdentityId,
     currentIdentity,
     identitys,
 
