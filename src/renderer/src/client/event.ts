@@ -8,7 +8,7 @@ export type Events = {
   'server:open': string
   'server:error': ClientError
   'server:close': undefined
-  'client:connection': DataConnection
+  'peer:connection': DataConnection
 }
 
 export type ClientEvent = Emitter<Events>

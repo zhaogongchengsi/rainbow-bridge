@@ -1,7 +1,8 @@
 import type { DataConnection, PeerOptions } from 'peerjs'
-import type { ClientError, ClientProvider } from './type'
+import type { ClientError, ClientProvider, Metadata } from './type'
 import { APP_PEER_PROVIDER } from '@renderer/client/constant'
 import { createEvent } from '@renderer/client/event'
+import { useIdentity } from '@renderer/store/identity'
 import { logger } from '@renderer/utils/logger'
 import ky from 'ky'
 import Peer from 'peerjs'
@@ -23,6 +24,9 @@ export function createClientSingle() {
   const client = shallowRef<Peer>()
 
   const peerOptions = ref<PeerOptions>(peer_options)
+  const connectionMap = new Map<string, DataConnection>()
+
+  const identity = useIdentity()
 
   const retryCount = ref<number>(0)
   const maxRetries = 5
@@ -77,18 +81,27 @@ export function createClientSingle() {
   }
 
   async function searchFriend(id: string) {
+    if (!identity.currentIdentity) {
+      throw new Error('Current identity not found')
+    }
+
     if (!id || !(await hasServerConnection(id))) {
       return undefined
     }
 
-    // getClient().connect(id).on('open', () => {
-
-    // })
+    await connectClient(id, {
+      id,
+      info: {
+        avatar: identity.currentIdentity.avatar,
+        uuid: identity.currentIdentity.uuid,
+        name: identity.currentIdentity.name,
+      },
+    })
 
     return id
   }
 
-  async function connect() {
+  async function connectServer() {
     destroy()
     id.value = await window.system.getID()
     connecting.value = true
@@ -118,7 +131,7 @@ export function createClientSingle() {
       retryCount.value++
       const delay = 2 ** retryCount.value * 1000 // Exponential backoff
       logger.info(`[peer] retrying connection (${retryCount.value}/${maxRetries}) in ${delay}ms`)
-      setTimeout(connect, delay)
+      setTimeout(connectServer, delay)
     }
     else {
       logger.error('[peer] max retries reached, giving up')
@@ -133,12 +146,60 @@ export function createClientSingle() {
     event.emit('server:close')
   }
 
+  function registerOpponentOpen(conn: DataConnection) {
+    return () => {
+      console.log('opponent open', conn)
+    }
+  }
+
+  function registerOpponentData(conn: DataConnection) {
+    return () => {
+      console.log('opponent data', conn)
+    }
+  }
+
+  function registerOpponentClose(conn: DataConnection) {
+    return () => {
+      console.log('opponent close', conn)
+    }
+  }
+
+  function registerOpponentError(conn: DataConnection) {
+    return () => {
+      console.log('opponent error', conn)
+    }
+  }
+
   function opConnection(conn: DataConnection) {
-    logger.info('[peer] connection')
+    logger.info(`[peer] connection ${conn.connectionId} ${conn.metadata}`)
 
-    // conn.type
+    connectionMap.set(conn.connectionId, conn)
+    conn.on('open', registerOpponentOpen(conn))
+    conn.on('data', registerOpponentData(conn))
+    conn.on('close', registerOpponentClose(conn))
+    conn.on('error', registerOpponentError(conn))
+    event.emit('peer:connection', conn)
+  }
 
-    event.emit('client:connection', conn)
+  function connectClient(id: string, metadata: Metadata) {
+    const { promise, reject, resolve } = Promise.withResolvers<DataConnection>()
+    const conn = getClient().connect(id, { metadata })
+
+    conn.once('open', () => {
+      connectionMap.set(id, conn)
+      resolve(conn)
+    })
+
+    conn.once('error', (error) => {
+      connectionMap.delete(id)
+      reject(error)
+    })
+
+    conn.once('close', () => {
+      connectionMap.delete(id)
+    })
+
+    return promise
   }
 
   watchEffect(() => {
@@ -156,6 +217,21 @@ export function createClientSingle() {
     client.value.on('connection', opConnection)
   })
 
+  onBeforeUnmount(() => {
+    logger.info('[peer] Before Unmount destroy')
+
+    if (client.value) {
+      client.value.removeAllListeners()
+    }
+
+    Array.from(connectionMap.values()).forEach((conn) => {
+      conn.removeAllListeners()
+      conn.close()
+    })
+
+    destroy()
+  })
+
   provide<ClientProvider>(APP_PEER_PROVIDER, {
     client,
     event,
@@ -171,7 +247,8 @@ export function createClientSingle() {
     searchFriend,
     getClient,
     tryGetClient,
+    connectClient,
   })
 
-  onMounted(connect)
+  onMounted(connectServer)
 }
