@@ -110,7 +110,7 @@ export function createClientSingle() {
   }
 
   async function onServerOpen(id: string) {
-    logger.info('[peer] open', id)
+    logger.info('[peer server] open', id)
     connecting.value = false
     connected.value = true
     peerId.value = id
@@ -119,7 +119,7 @@ export function createClientSingle() {
   }
 
   function onPeerError(error: ClientError) {
-    logger.error('[peer] error', `${error.type}: ${error.message}`)
+    logger.error('[peer server] error', `${error.type}: ${error.message}`)
     connecting.value = false
     connected.value = false
     connectError.value = true
@@ -139,7 +139,7 @@ export function createClientSingle() {
   }
 
   function opPeerClose() {
-    logger.info('[peer] close')
+    logger.info('[peer server] close')
     connecting.value = false
     connected.value = false
     connectError.value = false
@@ -186,6 +186,7 @@ export function createClientSingle() {
     const conn = getClient().connect(id, { metadata })
 
     conn.once('open', () => {
+      logger.info(`[peer client] connected to ${id}`)
       connectionMap.set(id, conn)
       resolve(conn)
     })
