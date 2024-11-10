@@ -2,17 +2,21 @@
 import Avatar from '@renderer/components/ui/ui-avatar.vue'
 import { useAsideMenu } from '@renderer/composables/aside'
 import { useIdentity } from '@renderer/store/identity'
-import { useAppStore } from '@renderer/store/store'
 import { debounce } from 'perfect-debounce'
 
 const menuStore = useAsideMenu()
 const appIdentity = useIdentity()
-const appStore = useAppStore()
 
 const copied = ref(false)
 
+const id = ref('')
+
+onMounted(async () => {
+  id.value = await window.system.getID()
+})
+
 const onCopy = debounce(() => {
-  navigator.clipboard.writeText(appStore.id!)
+  navigator.clipboard.writeText(id.value)
   copied.value = true
   setTimeout(() => {
     copied.value = false
@@ -58,8 +62,8 @@ const onCopy = debounce(() => {
             <Divider />
             <div class="flex items-center justify-between">
               <span>ID:</span>
-              <p class="max-w-40 truncate" :title="appStore.id">
-                {{ appStore.id }}
+              <p class="max-w-40 truncate" :title="id">
+                {{ id }}
               </p>
               <i :class="{ 'pi-copy': !copied, 'pi-check': copied }" class="pi cursor-pointer" @click="onCopy" />
             </div>

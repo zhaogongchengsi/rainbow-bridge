@@ -1,8 +1,9 @@
-import type { DataConnection, PeerOptions } from 'peerjs'
-import type { ClientError, ClientProvider, Metadata } from './type'
+import type { DataConnection, PeerError, PeerOptions } from 'peerjs'
+import type { ClientError, ClientProvider, Metadata, OpponentError } from './type'
 import { APP_PEER_PROVIDER } from '@renderer/client/constant'
 import { createEvent } from '@renderer/client/event'
 import { useIdentity } from '@renderer/store/identity'
+import { readBufferFromStore } from '@renderer/utils/ky'
 import { logger } from '@renderer/utils/logger'
 import ky from 'ky'
 import Peer from 'peerjs'
@@ -89,10 +90,14 @@ export function createClientSingle() {
       return undefined
     }
 
+    const avatar = await readBufferFromStore(identity.currentIdentity.avatar)
+
+    console.log(avatar)
+
     await connectClient(id, {
       id,
       info: {
-        avatar: identity.currentIdentity.avatar,
+        avatar,
         uuid: identity.currentIdentity.uuid,
         name: identity.currentIdentity.name,
       },
@@ -146,27 +151,43 @@ export function createClientSingle() {
     event.emit('server:close')
   }
 
+  function getMetadata(conn: DataConnection) {
+    const metadata = conn.metadata as Metadata
+    if (!metadata) {
+      logger.error(`[peer] opponent metadata not found: ${conn.connectionId}`)
+      throw new Error('Opponent metadata not found')
+    }
+    return metadata
+  }
+
   function registerOpponentOpen(conn: DataConnection) {
     return () => {
-      console.log('opponent open', conn)
+      const metadata = getMetadata(conn)
+
+      connectionMap.set(metadata.id, conn)
+
+      logger.info(`[peer] opponent open ${metadata.id} ${metadata.info.name} ${metadata.info.email}`)
     }
   }
 
   function registerOpponentData(conn: DataConnection) {
     return () => {
-      console.log('opponent data', conn)
+      logger.info(`[peer] opponent data ${getMetadata(conn)}`)
     }
   }
 
   function registerOpponentClose(conn: DataConnection) {
     return () => {
-      console.log('opponent close', conn)
+      const metadata = getMetadata(conn)
+      logger.silly(`opponent close :${metadata.id}`)
+      connectionMap.delete(metadata.id)
     }
   }
 
   function registerOpponentError(conn: DataConnection) {
-    return () => {
-      console.log('opponent error', conn)
+    return (err: OpponentError) => {
+      console.error('opponent error', err)
+      logger.error(`[peer] opponent error ${getMetadata(conn)} ${err.type} ${err.message}`)
     }
   }
 

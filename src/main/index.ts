@@ -1,7 +1,6 @@
 import process from 'node:process'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { app, BrowserWindow } from 'electron'
-import { PROTOCOL_NAME } from './libs/constant'
 import { logger } from './libs/logger'
 import { registerEvents, registerHandlers } from './libs/register'
 import { initFileStore, initStore } from './libs/store'
@@ -18,7 +17,7 @@ if (!app.requestSingleInstanceLock()) {
 const handles = import.meta.glob('./handles/*.ts')
 const events = import.meta.glob('./events/*.ts')
 
-const router = createAppRouter(PROTOCOL_NAME)
+const router = createAppRouter()
 
 app.whenReady().then(async () => {
   logger.silly('App is ready.')
