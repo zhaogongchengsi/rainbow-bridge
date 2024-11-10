@@ -1,4 +1,3 @@
-import type { WebHandlers } from '@common-types/web/handle'
 import type { BrowserWindowConstructorOptions } from 'electron'
 import { app, BrowserWindow, ipcMain } from 'electron'
 import { logger } from './logger'

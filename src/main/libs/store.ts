@@ -54,7 +54,7 @@ export function set<K extends keyof Store>(key: K, value: Store[K]) {
 }
 
 export async function initFileStore() {
-  fileStorePath = join(app.getPath('home'), FILE_STORE_NAME)
+  fileStorePath = join(app.getPath('home'), FILE_STORE_NAME, 'files')
   return await ensureDir(fileStorePath)
 }
 
