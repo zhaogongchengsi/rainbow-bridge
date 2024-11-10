@@ -11,14 +11,12 @@ const value = ref('')
 const friendId = ref('')
 const friendIdDebounced = refDebounced(friendId, 1000)
 
-watchEffect(() => {
+watchEffect(async () => {
   if (!friendIdDebounced.value) {
     return
   }
 
-  console.log(friendIdDebounced.value)
-
-  const res = peerClient.searchFriend(friendIdDebounced.value)
+  const res = await peerClient.searchFriend(friendIdDebounced.value)
 
   console.log(res)
 })

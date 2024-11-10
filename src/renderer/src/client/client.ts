@@ -92,8 +92,6 @@ export function createClientSingle() {
 
     const avatar = await readBufferFromStore(identity.currentIdentity.avatar)
 
-    console.log(avatar)
-
     await connectClient(id, {
       id,
       info: {
