@@ -1,14 +1,6 @@
+import { BASE_URL } from '@renderer/constants'
 import { createFetch } from '@vueuse/core'
-import ky from 'ky'
-
-const baseUrl = 'rainbow://app/'
 
 export const useAppFetch = createFetch({
-  baseUrl,
+  baseUrl: BASE_URL,
 })
-
-const original = ky.create({
-  prefixUrl: baseUrl,
-})
-
-export const useKy = () => original

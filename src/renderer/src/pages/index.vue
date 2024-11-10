@@ -1,27 +1,22 @@
 <script setup lang="ts">
 import type { Identity } from '@renderer/database/identit'
+import systemUpload from '@renderer/components/system/system-upload.vue'
 import { isDark } from '@renderer/composables/dark'
 import { useIdentity } from '@renderer/store/identity'
-import { useAppStore } from '@renderer/store/store'
 import { dateFromNow } from '@renderer/utils/date'
 import SystemClientState from '@renderer/views/system/system-client-state.vue'
 import SystemClose from '@renderer/views/system/system-close.vue'
 import SystemFullscreen from '@renderer/views/system/system-fullscreen.vue'
 import Theme from '@renderer/views/system/system-theme.vue'
 import SystemZoomOut from '@renderer/views/system/system-zoom-out.vue'
-// import Avatar from 'primevue/avatar'
-// import Button from 'primevue/button'
-// import Dialog from 'primevue/dialog'
-// import InputText from 'primevue/inputText'
-// import Toast from 'primevue/toast'
 import { useToast } from 'primevue/usetoast'
 
+const avatar = ref('')
 const username = ref('')
 const email = ref('')
 const comment = ref('')
 const toast = useToast()
 const identity = useIdentity()
-const appStore = useAppStore()
 const router = useRouter()
 const visible = ref(false)
 
@@ -35,7 +30,6 @@ function onError(content: string) {
 }
 
 function clearFrom() {
-  appStore.clearAvatar()
   username.value = ''
   email.value = ''
   comment.value = ''
@@ -51,9 +45,7 @@ function showDialog() {
 }
 
 async function onSave() {
-  const avatar = await appStore.uploadAvatar()
-
-  if (!avatar) {
+  if (!avatar.value) {
     onError('Please upload an avatar')
     return
   }
@@ -65,7 +57,7 @@ async function onSave() {
 
   try {
     await identity.createIdentity({
-      avatar,
+      avatar: avatar.value,
       name: username.value,
       email: email.value,
       comment: comment.value,
@@ -117,8 +109,7 @@ function onIdentityClick(identit: Identity) {
       >
         <div class="h-full w-full flex items-center gap-5 px-4 py-2">
           <Avatar
-            :image="
-              identit.avatar.startsWith('file://') ? identit.avatar : `file://${identit.avatar}`
+            :image="identit.avatar.startsWith('file://') ? identit.avatar : `file://${identit.avatar}`
             " :label="identit.avatar ? undefined : identit.name.at(0)" size="xlarge" shape="circle"
           />
           <div class="h-full min-w-0 flex flex-1 flex-col justify-around">
@@ -140,13 +131,12 @@ function onIdentityClick(identit: Identity) {
     </div>
     <Dialog v-model:visible="visible" modal header="Edit Profile" class="w-150">
       <div class="flex justify-center">
-        <button class="h-20 w-20 border rounded-full" @click="appStore.chooseAvatar()">
-          <Avatar
-            v-if="appStore.avatarPreview" class="h-20! w-20!" :image="appStore.avatarPreview" size="xlarge"
-            shape="circle"
-          />
-          <i v-else class="pi pi-upload" style="color: slateblue" />
-        </button>
+        <system-upload v-model:file="avatar" class="h-20 w-20 border rounded-full">
+          <template #default="{ previewFile }">
+            <Avatar v-if="previewFile" class="h-20! w-20!" :image="previewFile" size="xlarge" shape="circle" />
+            <i v-else class="pi pi-upload" style="color: slateblue" />
+          </template>
+        </system-upload>
       </div>
       <div class="mb-4 flex flex-col gap-4">
         <label for="username" class="w-24 font-semibold">Username</label>

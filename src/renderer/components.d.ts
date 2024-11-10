@@ -26,6 +26,7 @@ declare module 'vue' {
     SystemClose: typeof import('@renderer/views/system/system-close.vue')['default']
     SystemFullscreen: typeof import('@renderer/views/system/system-fullscreen.vue')['default']
     SystemFullscreenExit: typeof import('@renderer/views/system/system-fullscreen-exit.vue')['default']
+    SystemUpload: typeof import('./src/components/system/system-upload.vue')['default']
     SystemZoomOut: typeof import('@renderer/views/system/system-zoom-out.vue')['default']
     Toast: typeof import('primevue/toast')['default']
     UiAvatar: typeof import('./src/components/ui/ui-avatar.vue')['default']

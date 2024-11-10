@@ -8,14 +8,15 @@
       "@renderer/*": [
         "src/renderer/src/*"
       ],
-      "@common-types/*": [
-        "src/types/*"
-      ],
       "@shared/*": [
         "src/shared/*"
       ]
-    },
+    }
+
   },
+  "types": [
+    "src/types"
+  ],
   "include": [
     "src/renderer/src/env.d.ts",
     "src/renderer/src/**/*",
