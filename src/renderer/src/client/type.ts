@@ -32,3 +32,7 @@ export interface Metadata {
     avatar: BufferFile
   }
 }
+
+export interface Data {
+
+}

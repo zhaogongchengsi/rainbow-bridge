@@ -1,5 +1,5 @@
 import type { DataConnection, PeerError, PeerOptions } from 'peerjs'
-import type { ClientError, ClientProvider, Metadata, OpponentError } from './type'
+import type { ClientError, ClientProvider, Data, Metadata, OpponentError } from './type'
 import { APP_PEER_PROVIDER } from '@renderer/client/constant'
 import { createEvent } from '@renderer/client/event'
 import { useIdentity } from '@renderer/store/identity'
@@ -168,9 +168,9 @@ export function createClientSingle() {
     }
   }
 
-  function registerOpponentData(conn: DataConnection) {
+  function registerOpponentData(data: Data) {
     return () => {
-      logger.info(`[peer] opponent data ${getMetadata(conn)}`)
+      logger.info(`[peer] opponent data ${data}`)
     }
   }
 
