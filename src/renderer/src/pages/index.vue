@@ -19,6 +19,7 @@ const toast = useToast()
 const identity = useIdentity()
 const router = useRouter()
 const visible = ref(false)
+const isMacos = window.is.isMacOS
 
 function onError(content: string) {
   toast.add({
@@ -81,12 +82,12 @@ function onIdentityClick(identit: Identity) {
 <template>
   <div class="relative h-screen w-full flex flex-col items-center justify-center gap-10">
     <div class="draggable absolute right-0 top-0 w-full flex gap-2">
-      <div class="not-draggable ml-auto flex gap-2">
+      <div class="not-draggable ml-auto flex gap-2 px-2">
         <SystemClientState class="mx-3" />
         <Theme />
-        <SystemZoomOut />
-        <SystemFullscreen />
-        <SystemClose />
+        <SystemZoomOut v-if="!isMacos" />
+        <SystemFullscreen v-if="!isMacos" />
+        <SystemClose v-if="!isMacos" />
       </div>
     </div>
     <div class="flex flex-col items-center justify-center">
