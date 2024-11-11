@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { usePeerClient } from '@renderer/client/use'
+import { usePeerClientState } from '@renderer/client/use'
 
-const peer = usePeerClient()
+const peer = usePeerClientState()
 </script>
 
 <template>

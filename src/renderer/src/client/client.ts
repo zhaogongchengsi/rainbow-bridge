@@ -1,11 +1,12 @@
 import type { DataConnection, PeerOptions } from 'peerjs'
-import type { ClientError, ClientProvider, Data, Metadata, OpponentError } from './type'
-import { APP_PEER_PROVIDER } from '@renderer/client/constant'
+import type { DataType } from './enums'
+import type { ClientError, ClientProviderMethods, ClientProviderState, Data, Metadata, OpponentError } from './type'
+import { APP_PEER_PROVIDER_METHODS, APP_PEER_PROVIDER_STATE } from '@renderer/client/constant'
 import { createEvent } from '@renderer/client/event'
 import { useIdentity } from '@renderer/store/identity'
+import { decryptClientID, getClientID } from '@renderer/utils/id'
 import { readBufferFromStore } from '@renderer/utils/ky'
 import { logger } from '@renderer/utils/logger'
-import { destr } from 'destr'
 import ky from 'ky'
 import Peer from 'peerjs'
 
@@ -83,35 +84,22 @@ export function createClientSingle() {
   }
 
   async function searchFriend(id: string) {
-    if (!identity.currentIdentity) {
-      throw new Error('Current identity not found')
-    }
-
     if (!id || !(await hasServerConnection(id))) {
       return undefined
     }
 
-    const avatar = await readBufferFromStore(identity.currentIdentity.avatar)
-
-    await connectClient(id, {
-      id,
-      info: {
-        avatar,
-        uuid: identity.currentIdentity.uuid,
-        name: identity.currentIdentity.name,
-      },
-    })
+    await connectClient(id)
 
     return id
   }
 
-  function sendData(conn: DataConnection, data: Data) {
-    const jsonStr = JSON.stringify(data)
+  // function sendData(conn: DataConnection, type: DataType, data: Data['data']) {
+  //   const jsonStr = JSON.stringify(data)
 
-    console.log(conn.metadata.id)
+  //   console.log(conn.metadata.id)
 
-    conn.send(data)
-  }
+  //   conn.send(data)
+  // }
 
   async function connectServer() {
     destroy()
@@ -199,33 +187,62 @@ export function createClientSingle() {
   }
 
   function opConnection(conn: DataConnection) {
-    logger.info(`[peer] connection ${conn.connectionId} ${conn.metadata}`)
+    const meta = conn.metadata as Metadata
 
-    connectionMap.set(conn.connectionId, conn)
+    logger.info(`[peer] connection ${meta.id} ${meta}`)
+
+    connectionMap.set(meta.id, conn)
+
     conn.on('open', registerOpponentOpen(conn))
     conn.on('data', registerOpponentData(conn))
     conn.on('close', registerOpponentClose(conn))
     conn.on('error', registerOpponentError(conn))
+
     event.emit('peer:connection', conn)
   }
 
-  function connectClient(id: string, metadata: Metadata) {
+  async function connectClient(id: string, needDecrypt: boolean = true) {
     const { promise, reject, resolve } = Promise.withResolvers<DataConnection>()
-    const conn = getClient().connect(id, { metadata })
+
+    if (!identity.currentIdentity) {
+      throw new Error('Current identity not found')
+    }
+
+    let _id = id
+
+    if (connectionMap.has(id)) {
+      resolve(connectionMap.get(id)!)
+      return promise
+    }
+
+    if (needDecrypt) {
+      _id = await decryptClientID(id)
+    }
+
+    const metadata = {
+      id: await window.system.getID(),
+      info: {
+        avatar: await readBufferFromStore(identity.currentIdentity.avatar),
+        uuid: identity.currentIdentity.uuid,
+        name: identity.currentIdentity.name,
+      },
+    }
+
+    const conn = getClient().connect(_id, { metadata })
 
     conn.once('open', () => {
       logger.info(`[peer client] connected to ${id}`)
-      connectionMap.set(id, conn)
+      connectionMap.set(_id, conn)
       resolve(conn)
     })
 
     conn.once('error', (error) => {
-      connectionMap.delete(id)
+      connectionMap.delete(_id)
       reject(error)
     })
 
     conn.once('close', () => {
-      connectionMap.delete(id)
+      connectionMap.delete(_id)
     })
 
     return promise
@@ -261,26 +278,30 @@ export function createClientSingle() {
     destroy()
   })
 
-  provide<ClientProvider>(APP_PEER_PROVIDER, reactive({
-    id,
-    client,
-    event,
+  provide<ClientProviderState>(
+    APP_PEER_PROVIDER_STATE,
+    reactive({
+      id,
+      client,
+      event,
+      connecting,
+      connected,
+      connectError,
+      peerId,
+      retryCount,
+      connectionIds: data,
+    }),
+  )
 
-    connecting,
-    connected,
-    connectError,
-
-    peerId,
-    retryCount,
-    connectionIds: data,
+  provide<ClientProviderMethods>(APP_PEER_PROVIDER_METHODS, {
     destroy,
     getServerConnections,
     hasServerConnection,
     searchFriend,
+    connectClient,
     getClient,
     tryGetClient,
-    connectClient,
-  }))
+  })
 
   onMounted(connectServer)
 }

@@ -6,7 +6,7 @@ import type { DataConnection, PeerError, PeerErrorType } from 'peerjs'
 import type { Reactive, Ref } from 'vue'
 import type { DataType } from './enums'
 
-export type ClientProvider = Reactive<{
+export type ClientProviderState = Reactive<{
   id: Ref<string | undefined>
   client: Ref<Peer | undefined>
   event: ClientEvent
@@ -16,14 +16,17 @@ export type ClientProvider = Reactive<{
   peerId: Ref<string | undefined>
   retryCount: Ref<number>
   connectionIds: Ref<string[] | null>
+}>
+
+export interface ClientProviderMethods {
   destroy: () => void
   getServerConnections: () => Promise<string[]>
   hasServerConnection: (id: string) => Promise<boolean>
   searchFriend: (id: string) => Promise<string | undefined>
   getClient: () => Peer
   tryGetClient: () => Peer | undefined
-  connectClient: (id: string, metadata: Metadata) => Promise<DataConnection>
-}>
+  connectClient: (id: string, needDecrypt?: boolean) => Promise<DataConnection>
+}
 
 export type ClientError = PeerError<`${PeerErrorType}`>
 export type OpponentError = PeerError<'not-open-yet' | 'message-too-big' | 'negotiation-failed' | 'connection-closed'>

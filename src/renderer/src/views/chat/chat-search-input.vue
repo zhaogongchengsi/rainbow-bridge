@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { usePeerClient } from '@renderer/client/use'
+import { usePeerClientMethods } from '@renderer/client/use'
 import Menu from 'primevue/menu'
 
-const peerClient = usePeerClient()
+const peerClient = usePeerClientMethods()
 
 const menu = ref<InstanceType<typeof Menu> | null>(null)
 const visible = ref(false)

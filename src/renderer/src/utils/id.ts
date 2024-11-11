@@ -7,6 +7,6 @@ export async function getClientID() {
   return encryptString(id, SALT)
 }
 
-export function decryptClientID(id: string) {
-  return decryptString(id, SALT)
+export async function decryptClientID(id: string) {
+  return await decryptString(id, SALT)
 }
