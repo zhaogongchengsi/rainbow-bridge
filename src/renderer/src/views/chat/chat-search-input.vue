@@ -16,9 +16,7 @@ watchEffect(async () => {
     return
   }
 
-  const res = await peerClient.searchFriend(friendIdDebounced.value)
-
-  console.log(res)
+  await peerClient.searchFriend(friendIdDebounced.value)
 })
 
 const items = [

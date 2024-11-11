@@ -59,22 +59,27 @@ export async function encryptString(data: string, salt: string): Promise<string>
 
 // 解密字符串
 export async function decryptString(encryptedData: string, salt: string): Promise<string> {
-  const key = await generateKey(salt)
-  const buffer = Uint8Array.from(atob(encryptedData), c => c.charCodeAt(0))
-  const iv = buffer.slice(0, 12)
-  const data = buffer.slice(12)
+  try {
+    const key = await generateKey(salt)
+    const buffer = Uint8Array.from(atob(encryptedData), c => c.charCodeAt(0))
+    const iv = buffer.slice(0, 12)
+    const data = buffer.slice(12)
 
-  const decryptedData = await crypto.subtle.decrypt(
-    {
-      name: 'AES-GCM',
-      iv,
-    },
-    key,
-    data,
-  )
+    const decryptedData = await crypto.subtle.decrypt(
+      {
+        name: 'AES-GCM',
+        iv,
+      },
+      key,
+      data,
+    )
 
-  const decoder = new TextDecoder()
-  return decoder.decode(decryptedData)
+    const decoder = new TextDecoder()
+    return decoder.decode(decryptedData)
+  }
+  catch (error: any) {
+    throw new Error(`Failed to decrypt data: ${error.message}`)
+  }
 }
 
 export async function encryptObjectToBuffer(obj: any, salt: string): Promise<ArrayBuffer> {

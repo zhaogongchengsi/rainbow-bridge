@@ -84,13 +84,15 @@ export function createClientSingle() {
   }
 
   async function searchFriend(id: string) {
-    if (!id || !(await hasServerConnection(id))) {
-      return undefined
+    try {
+      const conn = await connectClient(id)
+
+      console.log(conn)
     }
-
-    await connectClient(id)
-
-    return id
+    catch (err) {
+      console.error(err)
+    }
+    // return id
   }
 
   // function sendData(conn: DataConnection, type: DataType, data: Data['data']) {
@@ -202,7 +204,7 @@ export function createClientSingle() {
   }
 
   async function connectClient(id: string, needDecrypt: boolean = true) {
-    const { promise, reject, resolve } = Promise.withResolvers<DataConnection>()
+    const { promise, reject, resolve } = Promise.withResolvers<DataConnection | undefined>()
 
     if (!identity.currentIdentity) {
       throw new Error('Current identity not found')
@@ -210,13 +212,17 @@ export function createClientSingle() {
 
     let _id = id
 
-    if (connectionMap.has(id)) {
-      resolve(connectionMap.get(id)!)
+    if (connectionMap.has(_id)) {
+      resolve(connectionMap.get(_id)!)
       return promise
     }
 
     if (needDecrypt) {
       _id = await decryptClientID(id)
+    }
+
+    if (!_id || !(await hasServerConnection(_id))) {
+      resolve(undefined)
     }
 
     const metadata = {

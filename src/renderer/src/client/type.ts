@@ -25,7 +25,7 @@ export interface ClientProviderMethods {
   searchFriend: (id: string) => Promise<string | undefined>
   getClient: () => Peer
   tryGetClient: () => Peer | undefined
-  connectClient: (id: string, needDecrypt?: boolean) => Promise<DataConnection>
+  connectClient: (id: string, needDecrypt?: boolean) => Promise<DataConnection | undefined>
 }
 
 export type ClientError = PeerError<`${PeerErrorType}`>
