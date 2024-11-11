@@ -40,6 +40,8 @@ export interface Metadata {
 
 export interface CommonData {
   id: string
+  timestamp: number
+  reply?: string
 }
 
 export type JsonData = CommonData & {
