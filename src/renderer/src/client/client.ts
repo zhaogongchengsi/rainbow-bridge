@@ -1,11 +1,11 @@
-import type { DataConnection, PeerError, PeerOptions } from 'peerjs'
+import type { DataConnection, PeerOptions } from 'peerjs'
 import type { ClientError, ClientProvider, Data, Metadata, OpponentError } from './type'
 import { APP_PEER_PROVIDER } from '@renderer/client/constant'
 import { createEvent } from '@renderer/client/event'
 import { useIdentity } from '@renderer/store/identity'
-import { getClientID } from '@renderer/utils/id'
 import { readBufferFromStore } from '@renderer/utils/ky'
 import { logger } from '@renderer/utils/logger'
+import { destr } from 'destr'
 import ky from 'ky'
 import Peer from 'peerjs'
 
@@ -105,6 +105,14 @@ export function createClientSingle() {
     return id
   }
 
+  function sendData(conn: DataConnection, data: Data) {
+    const jsonStr = JSON.stringify(data)
+
+    console.log(conn.metadata.id)
+
+    conn.send(data)
+  }
+
   async function connectServer() {
     destroy()
     id.value = await window.system.getID()
@@ -169,8 +177,8 @@ export function createClientSingle() {
     }
   }
 
-  function registerOpponentData(data: Data) {
-    return () => {
+  function registerOpponentData(_: DataConnection) {
+    return (data: any) => {
       logger.info(`[peer] opponent data ${data}`)
     }
   }

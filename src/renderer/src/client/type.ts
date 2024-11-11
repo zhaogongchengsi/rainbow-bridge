@@ -3,7 +3,8 @@ import type { Identity } from '@renderer/database/identit'
 import type { BufferFile } from '@renderer/utils/ky'
 import type Peer from 'peerjs'
 import type { DataConnection, PeerError, PeerErrorType } from 'peerjs'
-import type { Reactive, Ref, ShallowRef } from 'vue'
+import type { Reactive, Ref } from 'vue'
+import type { DataType } from './enums'
 
 export type ClientProvider = Reactive<{
   id: Ref<string | undefined>
@@ -34,6 +35,18 @@ export interface Metadata {
   }
 }
 
-export interface Data {
-
+export interface CommonData {
+  id: string
 }
+
+export type JsonData = CommonData & {
+  type: DataType.JSON
+  data: any
+}
+
+export type BinaryData = CommonData & {
+  type: DataType.BINARY
+  data: Blob
+}
+
+export type Data = JsonData | BinaryData
