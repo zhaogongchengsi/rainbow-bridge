@@ -3,6 +3,7 @@ import type { ClientError, ClientProvider, Data, Metadata, OpponentError } from 
 import { APP_PEER_PROVIDER } from '@renderer/client/constant'
 import { createEvent } from '@renderer/client/event'
 import { useIdentity } from '@renderer/store/identity'
+import { getClientID } from '@renderer/utils/id'
 import { readBufferFromStore } from '@renderer/utils/ky'
 import { logger } from '@renderer/utils/logger'
 import ky from 'ky'
@@ -252,23 +253,26 @@ export function createClientSingle() {
     destroy()
   })
 
-  provide<ClientProvider>(APP_PEER_PROVIDER, {
+  provide<ClientProvider>(APP_PEER_PROVIDER, reactive({
+    id,
     client,
     event,
+
     connecting,
     connected,
+    connectError,
+
     peerId,
     retryCount,
     connectionIds: data,
     destroy,
-    connectError,
     getServerConnections,
     hasServerConnection,
     searchFriend,
     getClient,
     tryGetClient,
     connectClient,
-  })
+  }))
 
   onMounted(connectServer)
 }

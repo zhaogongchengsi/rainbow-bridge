@@ -3,9 +3,10 @@ import type { Identity } from '@renderer/database/identit'
 import type { BufferFile } from '@renderer/utils/ky'
 import type Peer from 'peerjs'
 import type { DataConnection, PeerError, PeerErrorType } from 'peerjs'
-import type { Ref, ShallowRef } from 'vue'
+import type { Reactive, Ref, ShallowRef } from 'vue'
 
-export interface ClientProvider {
+export type ClientProvider = Reactive<{
+  id: Ref<string | undefined>
   client: Ref<Peer | undefined>
   event: ClientEvent
   connecting: Ref<boolean>
@@ -21,7 +22,7 @@ export interface ClientProvider {
   getClient: () => Peer
   tryGetClient: () => Peer | undefined
   connectClient: (id: string, metadata: Metadata) => Promise<DataConnection>
-}
+}>
 
 export type ClientError = PeerError<`${PeerErrorType}`>
 export type OpponentError = PeerError<'not-open-yet' | 'message-too-big' | 'negotiation-failed' | 'connection-closed'>

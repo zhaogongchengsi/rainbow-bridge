@@ -10,12 +10,3 @@ export function usePeerClient() {
 
   return v
 }
-
-export function usePeerClientStatue() {
-  const peer = usePeerClient()
-  return reactive({
-    connecting: peer.connecting,
-    connected: peer.connected,
-    connectError: peer.connectError,
-  })
-}

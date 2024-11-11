@@ -2,6 +2,7 @@
 import Avatar from '@renderer/components/ui/ui-avatar.vue'
 import { useAsideMenu } from '@renderer/composables/aside'
 import { useIdentity } from '@renderer/store/identity'
+import { getClientID } from '@renderer/utils/id'
 import { debounce } from 'perfect-debounce'
 
 const menuStore = useAsideMenu()
@@ -12,7 +13,7 @@ const copied = ref(false)
 const id = ref('')
 
 onMounted(async () => {
-  id.value = await window.system.getID()
+  id.value = await getClientID()
 })
 
 const onCopy = debounce(() => {

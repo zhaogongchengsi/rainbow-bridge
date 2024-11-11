@@ -13,6 +13,7 @@ interface ImportMetaEnv {
   readonly RENDERER_VITE_PEER_PATH: string
   readonly RENDERER_VITE_PEER_KEY: string
   readonly RENDERER_VITE_PEER_URL: string
+  readonly RENDERER_VITE_SALT: string
   // more env variables...
 }
 
