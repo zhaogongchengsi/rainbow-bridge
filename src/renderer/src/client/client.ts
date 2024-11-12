@@ -1,23 +1,13 @@
 import type { DataConnection, PeerOptions } from 'peerjs'
-import type { DataType } from './enums'
-import type { ClientError, ClientProviderMethods, ClientProviderState, Data, Metadata, OpponentError } from './type'
-import { APP_PEER_PROVIDER_METHODS, APP_PEER_PROVIDER_STATE } from '@renderer/client/constant'
+import type { ClientError, ClientProviderMethods, ClientProviderState, Metadata } from './type'
+import { APP_PEER_PROVIDER_METHODS, APP_PEER_PROVIDER_STATE, peer_options, server_base_url } from '@renderer/client/constant'
 import { createEvent } from '@renderer/client/event'
 import { useIdentity } from '@renderer/store/identity'
-import { decryptClientID, getClientID } from '@renderer/utils/id'
+import { decryptClientID } from '@renderer/utils/id'
 import { readBufferFromStore } from '@renderer/utils/ky'
 import { logger } from '@renderer/utils/logger'
-import ky from 'ky'
 import Peer from 'peerjs'
-
-const peer_options = {
-  port: Number(import.meta.env.RENDERER_VITE_PEER_PORT),
-  path: import.meta.env.RENDERER_VITE_PEER_PATH,
-  key: import.meta.env.RENDERER_VITE_PEER_KEY,
-  host: import.meta.env.RENDERER_VITE_PEER_URL,
-}
-
-const server_base_url = `http://${peer_options.host}:${peer_options.port}${peer_options.path}/${peer_options.key}`
+import { Manager } from './manager'
 
 export function createClientSingle() {
   logger.info(`[peer] create client server url: ${server_base_url}`)
@@ -27,7 +17,7 @@ export function createClientSingle() {
   const client = shallowRef<Peer>()
 
   const peerOptions = ref<PeerOptions>(peer_options)
-  const connectionMap = new Map<string, DataConnection>()
+  const manager = new Manager()
 
   const identity = useIdentity()
 
@@ -70,7 +60,7 @@ export function createClientSingle() {
    * @returns A promise that resolves to an array of server connection strings.
    */
   function getServerConnections() {
-    return ky.get<string[]>(`${server_base_url}/peers`).json()
+    return manager.getServerConnections()
   }
 
   /**
@@ -80,12 +70,12 @@ export function createClientSingle() {
    * @returns A promise that resolves to a boolean indicating whether the server connection exists.
    */
   async function hasServerConnection(id: string) {
-    return (await getServerConnections()).includes(id)
+    return await manager.hasServerConnection(id)
   }
 
   async function searchFriend(id: string) {
     try {
-      const conn = await connectClient(id)
+      const conn = await connect(id)
 
       console.log(conn)
     }
@@ -94,14 +84,6 @@ export function createClientSingle() {
     }
     // return id
   }
-
-  // function sendData(conn: DataConnection, type: DataType, data: Data['data']) {
-  //   const jsonStr = JSON.stringify(data)
-
-  //   console.log(conn.metadata.id)
-
-  //   conn.send(data)
-  // }
 
   async function connectServer() {
     destroy()
@@ -131,7 +113,7 @@ export function createClientSingle() {
       && ['socket-error', 'server-error', 'network'].includes(error.type)
     ) {
       retryCount.value++
-      const delay = 2 ** retryCount.value * 1000 // Exponential backoff
+      const delay = 2 ** retryCount.value * 1000
       logger.info(`[peer] retrying connection (${retryCount.value}/${maxRetries}) in ${delay}ms`)
       setTimeout(connectServer, delay)
     }
@@ -148,62 +130,17 @@ export function createClientSingle() {
     event.emit('server:close')
   }
 
-  function getMetadata(conn: DataConnection) {
-    const metadata = conn.metadata as Metadata
-    if (!metadata) {
-      logger.error(`[peer] opponent metadata not found: ${conn.connectionId}`)
-      throw new Error('Opponent metadata not found')
-    }
-    return metadata
-  }
-
-  function registerOpponentOpen(conn: DataConnection) {
-    return () => {
-      const metadata = getMetadata(conn)
-
-      connectionMap.set(metadata.id, conn)
-
-      logger.info(`[peer] opponent open ${metadata.id} ${metadata.info.name} ${metadata.info.email}`)
-    }
-  }
-
-  function registerOpponentData(_: DataConnection) {
-    return (data: any) => {
-      logger.info(`[peer] opponent data ${data}`)
-    }
-  }
-
-  function registerOpponentClose(conn: DataConnection) {
-    return () => {
-      const metadata = getMetadata(conn)
-      logger.silly(`opponent close :${metadata.id}`)
-      connectionMap.delete(metadata.id)
-    }
-  }
-
-  function registerOpponentError(conn: DataConnection) {
-    return (err: OpponentError) => {
-      console.error('opponent error', err)
-      logger.error(`[peer] opponent error ${getMetadata(conn)} ${err.type} ${err.message}`)
-    }
-  }
-
   function opConnection(conn: DataConnection) {
     const meta = conn.metadata as Metadata
 
     logger.info(`[peer] connection ${meta.id} ${meta}`)
 
-    connectionMap.set(meta.id, conn)
-
-    conn.on('open', registerOpponentOpen(conn))
-    conn.on('data', registerOpponentData(conn))
-    conn.on('close', registerOpponentClose(conn))
-    conn.on('error', registerOpponentError(conn))
+    manager.register(conn)
 
     event.emit('peer:connection', conn)
   }
 
-  async function connectClient(id: string, needDecrypt: boolean = true) {
+  async function connect(id: string, needDecrypt: boolean = true) {
     const { promise, reject, resolve } = Promise.withResolvers<DataConnection | undefined>()
 
     if (!identity.currentIdentity) {
@@ -211,11 +148,6 @@ export function createClientSingle() {
     }
 
     let _id = id
-
-    if (connectionMap.has(_id)) {
-      resolve(connectionMap.get(_id)!)
-      return promise
-    }
 
     if (needDecrypt) {
       _id = await decryptClientID(id)
@@ -238,18 +170,14 @@ export function createClientSingle() {
 
     conn.once('open', () => {
       logger.info(`[peer client] connected to ${id}`)
-      connectionMap.set(_id, conn)
       resolve(conn)
     })
 
     conn.once('error', (error) => {
-      connectionMap.delete(_id)
       reject(error)
     })
 
-    conn.once('close', () => {
-      connectionMap.delete(_id)
-    })
+    manager.register(conn)
 
     return promise
   }
@@ -276,10 +204,7 @@ export function createClientSingle() {
       client.value.removeAllListeners()
     }
 
-    Array.from(connectionMap.values()).forEach((conn) => {
-      conn.removeAllListeners()
-      conn.close()
-    })
+    manager.unmount()
 
     destroy()
   })
@@ -304,7 +229,7 @@ export function createClientSingle() {
     getServerConnections,
     hasServerConnection,
     searchFriend,
-    connectClient,
+    connect,
     getClient,
     tryGetClient,
   })

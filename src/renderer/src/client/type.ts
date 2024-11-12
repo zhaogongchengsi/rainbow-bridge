@@ -51,7 +51,7 @@ export type JsonData = CommonData & {
 
 export type BinaryData = CommonData & {
   type: DataType.BINARY
-  data: Blob
+  data: ArrayBuffer
 }
 
 export type Data = JsonData | BinaryData

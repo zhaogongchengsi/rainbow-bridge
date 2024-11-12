@@ -1,6 +1,6 @@
 import type { Emitter } from 'mitt'
 import type { DataConnection } from 'peerjs'
-import type { ClientError } from './type'
+import type { BinaryData, ClientError, Data, JsonData } from './type'
 import mitt from 'mitt'
 
 // eslint-disable-next-line ts/consistent-type-definitions
@@ -9,6 +9,9 @@ export type Events = {
   'server:error': ClientError
   'server:close': undefined
   'peer:connection': DataConnection
+  'peer:data': Data
+  'peer:json': JsonData
+  'peer:binary': BinaryData
 }
 
 export type ClientEvent = Emitter<Events>
