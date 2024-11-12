@@ -4,4 +4,5 @@ export enum DataType {
   TEXT = 'text',
   ARRAY_BUFFER = 'arrayBuffer',
   BLOB = 'blob',
+  REPLY = 'reply',
 }

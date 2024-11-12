@@ -41,7 +41,6 @@ export interface Metadata {
 export interface CommonData {
   id: string
   timestamp: number
-  reply?: string
 }
 
 export type JsonData = CommonData & {
@@ -54,4 +53,15 @@ export type BinaryData = CommonData & {
   data: ArrayBuffer
 }
 
-export type Data = JsonData | BinaryData
+export type ReplyData = CommonData & {
+  type: DataType.REPLY
+  response: {
+    result: boolean
+    error: any
+  }
+  name: string
+  argv: any[]
+  replyId: string
+}
+
+export type Data = JsonData | BinaryData | ReplyData

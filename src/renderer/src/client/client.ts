@@ -12,19 +12,21 @@ import { Manager } from './manager'
 export function createClientSingle() {
   logger.info(`[peer] create client server url: ${server_base_url}`)
 
+  const event = createEvent()
+
   const id = ref<string>()
   const peerId = ref<string>()
   const client = shallowRef<Peer>()
 
   const peerOptions = ref<PeerOptions>(peer_options)
-  const manager = new Manager()
+
+  const manager = new Manager(event)
 
   const identity = useIdentity()
 
   const retryCount = ref<number>(0)
   const maxRetries = 5
 
-  const event = createEvent()
   const connecting = ref<boolean>(false)
   const connected = ref<boolean>(false)
   const connectError = ref<boolean>(false)
@@ -157,6 +159,7 @@ export function createClientSingle() {
       resolve(undefined)
     }
 
+    // Information about the initiator
     const metadata = {
       id: await window.system.getID(),
       info: {

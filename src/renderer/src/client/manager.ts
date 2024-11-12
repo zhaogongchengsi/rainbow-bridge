@@ -1,9 +1,10 @@
-import type { DataConnection, PeerOptions } from 'peerjs'
-import type { Data, Metadata, OpponentError } from './type'
+import type { DataConnection } from 'peerjs'
+import type { ClientEvent } from './event'
+import type { BinaryData, Data, Metadata, OpponentError } from './type'
 import { SALT } from '@renderer/constants'
 import { formatDate } from '@renderer/utils/date'
-import { encryptObjectToBuffer } from '@renderer/utils/decrypt'
-import { decryptClientID, getClientID } from '@renderer/utils/id'
+import { decryptBufferToObject, encryptObjectToBuffer } from '@renderer/utils/decrypt'
+import { getClientID } from '@renderer/utils/id'
 import { logger } from '@renderer/utils/logger'
 import ky from 'ky'
 import { server_base_url } from './constant'
@@ -11,7 +12,11 @@ import { DataType } from './enums'
 
 export class Manager {
   connectionMap = new Map<string, DataConnection>()
-  constructor() { }
+  event: ClientEvent
+  replyMap = new Map<string, PromiseWithResolvers<any>>()
+  constructor(e: ClientEvent) {
+    this.event = e
+  }
 
   getMetadata(conn: DataConnection) {
     const metadata = conn.metadata as Metadata
@@ -25,7 +30,38 @@ export class Manager {
   registerOpponentData(_: DataConnection) {
     return (data: any) => {
       const _data = data as Data
+
       logger.info(`[peer] opponent data id: ${data.id} time: ${formatDate(data.timestamp)} reply: ${data.reply}`)
+
+      if (_data.type === DataType.JSON) {
+        _data.data = decryptBufferToObject(_data.data, SALT)
+      }
+
+      this.event.emit('peer:data', _data)
+
+      if (_data.type === DataType.REPLY) {
+        const promise = this.replyMap.get(_data.replyId)
+        if (promise) {
+          promise.promise.finally(() => {
+            this.replyMap.delete(_data.replyId)
+          })
+          if (_data.response.error) {
+            promise.reject(_data.response.error)
+          }
+          else {
+            promise.resolve(_data.response.result)
+          }
+        }
+        return
+      }
+
+      if (_data.type === DataType.JSON) {
+        this.event.emit('peer:json', _data)
+      }
+
+      else if (_data.type === DataType.BINARY) {
+        this.event.emit('peer:binary', _data)
+      }
     }
   }
 
@@ -92,6 +128,7 @@ export class Manager {
       id,
       timestamp,
       type: DataType.JSON,
+      // ! Decrypt with your own ID
       data: encryptObjectToBuffer(data, SALT),
     }
 
@@ -116,28 +153,28 @@ export class Manager {
     let buffer: ArrayBuffer
 
     if (typeof data === 'string') {
-    // 将字符串转换为 ArrayBuffer
+      // 将字符串转换为 ArrayBuffer
       const encoder = new TextEncoder()
       buffer = encoder.encode(data).buffer as ArrayBuffer
     }
     else if (data instanceof ArrayBuffer) {
-    // 如果已经是 ArrayBuffer，直接返回
+      // 如果已经是 ArrayBuffer，直接返回
       buffer = data
     }
     else if (data instanceof Blob) {
-    // 将 Blob 转换为 ArrayBuffer
+      // 将 Blob 转换为 ArrayBuffer
       return await data.arrayBuffer()
     }
     else if (Array.isArray(data)) {
-    // 将数组转换为 ArrayBuffer
+      // 将数组转换为 ArrayBuffer
       buffer = new Uint8Array(data).buffer
     }
     else if (data instanceof Uint8Array) {
-    // 如果是 Uint8Array，直接返回其 buffer
+      // 如果是 Uint8Array，直接返回其 buffer
       buffer = ArrayBuffer.prototype.slice.call(data.buffer, 0)
     }
     else {
-    // 将对象转换为 JSON 字符串，然后转换为 ArrayBuffer
+      // 将对象转换为 JSON 字符串，然后转换为 ArrayBuffer
       const jsonString = JSON.stringify(data)
       const encoder = new TextEncoder()
       buffer = encoder.encode(jsonString).buffer as ArrayBuffer
