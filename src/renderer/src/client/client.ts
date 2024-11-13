@@ -239,6 +239,8 @@ export function createClientSingle(app: App) {
     tryGetClient,
   })
 
+  app.onUnmount(unmount)
+
   connectServer()
   // onMounted(connectServer)
 }
