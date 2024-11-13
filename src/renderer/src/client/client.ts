@@ -1,15 +1,13 @@
 import type { DataConnection, PeerOptions } from 'peerjs'
+import type { App } from 'vue'
 import type { ClientError, ClientProviderMethods, ClientProviderState, Handler, Metadata } from './type'
 import { APP_PEER_PROVIDER_METHODS, APP_PEER_PROVIDER_STATE, peer_options, server_base_url } from '@renderer/client/constant'
 import { createEvent } from '@renderer/client/event'
-import { useIdentity } from '@renderer/store/identity'
-import { decryptClientID } from '@renderer/utils/id'
-import { readBufferFromStore } from '@renderer/utils/ky'
 import { logger } from '@renderer/utils/logger'
 import Peer from 'peerjs'
 import { Connect } from './connect'
 
-export function createClientSingle() {
+export function createClientSingle(app: App) {
   logger.info(`[peer] create client server url: ${server_base_url}`)
 
   const event = createEvent()
@@ -21,8 +19,6 @@ export function createClientSingle() {
   const peerOptions = ref<PeerOptions>(peer_options)
 
   const manager = new Connect(event)
-
-  const identity = useIdentity()
 
   const retryCount = ref<number>(0)
   const maxRetries = 5
@@ -146,47 +142,59 @@ export function createClientSingle() {
     event.emit('peer:connection', conn)
   }
 
-  async function connect(id: string, needDecrypt: boolean = true) {
-    const { promise, reject, resolve } = Promise.withResolvers<DataConnection | undefined>()
+  // async function connect(id: string, needDecrypt: boolean = true) {
+  //   const { promise, reject, resolve } = Promise.withResolvers<DataConnection | undefined>()
 
-    if (!identity.currentIdentity) {
-      throw new Error('Current identity not found')
+  //   if (!identity.currentIdentity) {
+  //     throw new Error('Current identity not found')
+  //   }
+
+  //   let _id = id
+
+  //   if (needDecrypt) {
+  //     _id = await decryptClientID(id)
+  //   }
+
+  //   if (!_id || !(await hasServerConnection(_id))) {
+  //     resolve(undefined)
+  //   }
+
+  //   // Information about the initiator
+  //   const metadata = {
+  //     id: await window.system.getID(),
+  //     info: {
+  //       avatar: await readBufferFromStore(identity.currentIdentity.avatar),
+  //       uuid: identity.currentIdentity.uuid,
+  //       name: identity.currentIdentity.name,
+  //     },
+  //   }
+
+  //   const conn = getClient().connect(_id, { metadata })
+
+  //   conn.once('open', () => {
+  //     logger.info(`[peer client] connected to ${id}`)
+  //     resolve(conn)
+  //   })
+
+  //   conn.once('error', (error) => {
+  //     reject(error)
+  //   })
+
+  //   manager.register(conn)
+
+  //   return promise
+  // }
+
+  function unmount() {
+    logger.info('[peer] Before Unmount destroy')
+
+    if (client.value) {
+      client.value.removeAllListeners()
     }
 
-    let _id = id
+    manager.unmount()
 
-    if (needDecrypt) {
-      _id = await decryptClientID(id)
-    }
-
-    if (!_id || !(await hasServerConnection(_id))) {
-      resolve(undefined)
-    }
-
-    // Information about the initiator
-    const metadata = {
-      id: await window.system.getID(),
-      info: {
-        avatar: await readBufferFromStore(identity.currentIdentity.avatar),
-        uuid: identity.currentIdentity.uuid,
-        name: identity.currentIdentity.name,
-      },
-    }
-
-    const conn = getClient().connect(_id, { metadata })
-
-    conn.once('open', () => {
-      logger.info(`[peer client] connected to ${id}`)
-      resolve(conn)
-    })
-
-    conn.once('error', (error) => {
-      reject(error)
-    })
-
-    manager.register(conn)
-
-    return promise
+    destroy()
   }
 
   watchEffect(() => {
@@ -204,19 +212,7 @@ export function createClientSingle() {
     client.value.on('connection', opConnection)
   })
 
-  onBeforeUnmount(() => {
-    logger.info('[peer] Before Unmount destroy')
-
-    if (client.value) {
-      client.value.removeAllListeners()
-    }
-
-    manager.unmount()
-
-    destroy()
-  })
-
-  provide<ClientProviderState>(
+  app.provide<ClientProviderState>(
     APP_PEER_PROVIDER_STATE,
     reactive({
       id,
@@ -231,16 +227,18 @@ export function createClientSingle() {
     }),
   )
 
-  provide<ClientProviderMethods>(APP_PEER_PROVIDER_METHODS, {
+  app.provide<ClientProviderMethods>(APP_PEER_PROVIDER_METHODS, {
     destroy,
     getServerConnections,
     hasServerConnection,
     searchFriend,
     registerHandler,
-    connect,
+    unmount,
+    // connect,
     getClient,
     tryGetClient,
   })
 
-  onMounted(connectServer)
+  connectServer()
+  // onMounted(connectServer)
 }

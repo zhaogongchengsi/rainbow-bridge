@@ -2,8 +2,8 @@
 import { createClientSingle } from '@renderer/client/client'
 import { createGlobalHandle } from '@renderer/composables/define'
 
+// createClientSingle()
 createGlobalHandle()
-createClientSingle()
 </script>
 
 <template>

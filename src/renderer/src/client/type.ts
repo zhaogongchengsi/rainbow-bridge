@@ -27,6 +27,7 @@ export interface ClientProviderMethods {
   tryGetClient: () => Peer | undefined
   connectClient: (id: string, needDecrypt?: boolean) => Promise<DataConnection | undefined>
   registerHandler: (name: string, handler: Handler) => void
+  unmount: () => void
 }
 
 export type Handler = (...args: any[]) => any | Promise<any>

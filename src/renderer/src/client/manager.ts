@@ -7,6 +7,7 @@ import { decryptBufferToObject, encryptObjectToBuffer } from '@renderer/utils/de
 import { getClientID } from '@renderer/utils/id'
 import { logger } from '@renderer/utils/logger'
 import ky from 'ky'
+import cloneDeep from 'lodash/cloneDeep'
 import { server_base_url } from './constant'
 import { DataType } from './enums'
 
@@ -37,6 +38,7 @@ export class Manager {
   }
 
   registerHandler(name: string, handler: Handler) {
+    logger.silly(`register handler: ${name}`)
     this.handlerMap.set(name, handler)
   }
 
@@ -154,7 +156,7 @@ export class Manager {
       timestamp,
       type: DataType.REPLY,
       response: {
-        result,
+        result: cloneDeep(result),
         error,
       },
       replyId,
@@ -176,7 +178,7 @@ export class Manager {
       id,
       timestamp,
       // ! Decrypt with your own ID
-      data: encryptObjectToBuffer(data, SALT),
+      data: encryptObjectToBuffer(cloneDeep(data), SALT),
     }
 
     return conn.send(sendData)

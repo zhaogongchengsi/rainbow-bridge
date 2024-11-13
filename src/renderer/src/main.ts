@@ -9,6 +9,7 @@ import { createApp } from 'vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { routes } from 'vue-router/auto-routes'
 import App from './App.vue'
+import { clientPlugin } from './client/plugin'
 import { logger } from './utils/logger'
 import './styles/config.css'
 import 'virtual:uno.css'
@@ -27,7 +28,10 @@ const router = createRouter({
 
 const pinia = createPinia()
 
+app.use(clientPlugin)
+
 app.use(router)
+
 app.use(pinia)
 app.use(MotionPlugin)
 app.use(PrimeVue, {

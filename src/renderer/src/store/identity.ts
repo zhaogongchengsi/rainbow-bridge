@@ -12,7 +12,7 @@ export const useIdentity = defineStore('identity', () => {
     identitys.value = await identityDatabase.getIdentitys()
   }
 
-  onMounted(once(init))
+  once(init)
 
   function canCreateIdentity() {
     return identitys.value.length < max_identity_count
