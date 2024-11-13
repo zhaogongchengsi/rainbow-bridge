@@ -1,13 +1,8 @@
-import type { DataConnection, PeerOptions } from 'peerjs'
-import type { Metadata } from './type'
+import type { ClientEvent } from './event'
+import { Manager } from './manager'
 
-export class Connect {
-  private conn: DataConnection
-  private metadata: Metadata
-  readonly id: string
-  constructor(conn: DataConnection) {
-    this.conn = conn
-    this.metadata = conn.metadata
-    this.id = conn.metadata.id
+export class Connect extends Manager {
+  constructor(e: ClientEvent) {
+    super(e)
   }
 }

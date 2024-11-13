@@ -1,6 +1,6 @@
 import type { DataConnection } from 'peerjs'
 import type { ClientEvent } from './event'
-import type { BinaryData, Data, Metadata, OpponentError } from './type'
+import type { Data, Handler, Metadata, OpponentError } from './type'
 import { SALT } from '@renderer/constants'
 import { formatDate } from '@renderer/utils/date'
 import { decryptBufferToObject, encryptObjectToBuffer } from '@renderer/utils/decrypt'
@@ -12,10 +12,19 @@ import { DataType } from './enums'
 
 export class Manager {
   connectionMap = new Map<string, DataConnection>()
+  handlerMap = new Map<string, Handler>()
   event: ClientEvent
   replyMap = new Map<string, PromiseWithResolvers<any>>()
+  private clientID = ''
   constructor(e: ClientEvent) {
     this.event = e
+  }
+
+  async getClientID() {
+    if (!this.clientID) {
+      this.clientID = await getClientID()
+    }
+    return this.clientID
   }
 
   getMetadata(conn: DataConnection) {
@@ -27,17 +36,37 @@ export class Manager {
     return metadata
   }
 
-  registerOpponentData(_: DataConnection) {
-    return (data: any) => {
+  registerHandler(name: string, handler: Handler) {
+    this.handlerMap.set(name, handler)
+  }
+
+  registerOpponentData(conn: DataConnection) {
+    return async (data: any) => {
       const _data = data as Data
 
       logger.info(`[peer] opponent data id: ${data.id} time: ${formatDate(data.timestamp)} reply: ${data.reply}`)
+
+      this.event.emit('peer:data', _data)
 
       if (_data.type === DataType.JSON) {
         _data.data = decryptBufferToObject(_data.data, SALT)
       }
 
-      this.event.emit('peer:data', _data)
+      if (_data.type === DataType.INVOKE) {
+        const handler = this.handlerMap.get(_data.name)
+        if (handler) {
+          try {
+            const result = await Promise.resolve(handler(..._data.argv))
+            await this.sendReply(conn, _data.replyId, result, undefined)
+          }
+          catch (error: any) {
+            await this.sendReply(conn, _data.replyId, undefined, error.message)
+          }
+        }
+        else {
+          await this.sendReply(conn, _data.replyId, undefined, 'Handler not found')
+        }
+      }
 
       if (_data.type === DataType.REPLY) {
         const promise = this.replyMap.get(_data.replyId)
@@ -116,28 +145,46 @@ export class Manager {
     return (await this.getServerConnections()).includes(id)
   }
 
+  async sendReply(conn: DataConnection, replyId: string, result?: any, error?: string) {
+    const timestamp = Date.now()
+    const id = await this.getClientID()
+
+    const sendData: Data = {
+      id,
+      timestamp,
+      type: DataType.REPLY,
+      response: {
+        result,
+        error,
+      },
+      replyId,
+    }
+
+    return await conn.send(sendData)
+  }
+
   async sendJson(conn: DataConnection, data: any) {
     if (data instanceof ArrayBuffer) {
       throw new TypeError('Data is not JSON')
     }
 
     const timestamp = Date.now()
-    const id = await getClientID()
+    const id = await this.getClientID()
 
     const sendData: Data = {
+      type: DataType.JSON,
       id,
       timestamp,
-      type: DataType.JSON,
       // ! Decrypt with your own ID
       data: encryptObjectToBuffer(data, SALT),
     }
 
-    return await conn.send(sendData)
+    return conn.send(sendData)
   }
 
   async sendBinary(conn: DataConnection, data: ArrayBuffer | Uint8Array | Blob) {
     const timestamp = Date.now()
-    const id = await getClientID()
+    const id = await this.getClientID()
 
     const sendData: Data = {
       id,

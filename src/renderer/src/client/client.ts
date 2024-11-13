@@ -1,5 +1,5 @@
 import type { DataConnection, PeerOptions } from 'peerjs'
-import type { ClientError, ClientProviderMethods, ClientProviderState, Metadata } from './type'
+import type { ClientError, ClientProviderMethods, ClientProviderState, Handler, Metadata } from './type'
 import { APP_PEER_PROVIDER_METHODS, APP_PEER_PROVIDER_STATE, peer_options, server_base_url } from '@renderer/client/constant'
 import { createEvent } from '@renderer/client/event'
 import { useIdentity } from '@renderer/store/identity'
@@ -7,7 +7,7 @@ import { decryptClientID } from '@renderer/utils/id'
 import { readBufferFromStore } from '@renderer/utils/ky'
 import { logger } from '@renderer/utils/logger'
 import Peer from 'peerjs'
-import { Manager } from './manager'
+import { Connect } from './connect'
 
 export function createClientSingle() {
   logger.info(`[peer] create client server url: ${server_base_url}`)
@@ -20,7 +20,7 @@ export function createClientSingle() {
 
   const peerOptions = ref<PeerOptions>(peer_options)
 
-  const manager = new Manager(event)
+  const manager = new Connect(event)
 
   const identity = useIdentity()
 
@@ -54,6 +54,10 @@ export function createClientSingle() {
     if (client.value) {
       client.value.destroy()
     }
+  }
+
+  function registerHandler(name: string, handler: Handler) {
+    manager.registerHandler(name, handler)
   }
 
   /**
@@ -232,6 +236,7 @@ export function createClientSingle() {
     getServerConnections,
     hasServerConnection,
     searchFriend,
+    registerHandler,
     connect,
     getClient,
     tryGetClient,

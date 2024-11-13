@@ -26,7 +26,12 @@ export interface ClientProviderMethods {
   getClient: () => Peer
   tryGetClient: () => Peer | undefined
   connectClient: (id: string, needDecrypt?: boolean) => Promise<DataConnection | undefined>
+  registerHandler: (name: string, handler: Handler) => void
 }
+
+export type Handler = (...args: any[]) => any | Promise<any>
+
+export type HandlerMapType = Map<keyof Handler, Handler[keyof Handler]>
 
 export type ClientError = PeerError<`${PeerErrorType}`>
 export type OpponentError = PeerError<'not-open-yet' | 'message-too-big' | 'negotiation-failed' | 'connection-closed'>
@@ -43,25 +48,30 @@ export interface CommonData {
   timestamp: number
 }
 
-export type JsonData = CommonData & {
+export interface JsonData extends CommonData {
   type: DataType.JSON
   data: any
 }
 
-export type BinaryData = CommonData & {
+export interface BinaryData extends CommonData {
   type: DataType.BINARY
   data: ArrayBuffer
 }
 
-export type ReplyData = CommonData & {
+export interface ReplyData extends CommonData {
   type: DataType.REPLY
   response: {
-    result: boolean
-    error: any
+    result?: boolean
+    error?: any
   }
+  replyId: string
+}
+
+export interface InvokeEData extends CommonData {
+  type: DataType.INVOKE
   name: string
   argv: any[]
   replyId: string
 }
 
-export type Data = JsonData | BinaryData | ReplyData
+export type Data = JsonData | BinaryData | ReplyData | InvokeEData

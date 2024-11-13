@@ -5,4 +5,5 @@ export enum DataType {
   ARRAY_BUFFER = 'arrayBuffer',
   BLOB = 'blob',
   REPLY = 'reply',
+  INVOKE = 'invoke',
 }
