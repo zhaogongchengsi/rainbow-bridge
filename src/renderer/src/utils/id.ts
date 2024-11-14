@@ -8,5 +8,11 @@ export async function getClientID() {
 }
 
 export async function decryptClientID(id: string) {
-  return await decryptString(id, SALT)
+  try {
+    return await decryptString(id, SALT)
+  }
+  catch (e: any) {
+    console.warn(e?.message)
+    return undefined
+  }
 }

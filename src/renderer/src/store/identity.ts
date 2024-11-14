@@ -1,9 +1,7 @@
 import type { Identity, IdentityOption } from '@renderer/database/identit'
 import { usePeerClientMethods } from '@renderer/client/use'
-import { SALT } from '@renderer/constants'
 import { identityDatabase } from '@renderer/database/identit'
-import { withTimeout } from '@renderer/utils/async'
-import { decryptString } from '@renderer/utils/decrypt'
+import { decryptClientID } from '@renderer/utils/id'
 import { readBufferFromStore } from '@renderer/utils/ky'
 import { logger } from '@renderer/utils/logger'
 import once from 'lodash/once'
@@ -14,7 +12,7 @@ export const useIdentity = defineStore('identity', () => {
   const currentIdentityId = useStorage<Identity['uuid']>('current-identity', null)
   const identitys = ref<Identity[]>([])
 
-  const { registerHandler, connect, invoke } = usePeerClientMethods()
+  const { registerHandler, connect, invoke, hasServerConnection } = usePeerClientMethods()
 
   async function init() {
     identitys.value = await identityDatabase.getIdentitys()
@@ -44,11 +42,12 @@ export const useIdentity = defineStore('identity', () => {
   registerHandler('request:identity', async () => {
     logger.log('request:identity')
     if (!currentIdentity.value) {
-      console.log('currentIdentity.value', currentIdentity.value)
       throw new Error('Current identity not found')
     }
     return {
-      ...currentIdentity.value,
+      name: currentIdentity.value.name,
+      email: currentIdentity.value.email,
+      uuid: currentIdentity.value.uuid,
       avatar: await readBufferFromStore(currentIdentity.value.avatar),
     }
   })
@@ -58,7 +57,13 @@ export const useIdentity = defineStore('identity', () => {
       throw new Error('Current identity not found')
     }
 
-    const conn = await connect(await decryptString(id, SALT), {
+    const _id = await decryptClientID(id)
+
+    if (!_id || await hasServerConnection(_id)) {
+      return undefined
+    }
+
+    const conn = await connect(_id, {
       id: await window.system.getID(),
       info: {
         name: currentIdentity.value.name,
@@ -68,7 +73,7 @@ export const useIdentity = defineStore('identity', () => {
       },
     })
 
-    const data = invoke(conn, 'request:identity')
+    const data = await invoke(conn, 'request:identity')
 
     console.log(data)
   }

@@ -40,8 +40,15 @@ export function resolveFilePath(file: string) {
   return isAbsolute(file) && file.startsWith('file:') ? file : `file://${file}`
 }
 
+const fileCache = new Map<string, Blob>()
+
 export async function downloadFileFromStore(file: string) {
-  return (await window.fetch(resolveFilePath(file))).blob()
+  if (fileCache.has(file)) {
+    return fileCache.get(file)!
+  }
+  const buffer = await (await window.fetch(resolveFilePath(file))).blob()
+  fileCache.set(file, buffer)
+  return buffer
 }
 
 export async function readBufferFromStore(file: string): Promise<BufferFile> {
