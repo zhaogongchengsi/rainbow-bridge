@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { usePeerClientMethods } from '@renderer/client/use'
+import { useIdentity } from '@renderer/store/identity'
 import Menu from 'primevue/menu'
 
-const peerClient = usePeerClientMethods()
+const identity = useIdentity()
 
 const menu = ref<InstanceType<typeof Menu> | null>(null)
 const visible = ref(false)
@@ -16,7 +16,7 @@ watchEffect(async () => {
     return
   }
 
-  await peerClient.searchFriend(friendIdDebounced.value)
+  await identity.searchFriend(friendIdDebounced.value)
 })
 
 const items = [

@@ -2,6 +2,7 @@ import type { DataConnection } from 'peerjs'
 import type { ClientEvent } from './event'
 import type { Data, Handler, Metadata, OpponentError } from './type'
 import { SALT } from '@renderer/constants'
+import { withTimeout } from '@renderer/utils/async'
 import { formatDate } from '@renderer/utils/date'
 import { decryptBufferToObject, encryptObjectToBuffer } from '@renderer/utils/decrypt'
 import { getClientID } from '@renderer/utils/id'
@@ -198,6 +199,8 @@ export class Manager {
   }
 
   async invoke<T>(conn: DataConnection, name: string, ...argv: any[]) {
+    console.log('invoke', name, argv)
+
     const promiser = Promise.withResolvers<T>()
     const timestamp = Date.now()
     const id = await this.getClientID()
@@ -217,7 +220,7 @@ export class Manager {
 
     await conn.send(sendData)
 
-    return promiser.promise
+    return withTimeout(promiser.promise, 10 * 1000)
   }
 
   async dataToArrayBuffer(data: any): Promise<ArrayBuffer> {

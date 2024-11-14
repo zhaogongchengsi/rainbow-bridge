@@ -200,9 +200,9 @@ export function createClientSingle(app: App) {
     connect,
     getClient,
     tryGetClient,
-    sendJson: manager.sendJson,
-    sendBinary: manager.sendBinary,
-    invoke: manager.invoke,
+    sendJson: manager.sendJson.bind(manager),
+    sendBinary: manager.sendBinary.bind(manager),
+    invoke: manager.invoke.bind(manager),
   })
 
   app.onUnmount(unmount)

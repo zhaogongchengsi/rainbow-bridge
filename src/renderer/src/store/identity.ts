@@ -20,7 +20,7 @@ export const useIdentity = defineStore('identity', () => {
     identitys.value = await identityDatabase.getIdentitys()
   }
 
-  once(init)
+  once(init)()
 
   function canCreateIdentity() {
     return identitys.value.length < max_identity_count
@@ -44,6 +44,7 @@ export const useIdentity = defineStore('identity', () => {
   registerHandler('request:identity', async () => {
     logger.log('request:identity')
     if (!currentIdentity.value) {
+      console.log('currentIdentity.value', currentIdentity.value)
       throw new Error('Current identity not found')
     }
     return {
@@ -67,7 +68,7 @@ export const useIdentity = defineStore('identity', () => {
       },
     })
 
-    const data = await withTimeout(invoke(conn, 'request:identity'))
+    const data = invoke(conn, 'request:identity')
 
     console.log(data)
   }
