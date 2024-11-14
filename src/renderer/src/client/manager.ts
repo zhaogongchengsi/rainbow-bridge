@@ -199,8 +199,6 @@ export class Manager {
   }
 
   async invoke<T>(conn: DataConnection, name: string, ...argv: any[]) {
-    console.log('invoke', name, argv)
-
     const promiser = Promise.withResolvers<T>()
     const timestamp = Date.now()
     const id = await this.getClientID()
