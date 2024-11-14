@@ -22,12 +22,11 @@ export interface ClientProviderMethods {
   destroy: () => void
   getServerConnections: () => Promise<string[]>
   hasServerConnection: (id: string) => Promise<boolean>
-  searchFriend: (id: string) => Promise<string | undefined>
   getClient: () => Peer
   tryGetClient: () => Peer | undefined
-  connectClient: (id: string, needDecrypt?: boolean) => Promise<DataConnection | undefined>
   registerHandler: (name: string, handler: Handler) => void
   unmount: () => void
+  connect: (id: string, metadata: Metadata) => Promise<DataConnection>
 }
 
 export type Handler = (...args: any[]) => any | Promise<any>

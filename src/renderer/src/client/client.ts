@@ -75,18 +75,6 @@ export function createClientSingle(app: App) {
     return await manager.hasServerConnection(id)
   }
 
-  async function searchFriend(id: string) {
-    try {
-      const conn = await connect(id)
-
-      console.log(conn)
-    }
-    catch (err) {
-      console.error(err)
-    }
-    // return id
-  }
-
   async function connectServer() {
     destroy()
     id.value = await window.system.getID()
@@ -142,48 +130,24 @@ export function createClientSingle(app: App) {
     event.emit('peer:connection', conn)
   }
 
-  // async function connect(id: string, needDecrypt: boolean = true) {
-  //   const { promise, reject, resolve } = Promise.withResolvers<DataConnection | undefined>()
+  async function connect(id: string, metadata: Metadata) {
+    const { promise, reject, resolve } = Promise.withResolvers<DataConnection>()
 
-  //   if (!identity.currentIdentity) {
-  //     throw new Error('Current identity not found')
-  //   }
+    const conn = getClient().connect(id, { metadata })
 
-  //   let _id = id
+    conn.once('open', () => {
+      logger.info(`[peer client] connected to ${id}`)
+      resolve(conn)
+    })
 
-  //   if (needDecrypt) {
-  //     _id = await decryptClientID(id)
-  //   }
+    conn.once('error', (error) => {
+      reject(error)
+    })
 
-  //   if (!_id || !(await hasServerConnection(_id))) {
-  //     resolve(undefined)
-  //   }
+    manager.register(conn)
 
-  //   // Information about the initiator
-  //   const metadata = {
-  //     id: await window.system.getID(),
-  //     info: {
-  //       avatar: await readBufferFromStore(identity.currentIdentity.avatar),
-  //       uuid: identity.currentIdentity.uuid,
-  //       name: identity.currentIdentity.name,
-  //     },
-  //   }
-
-  //   const conn = getClient().connect(_id, { metadata })
-
-  //   conn.once('open', () => {
-  //     logger.info(`[peer client] connected to ${id}`)
-  //     resolve(conn)
-  //   })
-
-  //   conn.once('error', (error) => {
-  //     reject(error)
-  //   })
-
-  //   manager.register(conn)
-
-  //   return promise
-  // }
+    return promise
+  }
 
   function unmount() {
     logger.info('[peer] Before Unmount destroy')
@@ -231,10 +195,9 @@ export function createClientSingle(app: App) {
     destroy,
     getServerConnections,
     hasServerConnection,
-    searchFriend,
     registerHandler,
     unmount,
-    // connect,
+    connect,
     getClient,
     tryGetClient,
   })
