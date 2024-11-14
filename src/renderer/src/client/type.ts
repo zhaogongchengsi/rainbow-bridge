@@ -27,6 +27,9 @@ export interface ClientProviderMethods {
   registerHandler: (name: string, handler: Handler) => void
   unmount: () => void
   connect: (id: string, metadata: Metadata) => Promise<DataConnection>
+  sendJson: (conn: DataConnection, data: any) => Promise<void>
+  sendBinary: (conn: DataConnection, data: ArrayBuffer | Uint8Array | Blob) => Promise<void>
+  invoke: <T>(conn: DataConnection, name: string, ...argv: any[]) => Promise<T>
 }
 
 export type Handler = (...args: any[]) => any | Promise<any>

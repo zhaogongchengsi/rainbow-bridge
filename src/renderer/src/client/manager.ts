@@ -1,6 +1,7 @@
 import type { DataConnection } from 'peerjs'
 import type { ClientEvent } from './event'
 import type { Data, Handler, Metadata, OpponentError } from './type'
+import { randomUUID } from 'node:crypto'
 import { SALT } from '@renderer/constants'
 import { formatDate } from '@renderer/utils/date'
 import { decryptBufferToObject, encryptObjectToBuffer } from '@renderer/utils/decrypt'
@@ -8,6 +9,7 @@ import { getClientID } from '@renderer/utils/id'
 import { logger } from '@renderer/utils/logger'
 import ky from 'ky'
 import cloneDeep from 'lodash/cloneDeep'
+import { invoke } from './../utils/ipc'
 import { server_base_url } from './constant'
 import { DataType } from './enums'
 
@@ -61,7 +63,7 @@ export class Manager {
         if (handler) {
           try {
             const result = await Promise.resolve(handler(..._data.argv))
-            await this.sendReply(conn, _data.replyId, result, undefined)
+            await this.sendReply(conn, _data.replyId, cloneDeep(result), undefined)
           }
           catch (error: any) {
             await this.sendReply(conn, _data.replyId, undefined, error.message)
@@ -194,6 +196,29 @@ export class Manager {
     }
 
     return await conn.send(sendData)
+  }
+
+  async invoke<T>(conn: DataConnection, name: string, ...argv: any[]) {
+    const promiser = Promise.withResolvers<T>()
+    const timestamp = Date.now()
+    const id = await this.getClientID()
+
+    const replyId = randomUUID()
+
+    const sendData: Data = {
+      id,
+      timestamp,
+      type: DataType.INVOKE,
+      name,
+      argv,
+      replyId,
+    }
+
+    this.replyMap.set(replyId, promiser)
+
+    await conn.send(sendData)
+
+    return promiser.promise
   }
 
   async dataToArrayBuffer(data: any): Promise<ArrayBuffer> {
