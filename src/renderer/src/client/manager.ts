@@ -52,6 +52,8 @@ export class Manager {
 
       if (_data.type === DataType.JSON) {
         _data.data = decryptBufferToObject(_data.data, SALT)
+        this.event.emit('peer:json', _data)
+        return
       }
 
       if (_data.type === DataType.INVOKE) {
@@ -86,11 +88,7 @@ export class Manager {
         return
       }
 
-      if (_data.type === DataType.JSON) {
-        this.event.emit('peer:json', _data)
-      }
-
-      else if (_data.type === DataType.BINARY) {
+      if (_data.type === DataType.BINARY) {
         this.event.emit('peer:binary', _data)
       }
     }
