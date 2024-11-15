@@ -21,6 +21,7 @@ declare module 'vue' {
     IdentityPanel: typeof import('./src/components/ui/identity-panel.vue')['default']
     InputIcon: typeof import('primevue/inputicon')['default']
     InputText: typeof import('primevue/inputtext')['default']
+    ProgressSpinner: typeof import('primevue/progressspinner')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SystemClose: typeof import('@renderer/views/system/system-close.vue')['default']
@@ -30,5 +31,7 @@ declare module 'vue' {
     SystemZoomOut: typeof import('@renderer/views/system/system-zoom-out.vue')['default']
     Toast: typeof import('primevue/toast')['default']
     UiAvatar: typeof import('./src/components/ui/ui-avatar.vue')['default']
+    UiBufferAvatar: typeof import('./src/components/ui/ui-buffer-avatar.vue')['default']
+    UiBuuferAvatar: typeof import('./src/components/ui/ui-buufer-avatar.vue')['default']
   }
 }

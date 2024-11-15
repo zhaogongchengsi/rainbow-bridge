@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ExchangeUser } from '@renderer/store/identity'
 import { useIdentity } from '@renderer/store/identity'
 import Menu from 'primevue/menu'
 
@@ -10,13 +11,27 @@ const visible = ref(false)
 const value = ref('')
 const friendId = ref('')
 const friendIdDebounced = refDebounced(friendId, 1000)
+const searchIng = ref(false)
+const searchUser = ref<ExchangeUser>()
 
 watchEffect(async () => {
   if (!friendIdDebounced.value) {
     return
   }
 
-  await identity.searchFriend(friendIdDebounced.value)
+  searchIng.value = true
+  try {
+    const user = await identity.searchFriend(friendIdDebounced.value)
+
+    if (!user) {
+      return
+    }
+
+    searchUser.value = user
+  }
+  finally {
+    searchIng.value = false
+  }
 })
 
 const items = [
@@ -24,7 +39,7 @@ const items = [
     label: 'Create Group',
     icon: 'pi pi-users',
     command: () => {
-      console.log('Light')
+      // console.log('Light')
     },
   },
   {
@@ -48,14 +63,29 @@ function toggle(event: MouseEvent) {
     </button>
     <Menu ref="menu" :model="items" :popup="true" />
     <Dialog v-model:visible="visible" modal header="Search friend">
-      <div class="h-100 w-150">
+      <div class="h-100 w-150 flex flex-col">
         <IconField class="w-full">
           <InputIcon class="pi pi-search" />
           <InputText v-model="friendId" class="w-full" placeholder="Search" />
         </IconField>
         <Divider />
-        <div>
-          asd
+        <div class="flex flex-1 flex-col">
+          <div v-if="searchIng" class="flex flex-1 flex-col justify-center">
+            <ProgressSpinner />
+          </div>
+          <div v-if="!searchUser && !searchIng" class="flex flex-1 flex-col justify-center">
+            <p class="text-center text-gray-500">
+              No user found
+            </p>
+          </div>
+          <div v-else-if="!searchIng" class="w-full flex flex-1 flex-col items-center justify-center gap-6 py-4">
+            <ui-buffer-avatar v-if="searchUser?.avatar" :src="searchUser.avatar" class="block size-20" />
+            <div class="flex flex-col gap-4">
+              <span class="text-lg font-bold">{{ searchUser?.name }}</span>
+              <span class="text-sm text-gray-500">{{ searchUser?.email }}</span>
+            </div>
+          </div>
+          <Button label="say hello" class="mt-auto w-full" raised severity="contrast" />
         </div>
       </div>
     </Dialog>

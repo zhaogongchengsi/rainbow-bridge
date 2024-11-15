@@ -63,7 +63,7 @@ export const useIdentity = defineStore('identity', () => {
 
     const _id = await decryptClientID(id)
 
-    if (!_id || await hasServerConnection(_id)) {
+    if (!_id || !await hasServerConnection(_id)) {
       return undefined
     }
 

@@ -67,12 +67,12 @@ export async function readBufferFromStore(file: string): Promise<BufferFile> {
 
 const urlCache = new Map<string, string>()
 
-export function bufferToUrl(buffer: BufferFile, type: string): string {
+export function bufferToUrl(buffer: BufferFile): string {
   const cacheKey = `${buffer.name}-${buffer.size}-${buffer.type}`
   if (urlCache.has(cacheKey)) {
     return urlCache.get(cacheKey)!
   }
-  const url = URL.createObjectURL(new Blob([buffer.buffer], { type }))
+  const url = URL.createObjectURL(new Blob([buffer.buffer], { type: buffer.type }))
   urlCache.set(cacheKey, url)
   return url
 }

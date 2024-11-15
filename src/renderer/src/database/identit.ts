@@ -2,7 +2,7 @@ import type { EntityTable } from 'dexie'
 import type { BaseUserInfo } from './user'
 import { RainbowBridgeDatabase } from './base'
 
-export type IdentityOption = Omit<Identity, 'id' | 'uuid' | 'create_by' | 'chats'>
+export type IdentityOption = Omit<Identity, 'id' | 'create_by' | 'chats'>
 
 export interface Identity extends BaseUserInfo {
   comment?: string

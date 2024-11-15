@@ -218,7 +218,7 @@ export class Manager {
 
     await conn.send(sendData)
 
-    return withTimeout(promiser.promise, 10 * 1000)
+    return withTimeout(promiser.promise, 30 * 1000)
   }
 
   async dataToArrayBuffer(data: any): Promise<ArrayBuffer> {
