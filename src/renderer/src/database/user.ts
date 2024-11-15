@@ -17,8 +17,21 @@ export class UserDatabase extends RainbowBridgeDatabase {
   constructor() {
     super()
     this.version(1).stores({
-      users: 'id, create_by, name, email, avatar, lastLoginTime, isContact',
+      users: this.generateDexieStoreString(
+        ['id', 'name', 'email', 'isContact'],
+        ['isContact', 'lastLoginTime', 'create_by', 'avatar'],
+      ),
     })
+  }
+
+  async createUser(newUser: Omit<User, 'id' | 'create_by' | 'isContact' | 'lastLoginTime'>) {
+    const index = await this.users.add({
+      ...newUser,
+      id: this.createUUID(),
+      create_by: Date.now(),
+      isContact: false,
+    })
+    return await this.users.get(index)
   }
 }
 

@@ -10,6 +10,10 @@ export interface BufferFile {
   size: number
 }
 
+export function isBufferFile(file: any): file is BufferFile {
+  return 'buffer' in file && 'name' in file && 'type' in file && 'size' in file
+}
+
 export const http = ky.create({
   prefixUrl: BASE_URL,
 })
@@ -59,4 +63,16 @@ export async function readBufferFromStore(file: string): Promise<BufferFile> {
     type: blob.type,
     size: blob.size,
   }
+}
+
+const urlCache = new Map<string, string>()
+
+export function bufferToUrl(buffer: BufferFile, type: string): string {
+  const cacheKey = `${buffer.name}-${buffer.size}-${buffer.type}`
+  if (urlCache.has(cacheKey)) {
+    return urlCache.get(cacheKey)!
+  }
+  const url = URL.createObjectURL(new Blob([buffer.buffer], { type }))
+  urlCache.set(cacheKey, url)
+  return url
 }

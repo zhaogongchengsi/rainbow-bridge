@@ -1,4 +1,6 @@
 import type { Identity, IdentityOption } from '@renderer/database/identit'
+import type { User } from '@renderer/database/user'
+import type { BufferFile } from '@renderer/utils/ky'
 import { usePeerClientMethods } from '@renderer/client/use'
 import { identityDatabase } from '@renderer/database/identit'
 import { decryptClientID } from '@renderer/utils/id'
@@ -73,9 +75,25 @@ export const useIdentity = defineStore('identity', () => {
       },
     })
 
-    const data = await invoke(conn, 'request:identity')
+    const user = await invoke<{
+      name: string
+      email: string
+      uuid: string
+      avatar: BufferFile
+    }>(conn, 'request:identity').catch((err) => {
+      logger.error('request:identity', err)
+    })
 
-    console.log(data)
+    if (!user) {
+      return undefined
+    }
+
+    return {
+      name: user.name,
+      email: user.email,
+      uuid: user.uuid,
+      avatar: user.avatar,
+    }
   }
 
   return {
