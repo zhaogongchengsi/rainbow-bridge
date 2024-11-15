@@ -12,10 +12,9 @@
         "src/shared/*"
       ]
     }
-
   },
   "types": [
-    "src/types"
+    "src/types/web"
   ],
   "include": [
     "src/renderer/src/env.d.ts",
@@ -25,6 +24,7 @@
     "src/renderer/typed-router.d.ts",
     "src/renderer/components.d.ts",
     "src/renderer/auto-imports.d.ts",
-    "src/types/**/*"
+    "src/types/web/**/*",
+    "src/types/common/**/*"
   ]
 }

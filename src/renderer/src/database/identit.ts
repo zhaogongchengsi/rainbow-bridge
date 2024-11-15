@@ -1,17 +1,13 @@
 import type { EntityTable } from 'dexie'
+import type { BaseUserInfo } from './user'
 import { RainbowBridgeDatabase } from './base'
 
 export type IdentityOption = Omit<Identity, 'id' | 'uuid' | 'create_by' | 'chats'>
 
-export interface Identity {
-  id: number
-  uuid: string
-  name: string
-  email?: string
+export interface Identity extends BaseUserInfo {
   comment?: string
   lastLoginTime?: number
   create_by: number
-  avatar: string
   chats: string[]
 }
 
@@ -21,7 +17,7 @@ class IdentityDatabase extends RainbowBridgeDatabase {
     super()
     this.version(1).stores({
       identitys: this.generateDexieStoreString(
-        ['++id', 'uuid', 'name', 'email'],
+        ['id', 'uuid', 'name', 'email'],
         ['chats', 'comment', 'lastLoginTime', 'create_by', 'avatar'],
       ),
     })
@@ -30,8 +26,8 @@ class IdentityDatabase extends RainbowBridgeDatabase {
   async addIdentity(identity: IdentityOption) {
     const uuid = this.createUUID()
     return this.identitys.add({
+      id: uuid,
       ...identity,
-      uuid,
       create_by: Date.now(),
       chats: [],
     })

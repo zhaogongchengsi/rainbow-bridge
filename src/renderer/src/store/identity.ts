@@ -1,5 +1,5 @@
 import type { Identity, IdentityOption } from '@renderer/database/identit'
-import type { User } from '@renderer/database/user'
+import type { BaseUserInfo } from '@renderer/database/user'
 import type { BufferFile } from '@renderer/utils/ky'
 import { usePeerClientMethods } from '@renderer/client/use'
 import { identityDatabase } from '@renderer/database/identit'
@@ -10,8 +10,10 @@ import once from 'lodash/once'
 
 const max_identity_count = 10
 
+export type ExchangeUser = Omit<BaseUserInfo, 'avatar'> & { avatar: BufferFile }
+
 export const useIdentity = defineStore('identity', () => {
-  const currentIdentityId = useStorage<Identity['uuid']>('current-identity', null)
+  const currentIdentityId = useStorage<Identity['id']>('current-identity', null)
   const identitys = ref<Identity[]>([])
 
   const { registerHandler, connect, invoke, hasServerConnection } = usePeerClientMethods()
@@ -34,14 +36,14 @@ export const useIdentity = defineStore('identity', () => {
   }
 
   function setCurrentIdentity(identity: Identity) {
-    currentIdentityId.value = identity.uuid
+    currentIdentityId.value = identity.id
   }
 
   const currentIdentity = computed(() => {
-    return identitys.value.find(identity => identity.uuid === currentIdentityId.value)
+    return identitys.value.find(identity => identity.id === currentIdentityId.value)
   })
 
-  registerHandler('request:identity', async () => {
+  registerHandler('request:identity', async (): Promise<ExchangeUser> => {
     logger.log('request:identity')
     if (!currentIdentity.value) {
       throw new Error('Current identity not found')
@@ -49,7 +51,7 @@ export const useIdentity = defineStore('identity', () => {
     return {
       name: currentIdentity.value.name,
       email: currentIdentity.value.email,
-      uuid: currentIdentity.value.uuid,
+      id: currentIdentity.value.id,
       avatar: await readBufferFromStore(currentIdentity.value.avatar),
     }
   })
@@ -71,29 +73,13 @@ export const useIdentity = defineStore('identity', () => {
         name: currentIdentity.value.name,
         avatar: await readBufferFromStore(currentIdentity.value.avatar),
         email: currentIdentity.value.email,
-        uuid: currentIdentity.value.uuid,
+        id: currentIdentity.value.id,
       },
     })
 
-    const user = await invoke<{
-      name: string
-      email: string
-      uuid: string
-      avatar: BufferFile
-    }>(conn, 'request:identity').catch((err) => {
+    return await invoke<ExchangeUser>(conn, 'request:identity').catch((err) => {
       logger.error('request:identity', err)
     })
-
-    if (!user) {
-      return undefined
-    }
-
-    return {
-      name: user.name,
-      email: user.email,
-      uuid: user.uuid,
-      avatar: user.avatar,
-    }
   }
 
   return {

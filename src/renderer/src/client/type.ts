@@ -1,6 +1,5 @@
 import type { ClientEvent } from '@renderer/client/event'
-import type { Identity } from '@renderer/database/identit'
-import type { BufferFile } from '@renderer/utils/ky'
+import type { ExchangeUser } from '@renderer/store/identity'
 import type Peer from 'peerjs'
 import type { DataConnection, PeerError, PeerErrorType } from 'peerjs'
 import type { Reactive, Ref } from 'vue'
@@ -41,9 +40,7 @@ export type OpponentError = PeerError<'not-open-yet' | 'message-too-big' | 'nego
 
 export interface Metadata {
   id: string
-  info: Pick<Identity, 'uuid' | 'email' | 'name'> & {
-    avatar: BufferFile
-  }
+  info: ExchangeUser
 }
 
 export interface CommonData {

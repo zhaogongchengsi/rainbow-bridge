@@ -1,12 +1,14 @@
 import type { EntityTable } from 'dexie'
 import { RainbowBridgeDatabase } from '@renderer/database/base'
 
-export interface User {
-  // peer id
+export interface BaseUserInfo {
   id: string
   name: string
-  avatar?: string
+  avatar: string
   email?: string
+}
+
+export interface User extends BaseUserInfo {
   lastLoginTime?: number
   create_by: number
   isContact: boolean

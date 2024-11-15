@@ -12,6 +12,8 @@
     "electron.vite.config.*",
     "src/main/**/*",
     "src/preload/**/*",
-    "src/types/**/*"
+    "src/types/node/**/*",
+    "src/types/env.d.ts",
+    "src/types/common/**/*"
   ]
 }
