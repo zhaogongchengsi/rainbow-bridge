@@ -12,15 +12,8 @@ export interface Identity extends BaseUserInfo {
 }
 
 class IdentityDatabase extends RainbowBridgeDatabase {
-  identitys!: EntityTable<Identity, 'id'>
   constructor() {
     super()
-    this.version(1).stores({
-      identitys: this.generateDexieStoreString(
-        ['id', 'uuid', 'name', 'email'],
-        ['chats', 'comment', 'lastLoginTime', 'create_by', 'avatar'],
-      ),
-    })
   }
 
   async addIdentity(identity: IdentityOption) {

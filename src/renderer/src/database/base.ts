@@ -1,11 +1,32 @@
+import type { EntityTable } from 'dexie'
+import type { Chat } from './chat'
+import type { Identity } from './identit'
+import type { Message } from './message'
 import Dexie from 'dexie'
 import flatMap from 'lodash/flatMap'
 import union from 'lodash/union'
 import { randomUUID } from 'uncrypto'
 
 export class RainbowBridgeDatabase extends Dexie {
+  chats!: EntityTable<Chat, 'id'>
+  messages!: EntityTable<Message, 'id'>
+  identitys!: EntityTable<Identity, 'id'>
   constructor() {
     super('rainbow-bridge-db')
+    this.version(1).stores({
+      chats: this.generateDexieStoreString(
+        ['id', 'type', 'email', 'isContact', 'createdAt', 'updatedAt', 'owner', 'title'],
+        ['participants', 'messages', 'avatar', 'description', 'isMute', 'isTop', 'isHide'],
+      ),
+      identitys: this.generateDexieStoreString(
+        ['id', 'name', 'email'],
+        ['chats', 'comment', 'lastLoginTime', 'create_by', 'avatar'],
+      ),
+      messages: this.generateDexieStoreString(
+        ['id', 'senderId', 'receiverId', 'status'],
+        ['timestamp', 'content'],
+      ),
+    })
   }
 
   createUUID() {

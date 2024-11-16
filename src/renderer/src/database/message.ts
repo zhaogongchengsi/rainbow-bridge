@@ -12,12 +12,8 @@ export interface Message {
 }
 
 export class MessageDatabase extends RainbowBridgeDatabase {
-  messages!: EntityTable<Message, 'id'>
   constructor() {
     super()
-    this.version(1).stores({
-      messages: 'id, senderId, receiverId, content, timestamp, status, sequence',
-    })
   }
 
   createTextMessage(message: Omit<Message, 'id' | 'timestamp' | 'status'>) {

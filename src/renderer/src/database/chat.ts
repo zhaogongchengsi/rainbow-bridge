@@ -1,5 +1,4 @@
 import type { Message } from '@renderer/database/message'
-import type { EntityTable } from 'dexie'
 import { MessageDatabase } from '@renderer/database/message'
 import { map } from '@renderer/utils/async'
 import { ChatType } from './enums'
@@ -27,15 +26,8 @@ export interface ChatData extends Omit<Chat, 'messages'> {
 export type ChatOption = Omit<Chat, 'id' | 'createdAt' | 'updatedAt' | 'messages' | 'isMute' | 'isTop' | 'isHide' | 'description'>
 
 class ChatDatabase extends MessageDatabase {
-  chats!: EntityTable<Chat, 'id'>
   constructor() {
     super()
-    this.version(1).stores({
-      chats: this.generateDexieStoreString(
-        ['id', 'type', 'email', 'isContact', 'createdAt', 'updatedAt', 'owner', 'title'],
-        ['participants', 'messages', 'avatar', 'description', 'isMute', 'isTop', 'isHide'],
-      ),
-    })
   }
 
   async createChatByCompleteInfo(chat: Chat) {

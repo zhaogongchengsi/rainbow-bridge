@@ -26,6 +26,7 @@ import { Pane, Splitpanes } from 'splitpanes'
   }
 
   .chat-left-body {
-    height: calc(100% - var(--chat-left-header-height));
+    --chat-left-body-height: calc(100% - var(--chat-left-header-height));
+    height: var(--chat-left-body-height);
   }
 </style>

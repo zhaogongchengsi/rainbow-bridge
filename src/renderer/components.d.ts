@@ -26,6 +26,7 @@ declare module 'vue' {
     ProgressSpinner: typeof import('primevue/progressspinner')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    ScrollPanel: typeof import('primevue/scrollpanel')['default']
     Skeleton: typeof import('primevue/skeleton')['default']
     SystemClose: typeof import('@renderer/views/system/system-close.vue')['default']
     SystemFullscreen: typeof import('@renderer/views/system/system-fullscreen.vue')['default']
