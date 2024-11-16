@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ExchangeUser } from '@renderer/store/identity'
 import { useIdentity } from '@renderer/store/identity'
+import { debounce } from 'perfect-debounce'
 import Menu from 'primevue/menu'
 
 const identity = useIdentity()
@@ -10,29 +11,8 @@ const visible = ref(false)
 
 const value = ref('')
 const friendId = ref('')
-const friendIdDebounced = refDebounced(friendId, 1000)
 const searchIng = ref(false)
 const searchUser = ref<ExchangeUser>()
-
-watchEffect(async () => {
-  if (!friendIdDebounced.value) {
-    return
-  }
-
-  searchIng.value = true
-  try {
-    const user = await identity.searchFriend(friendIdDebounced.value)
-
-    if (!user) {
-      return
-    }
-
-    searchUser.value = user
-  }
-  finally {
-    searchIng.value = false
-  }
-})
 
 const items = [
   {
@@ -53,6 +33,26 @@ const items = [
 function toggle(event: MouseEvent) {
   menu.value?.toggle(event)
 }
+const onSearch = debounce(async () => {
+  if (!friendId.value) {
+    searchUser.value = undefined
+    return
+  }
+
+  searchIng.value = true
+  try {
+    const user = await identity.searchFriend(friendId.value)
+
+    if (!user) {
+      return
+    }
+
+    searchUser.value = user
+  }
+  finally {
+    searchIng.value = false
+  }
+})
 </script>
 
 <template>
@@ -64,10 +64,10 @@ function toggle(event: MouseEvent) {
     <Menu ref="menu" :model="items" :popup="true" />
     <Dialog v-model:visible="visible" modal header="Search friend">
       <div class="h-100 w-150 flex flex-col">
-        <IconField class="w-full">
-          <InputIcon class="pi pi-search" />
-          <InputText v-model="friendId" class="w-full" placeholder="Search" />
-        </IconField>
+        <InputGroup>
+          <InputText v-model="friendId" placeholder="id" />
+          <Button label="Search" raised severity="contrast" @click="onSearch" />
+        </InputGroup>
         <Divider />
         <div class="flex flex-1 flex-col">
           <div v-if="searchIng" class="flex flex-1 flex-col justify-center">

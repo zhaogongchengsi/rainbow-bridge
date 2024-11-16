@@ -19,6 +19,8 @@ declare module 'vue' {
     IconField: typeof import('primevue/iconfield')['default']
     'Identity-': typeof import('./src/components/ui/identity-.vue')['default']
     IdentityPanel: typeof import('./src/components/ui/identity-panel.vue')['default']
+    InputGroup: typeof import('primevue/inputgroup')['default']
+    InputGroupAddon: typeof import('primevue/inputgroupaddon')['default']
     InputIcon: typeof import('primevue/inputicon')['default']
     InputText: typeof import('primevue/inputtext')['default']
     ProgressSpinner: typeof import('primevue/progressspinner')['default']
