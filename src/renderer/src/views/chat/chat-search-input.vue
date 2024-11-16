@@ -50,8 +50,16 @@ const onSearch = debounce(async () => {
     searchUser.value = user
   }
   finally {
+    searchUser.value = undefined
     searchIng.value = false
   }
+})
+
+const onSeyHello = debounce(async () => {
+  if (!searchUser.value)
+    return
+
+  await identity.sayHello(searchUser.value.id)
 })
 </script>
 
@@ -85,7 +93,7 @@ const onSearch = debounce(async () => {
               <span class="text-sm text-gray-500">{{ searchUser?.email }}</span>
             </div>
           </div>
-          <Button label="say hello" class="mt-auto w-full" raised severity="contrast" />
+          <Button label="say hello" class="mt-auto w-full" raised severity="contrast" @click="onSeyHello" />
         </div>
       </div>
     </Dialog>

@@ -1,8 +1,8 @@
 import type { Message } from '@renderer/database/message'
 import type { EntityTable } from 'dexie'
-import type { ChatType } from './enums'
 import { MessageDatabase } from '@renderer/database/message'
 import { map } from '@renderer/utils/async'
+import { ChatType } from './enums'
 
 export interface Chat {
   id: string
@@ -24,6 +24,8 @@ export interface ChatData extends Omit<Chat, 'messages'> {
   messages: Message[]
 }
 
+export type ChatOption = Omit<Chat, 'id' | 'createdAt' | 'updatedAt' | 'messages' | 'isMute' | 'isTop' | 'isHide'>
+
 class ChatDatabase extends MessageDatabase {
   chats!: EntityTable<Chat, 'id'>
   constructor() {
@@ -36,20 +38,36 @@ class ChatDatabase extends MessageDatabase {
     })
   }
 
-  async createChat(newChat: Omit<Chat, 'id' | 'createdAt' | 'updatedAt'>) {
+  async createChat(newChat: ChatOption) {
     const index = await this.chats.add({
       ...newChat,
       id: this.createUUID(),
       createdAt: new Date(),
       updatedAt: new Date(),
+      messages: [],
+      isHide: false,
+      isMute: false,
+      isTop: false,
     })
-    return await this.chats.get(index)
+    const _newChat = await this.chats.get(index)
+    if (!_newChat) {
+      return
+    }
+    return (await this.completeMessage([_newChat])).at(0)
   }
 
   async getChats() {
     return await this.completeMessage(
       (await this.chats.toArray()).sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()),
     )
+  }
+
+  async createPrivateChatChat(newChat: Omit<ChatOption, 'type'>) {
+    return await this.createChat({ ...newChat, type: ChatType.PRIVATE_CHAT })
+  }
+
+  async createGroupChat(newChat: Omit<ChatOption, 'type'>) {
+    return await this.createChat({ ...newChat, type: ChatType.GROUP_CHAT })
   }
 
   async completeMessage(chats: Chat[]): Promise<ChatData[]> {

@@ -35,6 +35,10 @@ export class UserDatabase extends RainbowBridgeDatabase {
     })
     return await this.users.get(index)
   }
+
+  async getUsers() {
+    return (await this.users.toArray()).sort((a, b) => b.create_by - a.create_by)
+  }
 }
 
 export const userDatabase = new UserDatabase()
