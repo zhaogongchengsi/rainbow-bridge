@@ -35,6 +35,7 @@ export function createWindow(router?: AppRouter) {
       partition: 'persist:main',
       zoomFactor: 1,
       webSecurity: false,
+      backgroundThrottling: false,
     },
   })
 

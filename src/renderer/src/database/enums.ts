@@ -5,6 +5,6 @@ export enum MessageState {
 }
 
 export enum ChatType {
-  PRIVATE = 'private',
-  GROUP = 'group',
+  PRIVATE_CHAT = 'private-chat',
+  GROUP_CHAT = 'group-chat',
 }
