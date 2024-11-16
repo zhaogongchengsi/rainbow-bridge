@@ -5,7 +5,7 @@ import { Pane, Splitpanes } from 'splitpanes'
 
 <template>
   <Splitpanes style="height: var(--system-container-box-height)">
-    <Pane min-size="15" max-size="20">
+    <Pane size="20" max-size="25" min-size="15">
       <div class="chat-left-container">
         <ChatSearchInput />
         <div class="chat-left-body">
@@ -13,7 +13,7 @@ import { Pane, Splitpanes } from 'splitpanes'
         </div>
       </div>
     </Pane>
-    <Pane>
+    <Pane size="80">
       message
     </Pane>
   </Splitpanes>

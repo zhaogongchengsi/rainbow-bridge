@@ -106,8 +106,12 @@ body,
 
 .splitpanes__splitter {
   background-color: var(--rainbow-border-color);
+  z-index: 999999;
 }
 
+.splitpanes--vertical .splitpanes__pane {
+  transition: none !important;
+}
 
 .v-popper--theme-app-menu .v-popper__inner {
   background-color: var(--rainbow-popper-background);

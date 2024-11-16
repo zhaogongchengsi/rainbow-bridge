@@ -38,7 +38,7 @@ const chats = ref<ChatData[]>([
 
 <template>
   <ScrollPanel style="width: 100%; height: 100% ">
-    <div>
+    <div class="h-screen">
       <div v-for="chat in chats" :key="chat.id">
         <div>{{ chat.title }}</div>
       </div>
