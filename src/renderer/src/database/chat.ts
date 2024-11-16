@@ -24,7 +24,7 @@ export interface ChatData extends Omit<Chat, 'messages'> {
   messages: Message[]
 }
 
-export type ChatOption = Omit<Chat, 'id' | 'createdAt' | 'updatedAt' | 'messages' | 'isMute' | 'isTop' | 'isHide'>
+export type ChatOption = Omit<Chat, 'id' | 'createdAt' | 'updatedAt' | 'messages' | 'isMute' | 'isTop' | 'isHide' | 'description'>
 
 class ChatDatabase extends MessageDatabase {
   chats!: EntityTable<Chat, 'id'>
@@ -38,8 +38,17 @@ class ChatDatabase extends MessageDatabase {
     })
   }
 
+  async createChatByCompleteInfo(chat: Chat) {
+    const index = await this.chats.add(chat)
+    const newChat = await this.chats.get(index)
+    if (!newChat) {
+      throw new Error('Create chat failed')
+    }
+    return (await this.completeMessage([newChat])).at(0)!
+  }
+
   async createChat(newChat: ChatOption) {
-    const index = await this.chats.add({
+    return await this.createChatByCompleteInfo({
       ...newChat,
       id: this.createUUID(),
       createdAt: new Date(),
@@ -48,12 +57,8 @@ class ChatDatabase extends MessageDatabase {
       isHide: false,
       isMute: false,
       isTop: false,
+      description: '',
     })
-    const _newChat = await this.chats.get(index)
-    if (!_newChat) {
-      return
-    }
-    return (await this.completeMessage([_newChat])).at(0)
   }
 
   async getChats() {

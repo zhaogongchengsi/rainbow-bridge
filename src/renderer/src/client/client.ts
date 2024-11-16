@@ -130,13 +130,24 @@ export function createClientSingle(app: App) {
     event.emit('peer:connection', conn)
   }
 
-  async function connect(id: string, metadata: Metadata) {
+  async function connect(id: string, metadata?: Metadata) {
     const { promise, reject, resolve } = Promise.withResolvers<DataConnection>()
+
+    if (manager.hasConnectionById(id)) {
+      resolve(manager.getConnectionById(id)!)
+      return promise
+    }
+
+    if (!metadata) {
+      reject(new Error('Metadata Required when innovating a new connection'))
+      return promise
+    }
 
     const conn = getClient().connect(id, { metadata })
 
     conn.once('open', () => {
       logger.info(`[peer client] connected to ${id}`)
+      manager.addConnection(id, conn)
       resolve(conn)
     })
 

@@ -1,16 +1,13 @@
 import type { Identity, IdentityOption } from '@renderer/database/identit'
-import type { BaseUserInfo } from '@renderer/database/user'
-import type { BufferFile } from '@renderer/utils/ky'
+import type { ExchangeUser } from '@renderer/database/user'
 import { usePeerClientMethods } from '@renderer/client/use'
 import { identityDatabase } from '@renderer/database/identit'
-import { decryptClientID } from '@renderer/utils/id'
+import { decryptClientID, getClientUniqueId } from '@renderer/utils/id'
 import { readBufferFromStore } from '@renderer/utils/ky'
 import { logger } from '@renderer/utils/logger'
 import once from 'lodash/once'
 
 const max_identity_count = 10
-
-export type ExchangeUser = Omit<BaseUserInfo, 'avatar'> & { avatar: BufferFile }
 
 export const useIdentity = defineStore('identity', () => {
   const currentIdentityId = useStorage<Identity['id']>('current-identity', null)
@@ -52,6 +49,7 @@ export const useIdentity = defineStore('identity', () => {
       name: currentIdentity.value.name,
       email: currentIdentity.value.email,
       id: currentIdentity.value.id,
+      connectID: await getClientUniqueId(),
       avatar: await readBufferFromStore(currentIdentity.value.avatar),
     }
   })
@@ -68,12 +66,13 @@ export const useIdentity = defineStore('identity', () => {
     }
 
     const conn = await connect(_id, {
-      id: await window.system.getID(),
+      id: await getClientUniqueId(),
       info: {
         name: currentIdentity.value.name,
         avatar: await readBufferFromStore(currentIdentity.value.avatar),
         email: currentIdentity.value.email,
         id: currentIdentity.value.id,
+        connectID: await getClientUniqueId(),
       },
     })
 

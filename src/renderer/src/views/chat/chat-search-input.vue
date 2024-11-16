@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import type { ExchangeUser } from '@renderer/store/identity'
+import type { ExchangeUser } from '@renderer/database/user'
+import { useChat } from '@renderer/store/chat'
 import { useIdentity } from '@renderer/store/identity'
 import { debounce } from 'perfect-debounce'
 import Menu from 'primevue/menu'
 
 const identity = useIdentity()
+const chat = useChat()
 
 const menu = ref<InstanceType<typeof Menu> | null>(null)
 const visible = ref(false)
@@ -59,7 +61,9 @@ const onSeyHello = debounce(async () => {
   if (!searchUser.value)
     return
 
-  await identity.sayHello(searchUser.value.id)
+  const newChat = await chat.createNewPrivateChat(searchUser.value)
+
+  console.log(newChat)
 })
 </script>
 

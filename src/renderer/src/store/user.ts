@@ -1,4 +1,4 @@
-import type { User } from '@renderer/database/user'
+import type { ExchangeUser, User } from '@renderer/database/user'
 import { userDatabase } from '@renderer/database/user'
 import once from 'lodash/once'
 
@@ -11,12 +11,13 @@ export const useUser = defineStore('app-user', () => {
 
   once(init)()
 
-  async function createUser(newChat: Omit<ChatOption, 'type'>) {
-    const chat = await chatDatabase.createPrivateChatChat(newChat)
-    if (!chat) {
+  async function createUser(newUser: ExchangeUser) {
+    const user = await userDatabase.createUser(newUser)
+    if (!user) {
       return
     }
-    users.value.unshift(chat)
+    users.value.push(user)
+    return user
   }
 
   return {

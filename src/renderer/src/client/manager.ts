@@ -5,7 +5,7 @@ import { SALT } from '@renderer/constants'
 import { withTimeout } from '@renderer/utils/async'
 import { formatDate } from '@renderer/utils/date'
 import { decryptBufferToObject, encryptObjectToBuffer } from '@renderer/utils/decrypt'
-import { getClientID } from '@renderer/utils/id'
+import { getClientUniqueId } from '@renderer/utils/id'
 import { logger } from '@renderer/utils/logger'
 import ky from 'ky'
 import cloneDeep from 'lodash/cloneDeep'
@@ -25,7 +25,7 @@ export class Manager {
 
   async getClientID() {
     if (!this.clientID) {
-      this.clientID = await getClientID()
+      this.clientID = await getClientUniqueId()
     }
     return this.clientID
   }
@@ -126,6 +126,18 @@ export class Manager {
     conn.on('data', this.registerOpponentData(conn))
     conn.on('close', this.registerOpponentClose(conn))
     conn.on('error', this.registerOpponentError(conn))
+  }
+
+  getConnectionById(id: string) {
+    return this.connectionMap.get(id)
+  }
+
+  hasConnectionById(id: string) {
+    return this.connectionMap.has(id)
+  }
+
+  addConnection(id: string, conn: DataConnection) {
+    this.connectionMap.set(id, conn)
   }
 
   /**

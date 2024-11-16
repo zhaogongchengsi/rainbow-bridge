@@ -1,9 +1,9 @@
 import type { EntityTable } from 'dexie'
-import type { MessageState } from './enums'
 import { RainbowBridgeDatabase } from '@renderer/database/base'
+import { MessageState } from './enums'
 
 export interface Message {
-  id?: string
+  id: string
   senderId: string
   receiverId: string
   content: string
@@ -19,6 +19,14 @@ export class MessageDatabase extends RainbowBridgeDatabase {
       messages: 'id, senderId, receiverId, content, timestamp, status, sequence',
     })
   }
-}
 
-export const messageDatabase = new MessageDatabase()
+  createTextMessage(message: Omit<Message, 'id' | 'timestamp' | 'status'>) {
+    const index = this.messages.add({
+      ...message,
+      id: this.createUUID(),
+      timestamp: Date.now(),
+      status: MessageState.SENT,
+    })
+    return this.messages.get(index)
+  }
+}

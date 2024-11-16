@@ -1,5 +1,5 @@
 import type { ClientEvent } from '@renderer/client/event'
-import type { ExchangeUser } from '@renderer/store/identity'
+import type { ExchangeUser } from '@renderer/database/user'
 import type Peer from 'peerjs'
 import type { DataConnection, PeerError, PeerErrorType } from 'peerjs'
 import type { Reactive, Ref } from 'vue'
@@ -25,7 +25,7 @@ export interface ClientProviderMethods {
   tryGetClient: () => Peer | undefined
   registerHandler: (name: string, handler: Handler) => void
   unmount: () => void
-  connect: (id: string, metadata: Metadata) => Promise<DataConnection>
+  connect: (id: string, metadata?: Metadata) => Promise<DataConnection>
   sendJson: (conn: DataConnection, data: any) => Promise<void>
   sendBinary: (conn: DataConnection, data: ArrayBuffer | Uint8Array | Blob) => Promise<void>
   invoke: <T>(conn: DataConnection, name: string, ...argv: any[]) => Promise<T>

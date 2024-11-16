@@ -1,5 +1,6 @@
 import type { EntityTable } from 'dexie'
 import { RainbowBridgeDatabase } from '@renderer/database/base'
+import { type BufferFile, uploadBufferToStore } from '@renderer/utils/ky'
 
 export interface BaseUserInfo {
   id: string
@@ -12,7 +13,10 @@ export interface User extends BaseUserInfo {
   lastLoginTime?: number
   create_by: number
   isContact: boolean
+  connectID: string
 }
+
+export type ExchangeUser = Omit<BaseUserInfo, 'avatar'> & { avatar: BufferFile, connectID: string }
 
 export class UserDatabase extends RainbowBridgeDatabase {
   users!: EntityTable<User, 'id'>
@@ -20,19 +24,25 @@ export class UserDatabase extends RainbowBridgeDatabase {
     super()
     this.version(1).stores({
       users: this.generateDexieStoreString(
-        ['id', 'name', 'email', 'isContact'],
+        ['id', 'name', 'email', 'isContact', 'connectID'],
         ['isContact', 'lastLoginTime', 'create_by', 'avatar'],
       ),
     })
   }
 
-  async createUser(newUser: Omit<User, 'id' | 'create_by' | 'isContact' | 'lastLoginTime'>) {
+  async createUser(newUser: ExchangeUser) {
+    const [avatar] = await uploadBufferToStore(newUser.avatar)
+
     const index = await this.users.add({
-      ...newUser,
-      id: this.createUUID(),
+      id: newUser.id,
       create_by: Date.now(),
       isContact: false,
+      name: newUser.name,
+      avatar,
+      email: newUser.email,
+      connectID: newUser.connectID,
     })
+
     return await this.users.get(index)
   }
 
