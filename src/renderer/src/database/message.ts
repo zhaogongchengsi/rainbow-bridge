@@ -1,4 +1,3 @@
-import type { EntityTable } from 'dexie'
 import { RainbowBridgeDatabase } from '@renderer/database/base'
 import { MessageState } from './enums'
 
@@ -9,6 +8,7 @@ export interface Message {
   content: string
   timestamp: number
   status: MessageState
+  isLastMessage: boolean
 }
 
 export class MessageDatabase extends RainbowBridgeDatabase {

@@ -23,7 +23,7 @@ export class RainbowBridgeDatabase extends Dexie {
         ['chats', 'comment', 'lastLoginTime', 'create_by', 'avatar'],
       ),
       messages: this.generateDexieStoreString(
-        ['id', 'senderId', 'receiverId', 'status'],
+        ['id', 'senderId', 'receiverId', 'status', 'isLastMessage'],
         ['timestamp', 'content'],
       ),
     })
