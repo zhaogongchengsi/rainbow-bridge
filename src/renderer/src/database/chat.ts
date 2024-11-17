@@ -21,6 +21,7 @@ export interface Chat {
 
 export interface ChatData extends Omit<Chat, 'messages'> {
   messages: Message[]
+  lastMessage?: Message
 }
 
 export type ChatOption = Omit<Chat, 'id' | 'createdAt' | 'updatedAt' | 'messages' | 'isMute' | 'isTop' | 'isHide' | 'description'>
@@ -69,8 +70,9 @@ class ChatDatabase extends MessageDatabase {
 
   async completeMessage(chats: Chat[]): Promise<ChatData[]> {
     return await map(chats, async (chat) => {
-      const messages = await this.messages.where('id').anyOf(chat.messages).toArray()
-      return { ...chat, messages }
+      const messages = await this.getMessagesByChatId(chat.id)
+      const lastMessage = messages.length > 0 ? messages.find(m => m.isLastMessage) : undefined
+      return { ...chat, messages, lastMessage }
     })
   }
 }

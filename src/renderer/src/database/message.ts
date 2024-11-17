@@ -9,6 +9,7 @@ export interface Message {
   timestamp: number
   status: MessageState
   isLastMessage: boolean
+  chatId: string
 }
 
 export class MessageDatabase extends RainbowBridgeDatabase {
@@ -24,5 +25,15 @@ export class MessageDatabase extends RainbowBridgeDatabase {
       status: MessageState.SENT,
     })
     return this.messages.get(index)
+  }
+
+  async getMessagesByChatId(chatId: string) {
+    return await this.messages.where('chatId').equals(chatId).toArray()
+  }
+
+  async getLastMessageByChatId(chatId: string): Promise<Message | undefined> {
+    return await this.messages
+      .where({ chatId, isLastMessage: true })
+      .last()
   }
 }
