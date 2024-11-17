@@ -22,6 +22,8 @@ declare module 'vue-router/auto-routes' {
     '/main': RouteRecordInfo<'/main', '/main', Record<never, never>, Record<never, never>>,
     '/main/': RouteRecordInfo<'/main/', '/main', Record<never, never>, Record<never, never>>,
     '/main/chat': RouteRecordInfo<'/main/chat', '/main/chat', Record<never, never>, Record<never, never>>,
+    '/main/chat/': RouteRecordInfo<'/main/chat/', '/main/chat', Record<never, never>, Record<never, never>>,
+    '/main/chat/[id]/': RouteRecordInfo<'/main/chat/[id]/', '/main/chat/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
     '/main/folder': RouteRecordInfo<'/main/folder', '/main/folder', Record<never, never>, Record<never, never>>,
   }
 }

@@ -13,6 +13,7 @@ declare module 'vue' {
     CardSpotlight: typeof import('./src/components/ui/card-spotlight.vue')['default']
     Checkbox: typeof import('primevue/checkbox')['default']
     ConfirmDialog: typeof import('primevue/confirmdialog')['default']
+    ContextMenu: typeof import('primevue/contextmenu')['default']
     DarkSelect: typeof import('./src/components/dark-select.vue')['default']
     Dialog: typeof import('primevue/dialog')['default']
     Divider: typeof import('primevue/divider')['default']
