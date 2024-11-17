@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ChatList from '@renderer/views/chat/chat-list.vue'
 import ChatSearchInput from '@renderer/views/chat/chat-search-input.vue'
 import { Pane, Splitpanes } from 'splitpanes'
 </script>
@@ -9,12 +10,12 @@ import { Pane, Splitpanes } from 'splitpanes'
       <div class="chat-left-container">
         <ChatSearchInput />
         <div class="chat-left-body">
-          <router-view />
+          <ChatList />
         </div>
       </div>
     </Pane>
     <Pane size="80">
-      message
+      <router-view />
     </Pane>
   </Splitpanes>
 </template>

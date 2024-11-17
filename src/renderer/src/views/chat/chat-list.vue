@@ -38,10 +38,21 @@ const chats = ref<ChatData[]>([
 
 <template>
   <ScrollPanel style="width: 100%; height: 100% ">
-    <div class="h-screen">
-      <div v-for="chat in chats" :key="chat.id">
+    <ul class="chat-list-contianer">
+      <li v-for="chat in chats" :key="chat.id" class="chat-list-item">
         <div>{{ chat.title }}</div>
-      </div>
-    </div>
+      </li>
+    </ul>
   </ScrollPanel>
 </template>
+
+<style>
+  .chat-list-contianer {
+    width: 100%;
+    --chat-list-item-height: 80px;
+  }
+
+  .chat-list-item {
+    height: var(--chat-list-item-height);
+  }
+</style>
