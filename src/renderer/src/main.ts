@@ -17,6 +17,7 @@ import '@unocss/reset/tailwind.css'
 import 'primeicons/primeicons.css'
 import 'splitpanes/dist/splitpanes.css'
 import 'floating-vue/dist/style.css'
+import './styles/scrollbar.css'
 import './styles/base.css'
 
 const app = createApp(App)

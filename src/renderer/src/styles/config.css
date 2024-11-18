@@ -25,6 +25,8 @@
   --rainbow-border-radius: 6px;
 
   --rainbow-popper-background: #f7f7f7;
+
+  --rainbow-scrollbar-thumb-color: #b3b3b3ef;
 }
 
 .dark {
@@ -35,4 +37,6 @@
   --rainbow-background-secondary: rgb(33 33 33 / 1);
 
   --rainbow-popper-background: rgb(32 32 32);
+
+  --rainbow-scrollbar-thumb-color: #e2e2e29d;
 }

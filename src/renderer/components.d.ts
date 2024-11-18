@@ -17,6 +17,7 @@ declare module 'vue' {
     DarkSelect: typeof import('./src/components/dark-select.vue')['default']
     Dialog: typeof import('primevue/dialog')['default']
     Divider: typeof import('primevue/divider')['default']
+    Editor: typeof import('./src/components/editor/editor.vue')['default']
     IconField: typeof import('primevue/iconfield')['default']
     'Identity-': typeof import('./src/components/ui/identity-.vue')['default']
     IdentityPanel: typeof import('./src/components/ui/identity-panel.vue')['default']

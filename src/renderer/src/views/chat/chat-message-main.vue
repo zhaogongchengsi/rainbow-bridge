@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-
+import Editor from '@renderer/components/editor'
 </script>
 
 <template>
@@ -11,7 +11,12 @@
       message
     </div>
     <div class="chat-main-footer">
-      footer
+      <div class="chat-main-footer_header">
+        tool
+      </div>
+      <div class="chat-main-footer_editor">
+        <Editor />
+      </div>
     </div>
   </div>
 </template>
@@ -23,7 +28,7 @@
     height: 100%;
 
     --chat-main-header-height: 80px;
-    --chat-main-footer-height: 200px;
+    --chat-main-footer-height: 260px;
     --chat-main-px: 20px;
     --chat-main-py: 10px;
 
@@ -38,7 +43,6 @@
     justify-content: space-between;
     align-items: center;
     padding: var(--chat-main-py) var(--chat-main-px);
-
   }
 
   .chat-main-body {
@@ -49,6 +53,15 @@
   .chat-main-footer {
     height: var(--chat-main-footer-height);
     border-top: 1px solid var(--rainbow-border-color);
-    padding: var(--chat-main-py) var(--chat-main-px);
+
+    .chat-main-footer_header {
+      padding: var(--chat-main-py) var(--chat-main-px);
+      height: 60px;
+      border-bottom: 1px solid var(--rainbow-border-color);
+    }
+
+    .chat-main-footer_editor {
+      height: 200px;
+    }
   }
 </style>
