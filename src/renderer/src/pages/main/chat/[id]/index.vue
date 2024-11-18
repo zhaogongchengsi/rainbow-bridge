@@ -1,9 +1,9 @@
 <script setup lang='ts'>
-
+import chatMessageMain from '@renderer/views/chat/chat-message-main.vue'
 </script>
 
 <template>
-  <div>
-    {{ $route.params.id }}
+  <div class="size-full flex">
+    <chat-message-main />
   </div>
 </template>
