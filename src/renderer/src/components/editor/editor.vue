@@ -10,8 +10,14 @@ const props = withDefaults(
   },
 )
 
+const textValue = defineModel<string>('text', { default: '' })
+
 const editor = useTemplateRef('editor')
 const quillRef = shallowRef<Quill>()
+
+function onTextChange() {
+  textValue.value = quillRef.value?.getText() ?? ''
+}
 
 watchEffect(() => {
   if (!editor.value)
@@ -19,6 +25,7 @@ watchEffect(() => {
   quillRef.value = new Quill(editor.value, {
     placeholder: props.placeholder,
   })
+  quillRef.value.on('text-change', onTextChange)
 })
 </script>
 

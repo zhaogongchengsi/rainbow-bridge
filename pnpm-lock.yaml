@@ -65,6 +65,9 @@ importers:
       vue-router:
         specifier: '4'
         version: 4.4.5(vue@3.5.12(typescript@5.6.3))
+      vue-virt-list:
+        specifier: ^1.5.5
+        version: 1.5.5(vue@3.5.12(typescript@5.6.3))
     devDependencies:
       '@electron-toolkit/eslint-config':
         specifier: ^1.0.2
@@ -4723,6 +4726,15 @@ packages:
     hasBin: true
     peerDependencies:
       typescript: '>=5.0.0'
+
+  vue-virt-list@1.5.5:
+    resolution: {integrity: sha512-v7FRpm7/zm/vpgjM9lcyeB9YJvzonAdtzirwY3sfFAYqX/V4tZ0mQsiT1miCwJTNeX63VqlWva+Z3yZodimkvw==}
+    peerDependencies:
+      '@vue/composition-api': ^1.0.0-rc.1
+      vue: ^2.0.0 || >=3.0.0
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
 
   vue@2.7.16:
     resolution: {integrity: sha512-4gCtFXaAA3zYZdTp5s4Hl2sozuySsgz4jy1EnpBHNfpMa9dK1ZCG7viqBPCwXtmgc8nHqUsAu3G4gtmXkkY3Sw==}
@@ -10159,6 +10171,11 @@ snapshots:
       '@vue/language-core': 2.1.6(typescript@5.6.3)
       semver: 7.6.3
       typescript: 5.6.3
+
+  vue-virt-list@1.5.5(vue@3.5.12(typescript@5.6.3)):
+    dependencies:
+      vue: 3.5.12(typescript@5.6.3)
+      vue-demi: 0.14.10(vue@3.5.12(typescript@5.6.3))
 
   vue@2.7.16:
     dependencies:

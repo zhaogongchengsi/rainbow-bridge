@@ -39,5 +39,6 @@ declare module 'vue' {
     UiAvatar: typeof import('./src/components/ui/ui-avatar.vue')['default']
     UiBufferAvatar: typeof import('./src/components/ui/ui-buffer-avatar.vue')['default']
     UiBuuferAvatar: typeof import('./src/components/ui/ui-buufer-avatar.vue')['default']
+    VirtualScroller: typeof import('primevue/virtualscroller')['default']
   }
 }
