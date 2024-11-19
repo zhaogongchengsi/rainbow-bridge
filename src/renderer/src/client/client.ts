@@ -79,7 +79,10 @@ export function createClientSingle(app: App) {
     destroy()
     id.value = await window.system.getID()
     connecting.value = true
-    client.value = new Peer(id.value, { ...peerOptions.value, debug: import.meta.env.PROD ? 0 : 3 })
+    const peer = new Peer(id.value, { ...peerOptions.value, debug: import.meta.env.PROD ? 0 : 3 })
+    client.value = peer
+
+    manager.mount(peer)
     logger.info('[peer] init', id.value)
   }
 
@@ -130,34 +133,8 @@ export function createClientSingle(app: App) {
     event.emit('peer:connection', conn)
   }
 
-  async function connect(id: string, metadata?: Metadata) {
-    const { promise, reject, resolve } = Promise.withResolvers<DataConnection>()
-
-    if (manager.hasConnectionById(id)) {
-      resolve(manager.getConnectionById(id)!)
-      return promise
-    }
-
-    if (!metadata) {
-      reject(new Error('Metadata Required when innovating a new connection'))
-      return promise
-    }
-
-    const conn = getClient().connect(id, { metadata })
-
-    conn.once('open', () => {
-      logger.info(`[peer client] connected to ${id}`)
-      manager.addConnection(id, conn)
-      resolve(conn)
-    })
-
-    conn.once('error', (error) => {
-      reject(error)
-    })
-
-    manager.register(conn)
-
-    return promise
+  async function connect(id: string) {
+    return await manager.connect(id)
   }
 
   function unmount() {
@@ -170,6 +147,10 @@ export function createClientSingle(app: App) {
     manager.unmount()
 
     destroy()
+  }
+
+  function setMetadata(metadata: Metadata) {
+    manager.setMetadata(metadata)
   }
 
   watchEffect(() => {
@@ -211,13 +192,16 @@ export function createClientSingle(app: App) {
     connect,
     getClient,
     tryGetClient,
+    setMetadata,
     sendJson: manager.sendJson.bind(manager),
     sendBinary: manager.sendBinary.bind(manager),
     invoke: manager.invoke.bind(manager),
+    invokeIdentity: manager.invokeIdentity.bind(manager),
+    sendMessage: manager.sendMessage.bind(manager),
+    on: event.on.bind(event),
   })
 
   app.onUnmount(unmount)
 
   connectServer()
-  // onMounted(connectServer)
 }

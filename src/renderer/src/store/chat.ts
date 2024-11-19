@@ -1,4 +1,5 @@
 import type { Chat, ChatData } from '@renderer/database/chat'
+import type { Message } from '@renderer/database/message'
 import type { ExchangeUser } from '@renderer/database/user'
 import { usePeerClientMethods } from '@renderer/client/use'
 import { chatDatabase } from '@renderer/database/chat'
@@ -11,7 +12,7 @@ export const useChat = defineStore('app-chat', () => {
   const chats = ref<ChatData[]>([])
   const currentChatId = useStorage<string>('current-chat-id', '')
 
-  const { registerHandler, connect, sendJson } = usePeerClientMethods()
+  const { registerHandler, sendMessage, on } = usePeerClientMethods()
 
   const user = useUser()
 
@@ -34,6 +35,17 @@ export const useChat = defineStore('app-chat', () => {
     }
     chats.value.unshift(newChat)
     return true
+  })
+
+  on('chat:message', (message: Message) => {
+    logger.log('chat:message')
+    console.log(message)
+    const chat = chats.value.find(chat => chat.id === message.chatId)
+    if (!chat) {
+      logger.error('Chat not found')
+      return
+    }
+    chat.messages.push(message)
   })
 
   async function createNewPrivateChat(userinfo: ExchangeUser) {
@@ -68,8 +80,6 @@ export const useChat = defineStore('app-chat', () => {
       return
     }
 
-    const conn = await connect(id)
-
     const newMessage = await chatDatabase.createTextMessage({
       content: text,
       senderId: await getClientUniqueId(),
@@ -78,7 +88,12 @@ export const useChat = defineStore('app-chat', () => {
       chatId: chat.id,
     })
 
-    return sendJson(conn, newMessage)
+    if (!newMessage) {
+      logger.error('Create new message failed')
+      return
+    }
+
+    return await sendMessage(id, newMessage)
   }
 
   return {

@@ -13,7 +13,7 @@ export const useIdentity = defineStore('identity', () => {
   const currentIdentityId = useStorage<Identity['id']>('current-identity', null)
   const identitys = ref<Identity[]>([])
 
-  const { registerHandler, connect, invoke, hasServerConnection } = usePeerClientMethods()
+  const { setMetadata, invokeIdentity, hasServerConnection } = usePeerClientMethods()
 
   async function init() {
     identitys.value = await identityDatabase.getIdentitys()
@@ -40,18 +40,20 @@ export const useIdentity = defineStore('identity', () => {
     return identitys.value.find(identity => identity.id === currentIdentityId.value)
   })
 
-  registerHandler('request:identity', async (): Promise<ExchangeUser> => {
-    logger.log('request:identity')
+  watch(currentIdentity, async () => {
     if (!currentIdentity.value) {
       throw new Error('Current identity not found')
     }
-    return {
-      name: currentIdentity.value.name,
-      email: currentIdentity.value.email,
-      id: currentIdentity.value.id,
-      connectID: await getClientUniqueId(),
-      avatar: await readBufferFromStore(currentIdentity.value.avatar),
-    }
+    setMetadata({
+      id: await getClientUniqueId(),
+      info: {
+        name: currentIdentity.value.name,
+        avatar: await readBufferFromStore(currentIdentity.value.avatar),
+        email: currentIdentity.value.email,
+        id: currentIdentity.value.id,
+        connectID: await getClientUniqueId(),
+      },
+    })
   })
 
   async function searchFriend(id: string) {
@@ -65,20 +67,7 @@ export const useIdentity = defineStore('identity', () => {
       return undefined
     }
 
-    const conn = await connect(_id, {
-      id: await getClientUniqueId(),
-      info: {
-        name: currentIdentity.value.name,
-        avatar: await readBufferFromStore(currentIdentity.value.avatar),
-        email: currentIdentity.value.email,
-        id: currentIdentity.value.id,
-        connectID: await getClientUniqueId(),
-      },
-    })
-
-    return await invoke<ExchangeUser>(conn, 'request:identity').catch((err) => {
-      logger.error('request:identity', err)
-    })
+    return invokeIdentity(_id)
   }
 
   return {

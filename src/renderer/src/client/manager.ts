@@ -1,5 +1,6 @@
-import type { DataConnection } from 'peerjs'
-import type { ClientEvent } from './event'
+import type { ExchangeUser } from '@renderer/database/user'
+import type { DataConnection, Peer } from 'peerjs'
+import type { ClientEvent, ClientHandler, Events } from './event'
 import type { Data, Handler, Metadata, OpponentError } from './type'
 import { SALT } from '@renderer/constants'
 import { withTimeout } from '@renderer/utils/async'
@@ -18,6 +19,10 @@ export class Manager {
   handlerMap = new Map<string, Handler>()
   event: ClientEvent
   replyMap = new Map<string, PromiseWithResolvers<any>>()
+
+  peer?: Peer
+  metadata?: Metadata
+
   private clientID = ''
   constructor(e: ClientEvent) {
     this.event = e
@@ -272,9 +277,90 @@ export class Manager {
       conn.removeAllListeners()
       conn.close()
     })
+
+    this.connectionMap.clear()
+    this.peer = undefined
+    this.handlerMap.clear()
   }
 
-  mount() {
+  mount(peer: Peer) {
+    this.peer = peer
+  }
 
+  setMetadata(metadata: Metadata) {
+    this.metadata = metadata
+    this.registerHandler('request:identity', async () => {
+      this.getThisMetadata()
+    })
+  }
+
+  async invokeIdentity(id: string) {
+    const conn = await this.connect(id)
+    try {
+      return await this.invoke<ExchangeUser>(conn, 'request:identity')
+    }
+    catch (err) {
+      logger.error('request:identity', err)
+      return undefined
+    }
+  }
+
+  getThisMetadata() {
+    if (!this.metadata) {
+      throw new Error('Metadata not found setMetadata() required')
+    }
+    return this.metadata
+  }
+
+  getClient() {
+    if (!this.peer) {
+      throw new Error('Peer not mounted')
+    }
+    return this.peer
+  }
+
+  connect(id: string) {
+    const { promise, reject, resolve } = Promise.withResolvers<DataConnection>()
+
+    if (this.hasConnectionById(id)) {
+      resolve(this.getConnectionById(id)!)
+      return promise
+    }
+
+    const conn = this.getClient().connect(id, { metadata: this.getThisMetadata() })
+
+    conn.once('open', () => {
+      logger.info(`[peer client] connected to ${id}`)
+      this.addConnection(id, conn)
+      resolve(conn)
+    })
+
+    conn.once('error', (error) => {
+      reject(error)
+    })
+
+    this.register(conn)
+
+    return promise
+  }
+
+  destroy() {
+    this.peer?.destroy()
+  }
+
+  tryGetClient() {
+    return this.peer
+  }
+
+  async lazyConnect(id: string) {
+    if (this.hasConnectionById(id)) {
+      return this.getConnectionById(id)!
+    }
+
+    return await this.connect(id)
+  }
+
+  on<Key extends keyof Events>(type: Key, handler: ClientHandler<Key>) {
+    this.event.on(type, handler)
   }
 }

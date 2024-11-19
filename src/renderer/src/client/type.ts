@@ -1,4 +1,6 @@
-import type { ClientEvent } from '@renderer/client/event'
+import type { ClientEvent, ClientHandler, Events } from '@renderer/client/event'
+import type { MessageState } from '@renderer/database/enums'
+import type { Message } from '@renderer/database/message'
 import type { ExchangeUser } from '@renderer/database/user'
 import type Peer from 'peerjs'
 import type { DataConnection, PeerError, PeerErrorType } from 'peerjs'
@@ -25,10 +27,14 @@ export interface ClientProviderMethods {
   tryGetClient: () => Peer | undefined
   registerHandler: (name: string, handler: Handler) => void
   unmount: () => void
-  connect: (id: string, metadata?: Metadata) => Promise<DataConnection>
+  connect: (id: string) => Promise<DataConnection>
   sendJson: (conn: DataConnection, data: any) => Promise<void>
   sendBinary: (conn: DataConnection, data: ArrayBuffer | Uint8Array | Blob) => Promise<void>
   invoke: <T>(conn: DataConnection, name: string, ...argv: any[]) => Promise<T>
+  setMetadata: (metadata: Metadata) => void
+  invokeIdentity: (id: string) => Promise<ExchangeUser | undefined>
+  sendMessage: (id: string, message: Message) => Promise<void>
+  on: <Key extends keyof Events>(type: Key, handler: ClientHandler<Key>) => void
 }
 
 export type Handler = (...args: any[]) => any | Promise<any>
@@ -75,3 +81,16 @@ export interface InvokeEData extends CommonData {
 }
 
 export type Data = JsonData | BinaryData | ReplyData | InvokeEData
+
+export interface JsonMessageContent {
+  type: 'message'
+  message: Message
+}
+
+export interface JsonMessageStatusContent {
+  type: 'message-state'
+  id: string
+  ack: MessageState
+}
+
+export type JsonMessage = JsonMessageContent | JsonMessageStatusContent

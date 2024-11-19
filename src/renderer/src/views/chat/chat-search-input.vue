@@ -62,7 +62,11 @@ const onSeyHello = debounce(async () => {
     return
 
   const newChat = await chat.createNewPrivateChat(searchUser.value)
-  console.log(newChat)
+  if (!newChat) {
+    console.error('create chat failed')
+    return
+  }
+  chat.sendTextMessage(newChat.id, 'Hello')
 })
 </script>
 
