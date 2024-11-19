@@ -42,6 +42,7 @@ const onSearch = debounce(async () => {
   }
 
   searchIng.value = true
+
   try {
     const user = await identity.searchFriend(friendId.value)
 
@@ -51,8 +52,11 @@ const onSearch = debounce(async () => {
 
     searchUser.value = user
   }
-  finally {
+  catch (error) {
     searchUser.value = undefined
+    console.error(error)
+  }
+  finally {
     searchIng.value = false
   }
 })
@@ -93,8 +97,8 @@ const onSeyHello = debounce(async () => {
               No user found
             </p>
           </div>
-          <div v-else-if="!searchIng" class="w-full flex flex-1 flex-col items-center justify-center gap-6 py-4">
-            <ui-buffer-avatar v-if="searchUser?.avatar" :src="searchUser.avatar" class="block size-20" />
+          <div v-else-if="!searchIng && searchUser" class="w-full flex flex-1 flex-col items-center justify-center gap-6 py-4">
+            <ui-buffer-avatar v-if="searchUser.avatar" :src="searchUser.avatar" class="block size-20" />
             <div class="flex flex-col gap-4">
               <span class="text-lg font-bold">{{ searchUser?.name }}</span>
               <span class="text-sm text-gray-500">{{ searchUser?.email }}</span>

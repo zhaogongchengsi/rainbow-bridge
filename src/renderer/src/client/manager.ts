@@ -53,7 +53,7 @@ export class Manager {
     return async (data: any) => {
       const _data = data as Data
 
-      logger.info(`[peer] opponent data id: ${data.id} time: ${formatDate(data.timestamp)} reply: ${data.reply}`)
+      logger.info(`[peer] opponent data id: ${data.id} type:${data.type} time: ${formatDate(data.timestamp)} reply: ${data.replyId}`)
 
       this.event.emit('peer:data', _data)
 
@@ -290,17 +290,18 @@ export class Manager {
   setMetadata(metadata: Metadata) {
     this.metadata = metadata
     this.registerHandler('request:identity', async () => {
-      this.getThisMetadata()
+      logger.info('request:identity')
+      return this.getThisMetadata()
     })
   }
 
   async invokeIdentity(id: string) {
     const conn = await this.connect(id)
     try {
-      return await this.invoke<ExchangeUser>(conn, 'request:identity')
+      return (await this.invoke<Metadata>(conn, 'request:identity')).info
     }
     catch (err) {
-      logger.error('request:identity', err)
+      logger.error('request:identity error', err)
       return undefined
     }
   }

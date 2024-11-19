@@ -1,10 +1,8 @@
 import type { Identity, IdentityOption } from '@renderer/database/identit'
-import type { ExchangeUser } from '@renderer/database/user'
 import { usePeerClientMethods } from '@renderer/client/use'
 import { identityDatabase } from '@renderer/database/identit'
 import { decryptClientID, getClientUniqueId } from '@renderer/utils/id'
 import { readBufferFromStore } from '@renderer/utils/ky'
-import { logger } from '@renderer/utils/logger'
 import once from 'lodash/once'
 
 const max_identity_count = 10
@@ -67,7 +65,7 @@ export const useIdentity = defineStore('identity', () => {
       return undefined
     }
 
-    return invokeIdentity(_id)
+    return await invokeIdentity(_id)
   }
 
   return {

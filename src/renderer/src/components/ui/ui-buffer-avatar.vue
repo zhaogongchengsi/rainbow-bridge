@@ -1,11 +1,13 @@
 <script setup lang='ts'>
 import { type BufferFile, bufferToUrl } from '@renderer/utils/ky'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   src: BufferFile
   alt?: string
   imageClass?: string
-}>()
+}>(), {
+  imageClass: 'w-full h-full object-cover',
+})
 
 const divRef = useTemplateRef<HTMLDivElement>('divRef')
 
@@ -18,7 +20,7 @@ watchEffect(async () => {
   const img = new Image()
   img.src = src.value
   img.alt = props.alt || ''
-  img.className = props.imageClass || ''
+  img.className = props.imageClass || 'w-full h-full object-cover'
   img.onload = () => {
     isLoading.value = false
     divRef.value?.appendChild(img)
