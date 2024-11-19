@@ -62,7 +62,6 @@ const onSeyHello = debounce(async () => {
     return
 
   const newChat = await chat.createNewPrivateChat(searchUser.value)
-
   console.log(newChat)
 })
 </script>

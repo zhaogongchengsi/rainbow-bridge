@@ -1,61 +1,11 @@
 <script setup lang="ts">
 import type { ChatData } from '@renderer/database/chat'
-import { ChatType, MessageState } from '@renderer/database/enums'
+import { useChat } from '@renderer/store/chat'
+import { formatDateShort } from '@renderer/utils/date'
 
 const menu = ref()
 
-const chats = ref<ChatData[]>([
-  {
-    id: '1',
-    type: ChatType.GROUP_CHAT,
-    title: 'test',
-    avatar: 'C:/Users/Administrator/.rainbow-bridge/files/wallhaven-l8y9yy.jpg',
-    messages: [],
-    participants: [],
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    owner: '',
-    description: '',
-    isMute: false,
-    isTop: false,
-    isHide: false,
-    lastMessage: {
-      id: '',
-      senderId: '',
-      receiverId: '',
-      content: '最后一条消息',
-      timestamp: 0,
-      status: MessageState.READ,
-      isLastMessage: false,
-      chatId: '',
-    },
-  },
-  {
-    id: '2',
-    type: ChatType.GROUP_CHAT,
-    title: 'test',
-    avatar: 'C:/Users/Administrator/.rainbow-bridge/files/wallhaven-l8y9yy.jpg',
-    messages: [],
-    participants: [],
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    owner: '',
-    description: '',
-    isMute: true,
-    isTop: false,
-    isHide: false,
-    lastMessage: {
-      id: '',
-      senderId: '',
-      receiverId: '',
-      content: '最后一条消息',
-      timestamp: 0,
-      status: MessageState.READ,
-      isLastMessage: false,
-      chatId: '',
-    },
-  },
-])
+const chatStore = useChat()
 
 const items = ref([
   {
@@ -91,8 +41,7 @@ const items = ref([
   },
 ])
 
-function onRightClick(event, user) {
-  console.log(user)
+function onRightClick(event, _: ChatData) {
   menu.value.show(event)
 }
 </script>
@@ -100,7 +49,7 @@ function onRightClick(event, user) {
 <template>
   <ScrollPanel style="width: 100%; height: 100% ">
     <ul class="chat-list-contianer">
-      <li v-for="chat in chats" :key="chat.id" class="chat-list-item" @contextmenu="onRightClick($event, chat)">
+      <li v-for="chat in chatStore.chats" :key="chat.id" class="chat-list-item" @contextmenu="onRightClick($event, chat)">
         <router-link class="chat-list-item-link block size-full" :to="`/main/chat/${chat.id}`">
           <div class="size-full flex gap-2">
             <div class="chat-avatar">
@@ -113,7 +62,7 @@ function onRightClick(event, user) {
               </p>
             </div>
             <div class="flex flex-col items-end justify-between">
-              <span class="block w-full truncate text-xs text-zinc-500">2021-10-10</span>
+              <span v-if="chat.lastMessage" class="block w-full truncate text-xs text-zinc-500">{{ formatDateShort(chat.lastMessage?.timestamp) }}</span>
               <i v-if="chat.isMute" class="pi-bell-slash pi text-zinc-500" />
             </div>
           </div>

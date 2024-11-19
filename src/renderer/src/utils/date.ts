@@ -8,6 +8,10 @@ export function formatDate(date: ConfigType): string {
   return dayjs(date).format('YYYY-MM-DD HH:mm:ss')
 }
 
+export function formatDateShort(date: ConfigType): string {
+  return dayjs(date).format('YYYY-MM-DD')
+}
+
 export function dateFromNow(date: ConfigType): string {
   return dayjs(date).fromNow()
 }

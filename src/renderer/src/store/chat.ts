@@ -11,7 +11,7 @@ export const useChat = defineStore('app-chat', () => {
   const chats = ref<ChatData[]>([])
   const currentChatId = useStorage<string>('current-chat-id', '')
 
-  const { registerHandler } = usePeerClientMethods()
+  const { registerHandler, connect, sendJson } = usePeerClientMethods()
 
   const user = useUser()
 
@@ -61,28 +61,31 @@ export const useChat = defineStore('app-chat', () => {
     return chat
   }
 
-  // async function sendTextMessage(id: string, text: string) {
-  //   const chat = chats.value.find(chat => chat.id === id)
-  //   if (!chat) {
-  //     logger.warn('Chat not found')
-  //     return
-  //   }
+  async function sendTextMessage(id: string, text: string) {
+    const chat = chats.value.find(chat => chat.id === id)
+    if (!chat) {
+      logger.warn('Chat not found')
+      return
+    }
 
-  //   const conn = await connect(id)
+    const conn = await connect(id)
 
-  //   const newMessage = await chatDatabase.createTextMessage({
-  //     content: text,
-  //     senderId: await getClientUniqueId(),
-  //     receiverId: id,
-  //   })
+    const newMessage = await chatDatabase.createTextMessage({
+      content: text,
+      senderId: await getClientUniqueId(),
+      receiverId: id,
+      isLastMessage: false,
+      chatId: chat.id,
+    })
 
-  //   return sendJson(conn, newMessage)
-  // }
+    return sendJson(conn, newMessage)
+  }
 
   return {
     chats,
     currentChatId,
     createNewPrivateChat,
     currentChat,
+    sendTextMessage,
   }
 })
