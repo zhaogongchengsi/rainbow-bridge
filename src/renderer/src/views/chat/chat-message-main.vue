@@ -1,11 +1,18 @@
 <script setup lang='ts'>
 import Editor from '@renderer/components/editor'
+import { useChat } from '@renderer/store/chat'
+import { debounce } from 'perfect-debounce'
 import { VirtList } from 'vue-virt-list'
+
+const chatStore = useChat()
+const router = useRoute()
 
 const virtListRef = useTemplateRef('virtListRef')
 
 const value = ref('')
 const page = ref(5)
+
+const currentChatId = computed(() => (router.params as any).id)
 
 function mock(length: number) {
   return Array.from({ length }).map((_, i) => ({ value: `Item #${i}` }))
@@ -31,12 +38,20 @@ async function toTop() {
   virtListRef.value?.addedList2Top(list)
   page.value = page.value - 1
 }
+
+const onSend = debounce(async () => {
+  if (!value.value)
+    return
+
+  await chatStore.sendTextMessage(currentChatId.value, value.value)
+  value.value = ''
+})
 </script>
 
 <template>
   <div class="chat-message-contianer">
     <div class="chat-main-header">
-      <span>{{ ($route.params as any).id }}</span>
+      <span>{{ chatStore.currentChat?.title }}</span>
     </div>
     <div class="chat-main-body">
       <VirtList ref="virtListRef" :list="items" item-key="value" :min-size="60" @to-top="toTop">
@@ -68,7 +83,7 @@ async function toTop() {
       <div class="chat-main-footer_editor">
         <Editor v-model:text="value" />
         <div class="chat-main-footer_send">
-          <Button label="Send" class="w-25" severity="contrast" />
+          <Button label="Send" class="w-25" severity="contrast" @click="onSend" />
         </div>
       </div>
     </div>
