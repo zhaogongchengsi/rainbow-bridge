@@ -58,7 +58,7 @@ export class Manager {
       this.event.emit('peer:data', _data)
 
       if (_data.type === DataType.JSON) {
-        _data.data = decryptBufferToObject(_data.data, SALT)
+        _data.data = await decryptBufferToObject(_data.data, SALT)
         this.event.emit('peer:json', _data)
         return
       }
@@ -195,7 +195,7 @@ export class Manager {
       id,
       timestamp,
       // ! Decrypt with your own ID
-      data: encryptObjectToBuffer(cloneDeep(data), SALT),
+      data: await encryptObjectToBuffer(cloneDeep(data), SALT),
     }
 
     return conn.send(sendData)
@@ -354,8 +354,8 @@ export class Manager {
   }
 
   async lazyConnect(id: string) {
-    if (this.hasConnectionById(id)) {
-      return this.getConnectionById(id)!
+    if (!await this.hasServerConnection(id)) {
+      throw new Error(`Server connection not found: ${id}`)
     }
 
     return await this.connect(id)

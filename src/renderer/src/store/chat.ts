@@ -121,6 +121,8 @@ export const useChat = defineStore('app-chat', () => {
       return
     }
 
+    console.log(newMessage)
+
     return await sendMessage(id, newMessage)
   }
 
