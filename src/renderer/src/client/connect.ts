@@ -6,11 +6,13 @@ import { Manager } from './manager'
 export class Connect extends Manager {
   constructor(e: ClientEvent) {
     super(e)
-    this.event.on('peer:json', this.onMessageData)
+    this.event.on('peer:json', this.onMessageData.bind(this))
   }
 
   onMessageData(jsonData: JsonData) {
     const data = jsonData.data
+
+    console.log('message: ', jsonData)
 
     if (!('type' in data) || !['message', 'message-state'].includes(data.type)) {
       return
