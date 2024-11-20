@@ -48,7 +48,7 @@ export const useIdentity = defineStore('identity', () => {
         name: currentIdentity.value.name,
         avatar: await readBufferFromStore(currentIdentity.value.avatar),
         email: currentIdentity.value.email,
-        id: currentIdentity.value.id,
+        id: await getClientUniqueId(),
         connectID: await getClientUniqueId(),
       },
     })

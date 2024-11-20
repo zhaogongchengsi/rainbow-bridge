@@ -90,6 +90,7 @@ export const useChat = defineStore('app-chat', () => {
       owner: selfId,
       avatar: newUser.avatar,
       isGroup: false,
+      id: userinfo.connectID,
     })
 
     if (!chat) {
@@ -123,9 +124,14 @@ export const useChat = defineStore('app-chat', () => {
     return await sendMessage(id, newMessage)
   }
 
+  function setCurrentChatId(id: string) {
+    currentChatId.value = id
+  }
+
   return {
     chats,
     currentChatId,
+    setCurrentChatId,
     createNewPrivateChat,
     currentChat,
     sendTextMessage,

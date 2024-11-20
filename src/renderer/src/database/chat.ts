@@ -25,7 +25,7 @@ export interface ChatData extends Omit<Chat, 'messages'> {
   lastMessage?: Message
 }
 
-export type ChatOption = Omit<Chat, 'id' | 'createdAt' | 'updatedAt' | 'messages' | 'isMuted' | 'isTop' | 'isHide' | 'description'>
+export type ChatOption = Omit<Chat, 'createdAt' | 'updatedAt' | 'messages' | 'isMuted' | 'isTop' | 'isHide' | 'description'>
 
 class ChatDatabase extends MessageDatabase {
   constructor() {
@@ -62,7 +62,16 @@ class ChatDatabase extends MessageDatabase {
   }
 
   async createPrivateChatChat(newChat: Omit<ChatOption, 'type'>) {
-    return await this.createChat({ ...newChat, type: ChatType.PRIVATE_CHAT })
+    const oldChat = await this.chats.get(newChat.id)
+
+    if (!oldChat) {
+      return await this.createChat({ ...newChat, type: ChatType.PRIVATE_CHAT })
+    }
+    else {
+      // Update the chat
+      await this.chats.update(newChat.id, { ...newChat, updatedAt: new Date() })
+      return (await this.completeMessage([(await this.chats.get(newChat.id))!])).at(0)!
+    }
   }
 
   async createGroupChat(newChat: Omit<ChatOption, 'type'>) {

@@ -14,6 +14,8 @@ const page = ref(5)
 
 const currentChatId = computed(() => (router.params as any).id)
 
+chatStore.setCurrentChatId(currentChatId.value)
+
 function mock(length: number) {
   return Array.from({ length }).map((_, i) => ({ value: `Item #${i}` }))
 }
@@ -54,10 +56,10 @@ const onSend = debounce(async () => {
       <span>{{ chatStore.currentChat?.title }}</span>
     </div>
     <div class="chat-main-body">
-      <VirtList ref="virtListRef" :list="items" item-key="value" :min-size="60" @to-top="toTop">
+      <VirtList ref="virtListRef" :list="chatStore.currentChat?.messages" item-key="id" :min-size="60" @to-top="toTop">
         <template #default="{ itemData }">
           <div style="height: 60px;">
-            {{ itemData.value }}
+            {{ itemData.content }}
           </div>
         </template>
         <template v-if="page > 1" #header>

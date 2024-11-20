@@ -63,7 +63,7 @@ function onRightClick(event, _: ChatData) {
             </div>
             <div class="flex flex-col items-end justify-between">
               <span v-if="chat.lastMessage" class="block w-full truncate text-xs text-zinc-500">{{ formatDateShort(chat.lastMessage?.timestamp) }}</span>
-              <i v-if="chat.isMute" class="pi-bell-slash pi text-zinc-500" />
+              <i v-if="chat.isMuted" class="pi-bell-slash pi text-zinc-500" />
             </div>
           </div>
         </router-link>
