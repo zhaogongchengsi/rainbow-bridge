@@ -16,7 +16,7 @@ export const useChat = defineStore('app-chat', () => {
   const chats = ref<ChatState[]>([])
   const currentChatId = useStorage<string>('current-chat-id', '')
 
-  const { registerHandler, sendMessage, on } = usePeerClientMethods()
+  const { registerHandler, sendMessage, on, invoke } = usePeerClientMethods()
 
   const user = useUser()
 
@@ -96,6 +96,8 @@ export const useChat = defineStore('app-chat', () => {
     if (!chat) {
       return
     }
+
+    // TODO: Notify the opposite side to create a new room
 
     appNewChat(chat)
 
