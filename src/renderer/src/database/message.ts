@@ -8,7 +8,6 @@ export interface Message {
   content: string
   timestamp: number
   status: MessageState
-  isLastMessage: boolean
   chatId: string
 }
 
@@ -17,23 +16,22 @@ export class MessageDatabase extends RainbowBridgeDatabase {
     super()
   }
 
-  createTextMessage(message: Omit<Message, 'id' | 'timestamp' | 'status'>) {
-    const index = this.messages.add({
+  async createTextMessage(message: Omit<Message, 'id' | 'timestamp' | 'status'>) {
+    return this.createOriginalMessage({
       ...message,
       id: this.createUUID(),
       timestamp: Date.now(),
       status: MessageState.SENT,
     })
-    return this.messages.get(index)
+  }
+
+  async createOriginalMessage(message: Message) {
+    const index = await this.messages.add(message)
+
+    return await this.messages.get(index)
   }
 
   async getMessagesByChatId(chatId: string) {
     return await this.messages.where('chatId').equals(chatId).toArray()
-  }
-
-  async getLastMessageByChatId(chatId: string): Promise<Message | undefined> {
-    return await this.messages
-      .where({ chatId, isLastMessage: true })
-      .last()
   }
 }

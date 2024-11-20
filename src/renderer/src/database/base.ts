@@ -14,18 +14,17 @@ export class RainbowBridgeDatabase extends Dexie {
   constructor() {
     super('rainbow-bridge-db')
     this.version(1).stores({
-      chats: this.generateDexieStoreString(
-        ['id', 'type', 'email', 'isContact', 'createdAt', 'updatedAt', 'owner', 'title'],
-        ['participants', 'messages', 'avatar', 'description', 'isMute', 'isTop', 'isHide'],
-      ),
-      identitys: this.generateDexieStoreString(
-        ['id', 'name', 'email'],
-        ['chats', 'comment', 'lastLoginTime', 'create_by', 'avatar'],
-      ),
-      messages: this.generateDexieStoreString(
-        ['id', 'senderId', 'receiverId', 'status', 'isLastMessage', 'chatId'],
-        ['timestamp', 'content'],
-      ),
+      chats: `
+        id, type, email, isContact, createdAt, updatedAt, owner, title,
+        participants, messages, avatar, description, isMuted, isTop,
+        isHide, isGroup
+      `,
+
+      identitys: `id, name, email, chats, comment, lastLoginTime, create_by, avatar`,
+
+      messages: `
+        id, senderId, receiverId, content, timestamp, status, isLastMessage, chatId
+      `,
     })
   }
 

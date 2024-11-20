@@ -14,9 +14,10 @@ export interface Chat {
   title: string
   avatar: string
   description: string
-  isMute: boolean
+  isMuted: boolean
   isTop: boolean
   isHide: boolean
+  isGroup: boolean
 }
 
 export interface ChatData extends Omit<Chat, 'messages'> {
@@ -24,7 +25,7 @@ export interface ChatData extends Omit<Chat, 'messages'> {
   lastMessage?: Message
 }
 
-export type ChatOption = Omit<Chat, 'id' | 'createdAt' | 'updatedAt' | 'messages' | 'isMute' | 'isTop' | 'isHide' | 'description'>
+export type ChatOption = Omit<Chat, 'id' | 'createdAt' | 'updatedAt' | 'messages' | 'isMuted' | 'isTop' | 'isHide' | 'description'>
 
 class ChatDatabase extends MessageDatabase {
   constructor() {
@@ -48,7 +49,7 @@ class ChatDatabase extends MessageDatabase {
       updatedAt: new Date(),
       messages: [],
       isHide: false,
-      isMute: false,
+      isMuted: false,
       isTop: false,
       description: '',
     })
@@ -71,7 +72,7 @@ class ChatDatabase extends MessageDatabase {
   async completeMessage(chats: Chat[]): Promise<ChatData[]> {
     return await map(chats, async (chat) => {
       const messages = await this.getMessagesByChatId(chat.id)
-      const lastMessage = messages.length > 0 ? messages.find(m => m.isLastMessage) : undefined
+      const lastMessage = messages.length > 0 ? messages.at(messages.length - 1) : undefined
       return { ...chat, messages, lastMessage }
     })
   }

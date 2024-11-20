@@ -8,8 +8,12 @@ import { logger } from '@renderer/utils/logger'
 import once from 'lodash/once'
 import { useUser } from './user'
 
+export interface ChatState extends ChatData {
+  newMessages: Message[]
+}
+
 export const useChat = defineStore('app-chat', () => {
-  const chats = ref<ChatData[]>([])
+  const chats = ref<ChatState[]>([])
   const currentChatId = useStorage<string>('current-chat-id', '')
 
   const { registerHandler, sendMessage, on } = usePeerClientMethods()
@@ -17,7 +21,14 @@ export const useChat = defineStore('app-chat', () => {
   const user = useUser()
 
   async function init() {
-    chats.value = await chatDatabase.getChats()
+    const _chats = await chatDatabase.getChats()
+
+    chats.value = _chats.map((chat) => {
+      return {
+        ...chat,
+        newMessages: [],
+      }
+    })
   }
 
   once(init)()
@@ -26,6 +37,13 @@ export const useChat = defineStore('app-chat', () => {
     return chats.value.find(chat => chat.id === currentChatId.value)
   })
 
+  function appNewChat(chat: ChatData) {
+    chats.value.unshift({
+      ...chat,
+      newMessages: [],
+    })
+  }
+
   registerHandler('chat:create-private-chat', async (chat: Chat): Promise<boolean> => {
     logger.log('chat:create-private-chat')
     const newChat = await chatDatabase.createChatByCompleteInfo(chat)
@@ -33,7 +51,8 @@ export const useChat = defineStore('app-chat', () => {
       logger.error('passive create new chat failed')
       return false
     }
-    chats.value.unshift(newChat)
+
+    appNewChat(newChat)
     return true
   })
 
@@ -45,7 +64,15 @@ export const useChat = defineStore('app-chat', () => {
       logger.error('Chat not found')
       return
     }
-    chat.messages.push(message)
+    try {
+      chatDatabase.createOriginalMessage(message)
+      chat.lastMessage = message
+      chat.newMessages.push(message)
+      chat.messages.push(message)
+    }
+    catch (error: any) {
+      logger.error(`Create message failed: ${error.message}`)
+    }
   })
 
   async function createNewPrivateChat(userinfo: ExchangeUser) {
@@ -62,13 +89,14 @@ export const useChat = defineStore('app-chat', () => {
       participants: [newUser.id, selfId],
       owner: selfId,
       avatar: newUser.avatar,
+      isGroup: false,
     })
 
     if (!chat) {
       return
     }
 
-    chats.value.unshift(chat)
+    appNewChat(chat)
 
     return chat
   }
@@ -84,7 +112,6 @@ export const useChat = defineStore('app-chat', () => {
       content: text,
       senderId: await getClientUniqueId(),
       receiverId: id,
-      isLastMessage: false,
       chatId: chat.id,
     })
 
