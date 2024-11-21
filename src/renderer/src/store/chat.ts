@@ -59,7 +59,6 @@ export const useChat = defineStore('app-chat', () => {
 
   on('chat:message', (message: Message) => {
     logger.log('chat:message')
-    console.log(message)
     const chat = chats.value.find(chat => chat.id === message.chatId)
     if (!chat) {
       logger.error('Chat not found')
@@ -128,9 +127,10 @@ export const useChat = defineStore('app-chat', () => {
       return
     }
 
-    console.log(newMessage)
+    await sendMessage(id, newMessage)
 
-    return await sendMessage(id, newMessage)
+    chat.messages.push(newMessage)
+    chat.lastMessage = newMessage
   }
 
   function setCurrentChatId(id: string) {
