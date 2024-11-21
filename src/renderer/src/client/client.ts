@@ -195,7 +195,7 @@ export function createClientSingle(app: App) {
     setMetadata,
     sendJson: manager.sendJson.bind(manager),
     sendBinary: manager.sendBinary.bind(manager),
-    invoke: manager.invoke.bind(manager),
+    invoke: manager.lazyInvoke.bind(manager),
     invokeIdentity: manager.invokeIdentity.bind(manager),
     sendMessage: manager.sendMessage.bind(manager),
     on: event.on.bind(event),

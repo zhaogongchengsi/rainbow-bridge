@@ -5,6 +5,7 @@ import { usePeerClientMethods } from '@renderer/client/use'
 import { chatDatabase } from '@renderer/database/chat'
 import { getClientUniqueId } from '@renderer/utils/id'
 import { logger } from '@renderer/utils/logger'
+import omit from 'lodash/omit'
 import once from 'lodash/once'
 import { useUser } from './user'
 
@@ -98,6 +99,10 @@ export const useChat = defineStore('app-chat', () => {
     }
 
     // TODO: Notify the opposite side to create a new room
+    await invoke(userinfo.connectID, 'chat:create-private-chat', {
+      ...omit(chat, 'messages', 'lastMessage'),
+      messages: [],
+    })
 
     appNewChat(chat)
 

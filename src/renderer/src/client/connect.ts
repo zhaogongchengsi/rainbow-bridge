@@ -12,8 +12,6 @@ export class Connect extends Manager {
   onMessageData(jsonData: JsonData) {
     const data = jsonData.data
 
-    console.log('message: ', jsonData)
-
     if (!('type' in data) || !['message', 'message-state'].includes(data.type)) {
       return
     }
@@ -25,6 +23,11 @@ export class Connect extends Manager {
     if (data.type === 'message-state') {
       this.event.emit('chat:message-state', data)
     }
+  }
+
+  async lazyInvoke<T = any>(id: string, name: string, ...argv: any[]) {
+    const conn = await this.lazyConnect(id)
+    return await this.invoke<T>(conn, name, ...argv)
   }
 
   async sendMessageData(id: string, message: JsonMessage) {
