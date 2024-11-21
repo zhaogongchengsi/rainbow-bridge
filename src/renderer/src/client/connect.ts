@@ -25,9 +25,9 @@ export class Connect extends Manager {
     }
   }
 
-  async lazyInvoke<T = any>(id: string, name: string, ...argv: any[]) {
+  async lazyInvoke<T = any>(id: string, name: string, argv: any[] = [], resourceKeys?: string[]) {
     const conn = await this.lazyConnect(id)
-    return await this.invoke<T>(conn, name, ...argv)
+    return await this.invoke<T>(conn, name, argv, resourceKeys)
   }
 
   async sendMessageData(id: string, message: JsonMessage) {

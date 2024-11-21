@@ -2,6 +2,7 @@ import type { ClientEvent, ClientHandler, Events } from '@renderer/client/event'
 import type { MessageState } from '@renderer/database/enums'
 import type { Message } from '@renderer/database/message'
 import type { ExchangeUser } from '@renderer/database/user'
+import type { BufferFile } from '@renderer/utils/ky'
 import type Peer from 'peerjs'
 import type { DataConnection, PeerError, PeerErrorType } from 'peerjs'
 import type { Reactive, Ref } from 'vue'
@@ -30,7 +31,7 @@ export interface ClientProviderMethods {
   connect: (id: string) => Promise<DataConnection>
   sendJson: (conn: DataConnection, data: any) => Promise<void>
   sendBinary: (conn: DataConnection, data: ArrayBuffer | Uint8Array | Blob) => Promise<void>
-  invoke: <T>(id: string, name: string, ...argv: any[]) => Promise<T>
+  invoke: <T>(id: string, name: string, argv?: any[], resourceKeys?: string[]) => Promise<T>
   setMetadata: (metadata: Metadata) => void
   invokeIdentity: (id: string) => Promise<ExchangeUser | undefined>
   sendMessage: (id: string, message: Message) => Promise<void>
@@ -52,6 +53,7 @@ export interface Metadata {
 export interface CommonData {
   id: string
   timestamp: number
+  resource?: Record<string, BufferFile | undefined>
 }
 
 export interface JsonData extends CommonData {

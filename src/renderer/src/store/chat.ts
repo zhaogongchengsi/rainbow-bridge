@@ -98,10 +98,10 @@ export const useChat = defineStore('app-chat', () => {
     }
 
     // TODO: Notify the opposite side to create a new room
-    await invoke(userinfo.connectID, 'chat:create-private-chat', {
+    await invoke(userinfo.connectID, 'chat:create-private-chat', [{
       ...omit(chat, 'messages', 'lastMessage'),
       messages: [],
-    })
+    }], ['avatar'])
 
     appNewChat(chat)
 

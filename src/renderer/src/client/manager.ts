@@ -1,15 +1,19 @@
-import type { ExchangeUser } from '@renderer/database/user'
 import type { DataConnection, Peer } from 'peerjs'
 import type { ClientEvent, ClientHandler, Events } from './event'
 import type { Data, Handler, Metadata, OpponentError } from './type'
 import { SALT } from '@renderer/constants'
-import { withTimeout } from '@renderer/utils/async'
+import { map, withTimeout } from '@renderer/utils/async'
 import { formatDate } from '@renderer/utils/date'
 import { decryptBufferToObject, encryptObjectToBuffer } from '@renderer/utils/decrypt'
 import { getClientUniqueId } from '@renderer/utils/id'
+import { type BufferFile, readBufferFromStore, uploadBufferToStore } from '@renderer/utils/ky'
 import { logger } from '@renderer/utils/logger'
 import ky from 'ky'
 import cloneDeep from 'lodash/cloneDeep'
+import get from 'lodash/get'
+import has from 'lodash/has'
+import isEmpty from 'lodash/isEmpty'
+import set from 'lodash/set'
 import { randomUUID } from 'uncrypto'
 import { server_base_url } from './constant'
 import { DataType } from './enums'
@@ -52,13 +56,23 @@ export class Manager {
   registerOpponentData(conn: DataConnection) {
     return async (data: any) => {
       const _data = data as Data
-
       logger.info(`[peer] opponent data id: ${data.id} type:${data.type} time: ${formatDate(data.timestamp)} reply: ${data.replyId}`)
 
       this.event.emit('peer:data', _data)
 
       if (_data.type === DataType.JSON) {
         _data.data = await decryptBufferToObject(_data.data, SALT)
+
+        if (_data.resource) {
+          for (const [key, bufferFile] of Object.entries(_data.resource)) {
+            if (!bufferFile) {
+              continue
+            }
+            const filePath = await uploadBufferToStore(bufferFile)
+            set(_data.data, key, filePath)
+          }
+        }
+
         this.event.emit('peer:json', _data)
         return
       }
@@ -67,7 +81,21 @@ export class Manager {
         const handler = this.handlerMap.get(_data.name)
         if (handler) {
           try {
-            const result = await Promise.resolve(handler(..._data.argv))
+            let argv = _data.argv
+
+            if (_data.resource) {
+              argv = await map(_data.argv, async (arg) => {
+                for (const [key, bufferFile] of Object.entries(_data.resource!)) {
+                  if (has(arg, key) && bufferFile) {
+                    const filePath = await uploadBufferToStore(bufferFile)
+                    set(arg, key, filePath)
+                  }
+                }
+                return arg
+              })
+            }
+
+            const result = await Promise.resolve(handler(...argv))
             await this.sendReply(conn, _data.replyId, cloneDeep(result), undefined)
           }
           catch (error: any) {
@@ -182,13 +210,29 @@ export class Manager {
     return await conn.send(sendData)
   }
 
-  async sendJson(conn: DataConnection, data: any) {
+  async sendJson(conn: DataConnection, data: any, resourceKeys?: string[]) {
     if (data instanceof ArrayBuffer) {
       throw new TypeError('Data is not JSON')
     }
 
     const timestamp = Date.now()
     const id = await this.getClientID()
+    const _data = cloneDeep(data)
+
+    let resource: Record<string, BufferFile | undefined> | undefined
+
+    if (resourceKeys) {
+      resource = Object.fromEntries(
+        await map(resourceKeys, async (key) => {
+          const filePath = get(_data, key)
+          if (!filePath) {
+            return [key, undefined]
+          }
+          const bufferFile = await readBufferFromStore(filePath)
+          return [key, bufferFile]
+        }),
+      )
+    }
 
     const sendData: Data = {
       type: DataType.JSON,
@@ -196,6 +240,7 @@ export class Manager {
       timestamp,
       // ! Decrypt with your own ID
       data: await encryptObjectToBuffer(cloneDeep(data), SALT),
+      resource: resource ?? undefined,
     }
 
     return conn.send(sendData)
@@ -215,12 +260,23 @@ export class Manager {
     return await conn.send(sendData)
   }
 
-  async invoke<T>(conn: DataConnection, name: string, ...argv: any[]) {
+  async invoke<T>(conn: DataConnection, name: string, argv: any[] = [], resourceKeys?: string[]) {
     const promiser = Promise.withResolvers<T>()
     const timestamp = Date.now()
     const id = await this.getClientID()
 
     const replyId = randomUUID()
+
+    const fileKeys = argv.map(arg => resourceKeys?.map((key) => {
+      return { key, path: get(arg, key) }
+    }).filter(Boolean) ?? []).flat().filter(Boolean)
+
+    const resource = Object.fromEntries(
+      await map(fileKeys, async ({ key, path }) => {
+        const bufferFile = await readBufferFromStore(path)
+        return [key, bufferFile]
+      }),
+    )
 
     const sendData: Data = {
       id,
@@ -229,6 +285,7 @@ export class Manager {
       name,
       argv,
       replyId,
+      resource: isEmpty(resource) ? undefined : resource,
     }
 
     this.replyMap.set(replyId, promiser)

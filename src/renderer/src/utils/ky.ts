@@ -1,6 +1,8 @@
 import { BASE_URL } from '@renderer/constants'
 import ky from 'ky'
+import get from 'lodash/get'
 import isEmpty from 'lodash/isEmpty'
+import set from 'lodash/set'
 import { isAbsolute, parse } from 'pathe'
 
 export interface BufferFile {
@@ -75,4 +77,20 @@ export function bufferToUrl(buffer: BufferFile): string {
   const url = URL.createObjectURL(new Blob([buffer.buffer], { type: buffer.type }))
   urlCache.set(cacheKey, url)
   return url
+}
+
+export async function replaceFileWithBufferFile(obj: any, path: string): Promise<void> {
+  const filePath = get(obj, path)
+  if (typeof filePath === 'string') {
+    const bufferFile = await readBufferFromStore(filePath)
+    set(obj, path, bufferFile)
+  }
+}
+
+export async function replaceBufferFileWithFile(obj: any, path: string): Promise<void> {
+  const bufferFile = get(obj, path)
+  if (bufferFile && isBufferFile(bufferFile)) {
+    const filePath = uploadBufferToStore(bufferFile as BufferFile)
+    set(obj, path, filePath)
+  }
 }
