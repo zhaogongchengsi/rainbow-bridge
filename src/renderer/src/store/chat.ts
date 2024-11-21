@@ -1,35 +1,62 @@
 import type { Chat, ChatData } from '@renderer/database/chat'
 import type { Message } from '@renderer/database/message'
-import type { ExchangeUser } from '@renderer/database/user'
 import { usePeerClientMethods } from '@renderer/client/use'
 import { chatDatabase } from '@renderer/database/chat'
+import { type ExchangeUser, type User, userDatabase } from '@renderer/database/user'
+import { map } from '@renderer/utils/async'
 import { getClientUniqueId } from '@renderer/utils/id'
 import { logger } from '@renderer/utils/logger'
 import omit from 'lodash/omit'
 import once from 'lodash/once'
 import { useUser } from './user'
 
-export interface ChatState extends ChatData {
-  newMessages: Message[]
+export interface MessageState extends Omit<Message, 'senderId' | 'receiverId'> {
+  senderId: User
+  receiverId: User
+  isSelfSend: boolean
+}
+
+export interface ChatState extends Omit<ChatData, 'messages' | 'lastMessage'> {
+  newMessages: MessageState[]
+  messages: MessageState[]
+  lastMessage?: MessageState
+
+}
+
+export async function resolveMessageState(message: Message): Promise<MessageState> {
+  const selfId = await getClientUniqueId()
+  const [sender, receiver] = await Promise.all([
+    userDatabase.getUserById(message.senderId),
+    userDatabase.getUserById(message.receiverId),
+  ])
+  return {
+    ...message,
+    senderId: sender!,
+    receiverId: receiver!,
+    isSelfSend: message.senderId === selfId,
+  }
+}
+
+async function resolveChatState(chat: ChatData): Promise<ChatState> {
+  return {
+    ...chat,
+    newMessages: [],
+    messages: await map(chat.messages, resolveMessageState),
+    lastMessage: chat.lastMessage ? await resolveMessageState(chat.lastMessage) : undefined,
+  }
 }
 
 export const useChat = defineStore('app-chat', () => {
   const chats = ref<ChatState[]>([])
   const currentChatId = useStorage<string>('current-chat-id', '')
 
-  const { registerHandler, sendMessage, on, invoke } = usePeerClientMethods()
-
   const user = useUser()
+  const { registerHandler, sendMessage, on, invoke } = usePeerClientMethods()
 
   async function init() {
     const _chats = await chatDatabase.getChats()
 
-    chats.value = _chats.map((chat) => {
-      return {
-        ...chat,
-        newMessages: [],
-      }
-    })
+    chats.value = await map(_chats, resolveChatState)
   }
 
   once(init)()
@@ -38,11 +65,8 @@ export const useChat = defineStore('app-chat', () => {
     return chats.value.find(chat => chat.id === currentChatId.value)
   })
 
-  function appNewChat(chat: ChatData) {
-    chats.value.unshift({
-      ...chat,
-      newMessages: [],
-    })
+  async function appNewChat(chat: ChatData) {
+    chats.value.unshift(await resolveChatState(chat))
   }
 
   registerHandler('chat:create-private-chat', async (chat: Chat): Promise<boolean> => {
@@ -57,7 +81,7 @@ export const useChat = defineStore('app-chat', () => {
     return true
   })
 
-  on('chat:message', (message: Message) => {
+  on('chat:message', async (message: Message) => {
     logger.log('chat:message')
     const chat = chats.value.find(chat => chat.id === message.chatId)
     if (!chat) {
@@ -66,9 +90,9 @@ export const useChat = defineStore('app-chat', () => {
     }
     try {
       chatDatabase.createOriginalMessage(message)
-      chat.lastMessage = message
-      chat.newMessages.push(message)
-      chat.messages.push(message)
+      chat.lastMessage = await resolveMessageState(message)
+      chat.newMessages.push(await resolveMessageState(message))
+      chat.messages.push(await resolveMessageState(message))
     }
     catch (error: any) {
       logger.error(`Create message failed: ${error.message}`)
@@ -97,7 +121,6 @@ export const useChat = defineStore('app-chat', () => {
       return
     }
 
-    // TODO: Notify the opposite side to create a new room
     await invoke(userinfo.connectID, 'chat:create-private-chat', [{
       ...omit(chat, 'messages', 'lastMessage'),
       messages: [],
@@ -129,8 +152,8 @@ export const useChat = defineStore('app-chat', () => {
 
     await sendMessage(id, newMessage)
 
-    chat.messages.push(newMessage)
-    chat.lastMessage = newMessage
+    chat.messages.push(await resolveMessageState(newMessage))
+    chat.lastMessage = await resolveMessageState(newMessage)
   }
 
   function setCurrentChatId(id: string) {

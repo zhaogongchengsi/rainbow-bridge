@@ -10,7 +10,7 @@ const router = useRoute()
 const virtListRef = useTemplateRef('virtListRef')
 
 const value = ref('')
-const page = ref(5)
+const page = ref(1)
 
 const currentChatId = computed(() => (router.params as any).id)
 
@@ -56,7 +56,7 @@ const onSend = debounce(async () => {
       <span>{{ chatStore.currentChat?.title }}</span>
     </div>
     <div class="chat-main-body">
-      <VirtList ref="virtListRef" :list="chatStore.currentChat?.messages" item-key="id" :min-size="60" @to-top="toTop">
+      <VirtList ref="virtListRef" :list="chatStore.currentChat?.messages" item-key="id" :min-size="60" :buffer="10" @to-top="toTop">
         <template #default="{ itemData }">
           <div style="height: 60px;">
             {{ itemData.content }}
