@@ -1,3 +1,4 @@
+import transform from 'lodash/transform'
 import { describe, expect, it } from 'vitest'
 import { findFileKeys } from './object'
 

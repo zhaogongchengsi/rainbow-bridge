@@ -8,16 +8,13 @@ import { decryptBufferToObject, encryptObjectToBuffer } from '@renderer/utils/de
 import { getClientUniqueId } from '@renderer/utils/id'
 import { type BufferFile, readBufferFromStore, uploadBufferToStore } from '@renderer/utils/ky'
 import { logger } from '@renderer/utils/logger'
-import { findFileKeys } from '@renderer/utils/object'
+import { findFileKeys, isFilePath } from '@renderer/utils/object'
 import ky from 'ky'
+import { cloneDeepWith } from 'lodash'
 import cloneDeep from 'lodash/cloneDeep'
 import get from 'lodash/get'
 import has from 'lodash/has'
-import isArray from 'lodash/isArray'
 import isEmpty from 'lodash/isEmpty'
-import isString from 'lodash/isString'
-import set from 'lodash/set'
-import transform from 'lodash/transform'
 import { randomUUID } from 'uncrypto'
 import { server_base_url } from './constant'
 import { DataType } from './enums'
@@ -77,7 +74,7 @@ export class Manager {
     return Object.fromEntries(fileKeys) as Record<string, BufferFile>
   }
 
-  private async replceFileWithBufferFile(data: any, files?: Record<string, BufferFile | undefined>, key?: string) {
+  private async replaceFileWithBufferFile(data: any, files?: Record<string, BufferFile | undefined>, key?: string) {
     let _data = data
 
     if (key && has(data, key)) {
@@ -90,14 +87,23 @@ export class Manager {
       return data
     }
 
-    const fileBuffer = await map(fileKeys, async (file) => {
-      const buffer = files[file]
-      if (buffer) {
-        const newFile = await uploadBufferToStore(buffer)
-        return [file, newFile]
-      }
+    const fileBuffer = Object.fromEntries(
+      await map(fileKeys, async (file) => {
+        const buffer = files[file]
+        if (buffer) {
+          const newFile = await uploadBufferToStore(buffer)
+          return [file, newFile]
+        }
 
-      return [file, undefined]
+        return [file, undefined]
+      }),
+    )
+
+    return cloneDeepWith(_data, (value) => {
+      if (isFilePath(value) && has(fileBuffer, value)) {
+        return get(fileBuffer, value) ?? value
+      }
+      return value
     })
   }
 
@@ -112,13 +118,7 @@ export class Manager {
         _data.data = await decryptBufferToObject(_data.data, SALT)
 
         if (_data.resource) {
-          for (const [key, bufferFile] of Object.entries(_data.resource)) {
-            if (!bufferFile) {
-              continue
-            }
-            const filePath = await uploadBufferToStore(bufferFile)
-            set(_data.data, key, filePath)
-          }
+          _data.data = await this.replaceFileWithBufferFile(_data.data, _data.resource)
         }
 
         this.event.emit('peer:json', _data)
@@ -132,15 +132,7 @@ export class Manager {
             let argv = _data.argv
 
             if (_data.resource) {
-              argv = await map(_data.argv, async (arg) => {
-                for (const [key, bufferFile] of Object.entries(_data.resource!)) {
-                  if (has(arg, key) && bufferFile) {
-                    const filePath = await uploadBufferToStore(bufferFile)
-                    set(arg, key, filePath)
-                  }
-                }
-                return arg
-              })
+              argv = await this.replaceFileWithBufferFile(_data.argv, _data.resource)
             }
 
             const result = await Promise.resolve(handler(...argv))
@@ -165,7 +157,11 @@ export class Manager {
             promise.reject(_data.response.error)
           }
           else {
-            promise.resolve(_data.response.result)
+            let _result = _data.response.result
+            if (_data.resource) {
+              _result = await this.replaceFileWithBufferFile(_data.response.result, _data.resource)
+            }
+            promise.resolve(_result)
           }
         }
         return
@@ -244,15 +240,20 @@ export class Manager {
     const timestamp = Date.now()
     const id = await this.getClientID()
 
+    const data = cloneDeep(result)
+
+    const resource = await this.findFileWithBufferFile(data)
+
     const sendData: Data = {
       id,
       timestamp,
       type: DataType.REPLY,
       response: {
-        result: cloneDeep(result),
+        result: data,
         error,
       },
       replyId,
+      resource,
     }
 
     return await conn.send(sendData)
