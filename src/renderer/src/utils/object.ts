@@ -1,42 +1,44 @@
+import forOwn from 'lodash/forOwn'
 import isArray from 'lodash/isArray'
 import isObject from 'lodash/isObject'
+import isString from 'lodash/isString'
 
-export type Predicate = (value: any) => boolean
+export function isFilePath(file: string) {
+  return isString(file) && file.startsWith('file://')
+}
 
-export function findKeysByPredicate(obj: any, predicate: Predicate): string[] {
-  const result: string[] = []
+export function findFileKeys(obj: any): string[] {
+  const fileKeys = new Set<string>()
 
-  function traverse(currentObj: any, path: string[] = []) {
-    if (isArray(currentObj)) {
-      currentObj.forEach((item, index) => {
-        // TODO: [`...path, '${index.toString()}'`]
-        const currentPath = [...path, index.toString()]
-        if (predicate(item)) {
-          result.push(currentPath.join('.'))
-        }
-        if (isObject(item) && item !== null) {
-          traverse(item, currentPath)
-        }
-      })
-    }
-    else {
-      for (const key in currentObj) {
-        if (Object.hasOwnProperty.call(currentObj, key)) {
-          const value = currentObj[key]
-          const currentPath = [...path, key]
-
-          if (predicate(value)) {
-            result.push(currentPath.join('.'))
-          }
-
-          if (isObject(value) && value !== null) {
-            traverse(value, currentPath)
-          }
-        }
+  const traverse = (obj: any) => {
+    const keys: string[] = []
+    forOwn(obj, (value) => {
+      if (!value)
+        return
+      if (isObject(value)) {
+        keys.push(...traverse(value))
       }
-    }
+      else if (isArray(value)) {
+        value.forEach((v) => {
+          keys.push(...traverse(v))
+        })
+      }
+      if (isFilePath(value)) {
+        keys.push(value)
+      }
+    })
+    return keys
   }
 
-  traverse(obj)
-  return result
+  if (isArray(obj)) {
+    obj.forEach((value) => {
+      traverse(value).forEach(f => fileKeys.add(f))
+    })
+  }
+
+  if (isObject(obj)) {
+    traverse(obj).forEach(f => fileKeys.add(f))
+  }
+
+  return Array.from(fileKeys)
 }

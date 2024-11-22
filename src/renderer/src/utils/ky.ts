@@ -78,19 +78,3 @@ export function bufferToUrl(buffer: BufferFile): string {
   urlCache.set(cacheKey, url)
   return url
 }
-
-export async function replaceFileWithBufferFile(obj: any, path: string): Promise<void> {
-  const filePath = get(obj, path)
-  if (typeof filePath === 'string') {
-    const bufferFile = await readBufferFromStore(filePath)
-    set(obj, path, bufferFile)
-  }
-}
-
-export async function replaceBufferFileWithFile(obj: any, path: string): Promise<void> {
-  const bufferFile = get(obj, path)
-  if (bufferFile && isBufferFile(bufferFile)) {
-    const filePath = uploadBufferToStore(bufferFile as BufferFile)
-    set(obj, path, filePath)
-  }
-}

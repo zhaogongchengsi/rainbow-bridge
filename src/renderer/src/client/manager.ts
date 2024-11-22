@@ -8,12 +8,16 @@ import { decryptBufferToObject, encryptObjectToBuffer } from '@renderer/utils/de
 import { getClientUniqueId } from '@renderer/utils/id'
 import { type BufferFile, readBufferFromStore, uploadBufferToStore } from '@renderer/utils/ky'
 import { logger } from '@renderer/utils/logger'
+import { findFileKeys } from '@renderer/utils/object'
 import ky from 'ky'
 import cloneDeep from 'lodash/cloneDeep'
 import get from 'lodash/get'
 import has from 'lodash/has'
+import isArray from 'lodash/isArray'
 import isEmpty from 'lodash/isEmpty'
+import isString from 'lodash/isString'
 import set from 'lodash/set'
+import transform from 'lodash/transform'
 import { randomUUID } from 'uncrypto'
 import { server_base_url } from './constant'
 import { DataType } from './enums'
@@ -51,6 +55,50 @@ export class Manager {
   registerHandler(name: string, handler: Handler) {
     logger.silly(`register handler: ${name}`)
     this.handlerMap.set(name, handler)
+  }
+
+  private async findFileWithBufferFile(data: any, key?: string) {
+    let _data = data
+
+    if (key && has(data, key)) {
+      _data = get(data, key) as any
+    }
+
+    const files = findFileKeys(_data)
+
+    if (isEmpty(files)) {
+      return undefined
+    }
+
+    const fileKeys = await map(files, async (file) => {
+      return [file, await readBufferFromStore(file)]
+    })
+
+    return Object.fromEntries(fileKeys) as Record<string, BufferFile>
+  }
+
+  private async replceFileWithBufferFile(data: any, files?: Record<string, BufferFile | undefined>, key?: string) {
+    let _data = data
+
+    if (key && has(data, key)) {
+      _data = get(data, key) as any
+    }
+
+    const fileKeys = findFileKeys(_data)
+
+    if (isEmpty(fileKeys) || !files || isEmpty(files)) {
+      return data
+    }
+
+    const fileBuffer = await map(fileKeys, async (file) => {
+      const buffer = files[file]
+      if (buffer) {
+        const newFile = await uploadBufferToStore(buffer)
+        return [file, newFile]
+      }
+
+      return [file, undefined]
+    })
   }
 
   registerOpponentData(conn: DataConnection) {
@@ -210,7 +258,7 @@ export class Manager {
     return await conn.send(sendData)
   }
 
-  async sendJson(conn: DataConnection, data: any, resourceKeys?: string[]) {
+  async sendJson(conn: DataConnection, data: any) {
     if (data instanceof ArrayBuffer) {
       throw new TypeError('Data is not JSON')
     }
@@ -219,27 +267,14 @@ export class Manager {
     const id = await this.getClientID()
     const _data = cloneDeep(data)
 
-    let resource: Record<string, BufferFile | undefined> | undefined
-
-    if (resourceKeys) {
-      resource = Object.fromEntries(
-        await map(resourceKeys, async (key) => {
-          const filePath = get(_data, key)
-          if (!filePath) {
-            return [key, undefined]
-          }
-          const bufferFile = await readBufferFromStore(filePath)
-          return [key, bufferFile]
-        }),
-      )
-    }
+    const resource = await this.findFileWithBufferFile(_data)
 
     const sendData: Data = {
       type: DataType.JSON,
       id,
       timestamp,
       // ! Decrypt with your own ID
-      data: await encryptObjectToBuffer(cloneDeep(data), SALT),
+      data: await encryptObjectToBuffer(_data, SALT),
       resource: resource ?? undefined,
     }
 
@@ -260,23 +295,14 @@ export class Manager {
     return await conn.send(sendData)
   }
 
-  async invoke<T>(conn: DataConnection, name: string, argv: any[] = [], resourceKeys?: string[]) {
+  async invoke<T>(conn: DataConnection, name: string, argv: any[] = []) {
     const promiser = Promise.withResolvers<T>()
     const timestamp = Date.now()
     const id = await this.getClientID()
 
     const replyId = randomUUID()
 
-    const fileKeys = argv.map(arg => resourceKeys?.map((key) => {
-      return { key, path: get(arg, key) }
-    }).filter(Boolean) ?? []).flat().filter(Boolean)
-
-    const resource = Object.fromEntries(
-      await map(fileKeys, async ({ key, path }) => {
-        const bufferFile = await readBufferFromStore(path)
-        return [key, bufferFile]
-      }),
-    )
+    const resource = await this.findFileWithBufferFile(argv)
 
     const sendData: Data = {
       id,
@@ -285,7 +311,7 @@ export class Manager {
       name,
       argv,
       replyId,
-      resource: isEmpty(resource) ? undefined : resource,
+      resource,
     }
 
     this.replyMap.set(replyId, promiser)
