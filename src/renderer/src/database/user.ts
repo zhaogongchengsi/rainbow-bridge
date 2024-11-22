@@ -19,8 +19,6 @@ export interface User extends BaseUserInfo {
 export type ExchangeUser = Omit<BaseUserInfo, 'avatar'> & { avatar: BufferFile, connectID: string }
 
 export class UserDatabase extends RainbowBridgeDatabase {
-  users!: EntityTable<User, 'id'>
-
   private cache: Map<string, { user: User, timestamp: number }> = new Map()
   private cacheDuration: number = 3 * 60 * 1000
 

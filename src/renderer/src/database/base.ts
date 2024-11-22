@@ -2,6 +2,7 @@ import type { EntityTable } from 'dexie'
 import type { Chat } from './chat'
 import type { Identity } from './identit'
 import type { Message } from './message'
+import type { User } from './user'
 import Dexie from 'dexie'
 import flatMap from 'lodash/flatMap'
 import union from 'lodash/union'
@@ -11,6 +12,7 @@ export class RainbowBridgeDatabase extends Dexie {
   chats!: EntityTable<Chat, 'id'>
   messages!: EntityTable<Message, 'id'>
   identitys!: EntityTable<Identity, 'id'>
+  users!: EntityTable<User, 'id'>
   constructor() {
     super('rainbow-bridge-db')
     this.version(1).stores({
