@@ -40,6 +40,13 @@ export class Manager {
     return this.clientID
   }
 
+  /**
+   * Retrieves the metadata from a given DataConnection.
+   *
+   * @param conn - The DataConnection object from which to retrieve the metadata.
+   * @returns The metadata associated with the DataConnection.
+   * @throws Will throw an error if the metadata is not found.
+   */
   getMetadata(conn: DataConnection) {
     const metadata = conn.metadata as Metadata
     if (!metadata) {
@@ -54,6 +61,13 @@ export class Manager {
     this.handlerMap.set(name, handler)
   }
 
+  /**
+   * Finds files with buffer data from the provided data object.
+   *
+   * @param data - The data object to search for files.
+   * @param key - An optional key to access a nested object within the data.
+   * @returns A promise that resolves to a record of file keys and their corresponding buffer files, or undefined if no files are found.
+   */
   private async findFileWithBufferFile(data: any, key?: string) {
     let _data = data
 
@@ -74,6 +88,14 @@ export class Manager {
     return Object.fromEntries(fileKeys) as Record<string, BufferFile>
   }
 
+  /**
+   * Replaces file paths in the provided data with new file paths obtained by uploading the corresponding buffer files.
+   *
+   * @param data - The data object that may contain file paths to be replaced.
+   * @param files - An optional record of buffer files, where the key is the file path and the value is the buffer file.
+   * @param key - An optional key to access a nested object within the data.
+   * @returns A promise that resolves to the data object with file paths replaced by new file paths from the buffer files.
+   */
   private async replaceFileWithBufferFile(data: any, files?: Record<string, BufferFile | undefined>, key?: string) {
     let _data = data
 
@@ -107,6 +129,20 @@ export class Manager {
     })
   }
 
+  /**
+   * Registers a handler for opponent data received through a DataConnection.
+   *
+   * @param conn - The DataConnection instance through which data is received.
+   * @returns An asynchronous function that processes the received data.
+   *
+   * The function processes the data based on its type:
+   * - For `DataType.JSON`, it decrypts the data and optionally replaces file references with buffer files, then emits a 'peer:json' event.
+   * - For `DataType.INVOKE`, it invokes the corresponding handler with the provided arguments and sends a reply with the result or an error message.
+   * - For `DataType.REPLY`, it resolves or rejects the corresponding promise based on the response and optionally replaces file references with buffer files.
+   * - For `DataType.BINARY`, it emits a 'peer:binary' event.
+   *
+   * The function also emits a 'peer:data' event with the received data.
+   */
   registerOpponentData(conn: DataConnection) {
     return async (data: any) => {
       const _data = data as Data
