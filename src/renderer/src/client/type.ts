@@ -31,7 +31,7 @@ export interface ClientProviderMethods {
   connect: (id: string) => Promise<DataConnection>
   sendJson: (conn: DataConnection, data: any) => Promise<void>
   sendBinary: (conn: DataConnection, data: ArrayBuffer | Uint8Array | Blob) => Promise<void>
-  invoke: <T>(id: string, name: string, argv?: any[], resourceKeys?: string[]) => Promise<T>
+  invoke: <T>(id: string, name: string, argv?: any[]) => Promise<T>
   setMetadata: (metadata: Metadata) => void
   invokeIdentity: (id: string) => Promise<ExchangeUser | undefined>
   sendMessage: (id: string, message: Message) => Promise<void>
