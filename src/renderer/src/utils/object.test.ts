@@ -21,6 +21,7 @@ describe('object', () => {
 
   it('should correctly identify file paths', () => {
     expect(isFilePath('file://path/to/file')).toBe(true)
+    expect(isFilePath('C:/asdasd/asdasd/.rainbow-bridge/files/wallhaven-jxzq2m.png')).toBe(true)
     expect(isFilePath('C:\\path\\to\\file')).toBe(true)
     expect(isFilePath('/path/to/file')).toBe(true)
     expect(isFilePath('not/a/file/path')).toBe(false)

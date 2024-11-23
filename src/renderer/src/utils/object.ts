@@ -3,7 +3,7 @@ import isArray from 'lodash/isArray'
 import isObject from 'lodash/isObject'
 import isString from 'lodash/isString'
 
-const windowsRegex = /^[a-z]:\\(?:[^\\/:*?"<>|\r\n]+\\)*[^\\/:*?"<>|\r\n]*$/i
+const windowsRegex = /^[a-z]:[\\/](?:[^\\/:*?"<>|\r\n]+[\\/])*[^\\/:*?"<>|\r\n]*$/i
 // eslint-disable-next-line regexp/no-useless-escape, regexp/no-unused-capturing-group
 const unixRegex = /^(\/[^\/]+)+\/?$/
 
