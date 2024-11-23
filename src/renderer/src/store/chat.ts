@@ -77,7 +77,7 @@ export const useChat = defineStore('app-chat', () => {
       return false
     }
 
-    appNewChat(newChat)
+    await appNewChat(newChat)
     return true
   })
 
@@ -126,7 +126,7 @@ export const useChat = defineStore('app-chat', () => {
       messages: [],
     }], ['avatar'])
 
-    appNewChat(chat)
+    await appNewChat(chat)
 
     return chat
   }
