@@ -1,6 +1,5 @@
-import transform from 'lodash/transform'
 import { describe, expect, it } from 'vitest'
-import { findFileKeys } from './object'
+import { findFileKeys, isFilePath } from './object'
 
 describe('object', () => {
   it('path to all file protocols should be found', async () => {
@@ -18,5 +17,15 @@ describe('object', () => {
     }
     const result = findFileKeys(obj)
     expect(result.length).toBe(12)
+  })
+
+  it('should correctly identify file paths', () => {
+    expect(isFilePath('file://path/to/file')).toBe(true)
+    expect(isFilePath('C:\\path\\to\\file')).toBe(true)
+    expect(isFilePath('/path/to/file')).toBe(true)
+    expect(isFilePath('not/a/file/path')).toBe(false)
+    expect(isFilePath('')).toBe(false)
+    expect(isFilePath(null)).toBe(false)
+    expect(isFilePath(undefined)).toBe(false)
   })
 })

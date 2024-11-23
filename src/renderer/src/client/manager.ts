@@ -341,7 +341,7 @@ export class Manager {
 
     const resource = await this.findFileWithBufferFile(argv)
 
-    console.log({ resource })
+    console.log({ resource, argv })
 
     const sendData: Data = {
       id,

@@ -3,8 +3,12 @@ import isArray from 'lodash/isArray'
 import isObject from 'lodash/isObject'
 import isString from 'lodash/isString'
 
-export function isFilePath(file: string) {
-  return isString(file) && file.startsWith('file://')
+const windowsRegex = /^[a-z]:\\(?:[^\\/:*?"<>|\r\n]+\\)*[^\\/:*?"<>|\r\n]*$/i
+// eslint-disable-next-line regexp/no-useless-escape, regexp/no-unused-capturing-group
+const unixRegex = /^(\/[^\/]+)+\/?$/
+
+export function isFilePath(file: unknown) {
+  return isString(file) && [file.startsWith('file://'), windowsRegex.test(file), unixRegex.test(file)].some(Boolean)
 }
 
 export function findFileKeys(obj: any): string[] {
