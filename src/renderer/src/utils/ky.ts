@@ -34,7 +34,8 @@ export async function uploadFilesToStore(files: FileList | File[]) {
 export async function uploadBufferToStore(buffer: BufferFile) {
   const data = new FormData()
   data.append(buffer.name, new Blob([buffer.buffer], { type: buffer.type }), buffer.name)
-  return await http.post<string>('store/file/upload', { body: data }).json()
+  const [filePath] = await http.post<string[]>('store/file/upload', { body: data }).json()
+  return filePath
 }
 
 export async function uploadAvatar(file: File) {

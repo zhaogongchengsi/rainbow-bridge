@@ -10,7 +10,7 @@ import { type BufferFile, readBufferFromStore, uploadBufferToStore } from '@rend
 import { logger } from '@renderer/utils/logger'
 import { findFileKeys, isFilePath } from '@renderer/utils/object'
 import ky from 'ky'
-import { cloneDeepWith } from 'lodash'
+import { cloneDeepWith, isString } from 'lodash'
 import cloneDeep from 'lodash/cloneDeep'
 import get from 'lodash/get'
 import has from 'lodash/has'
@@ -122,10 +122,10 @@ export class Manager {
     )
 
     return cloneDeepWith(_data, (value) => {
-      if (isFilePath(value) && has(fileBuffer, value)) {
+      if (isString(value) && isFilePath(value) && has(fileBuffer, value)) {
         return get(fileBuffer, value) ?? value
       }
-      return value
+      return undefined
     })
   }
 
@@ -340,8 +340,6 @@ export class Manager {
     const replyId = randomUUID()
 
     const resource = await this.findFileWithBufferFile(argv)
-
-    console.log({ resource, argv })
 
     const sendData: Data = {
       id,
