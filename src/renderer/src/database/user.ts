@@ -27,7 +27,7 @@ export class UserDatabase extends RainbowBridgeDatabase {
   }
 
   async createUser(newUser: ExchangeUser) {
-    const [avatar] = await uploadBufferToStore(newUser.avatar)
+    const avatar = await uploadBufferToStore(newUser.avatar)
 
     const index = await this.users.add({
       id: newUser.id,
