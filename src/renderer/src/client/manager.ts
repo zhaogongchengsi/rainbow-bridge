@@ -179,7 +179,7 @@ export class Manager {
           }
         }
         else {
-          await this.sendReply(conn, _data.replyId, undefined, 'Handler not found')
+          await this.sendReply(conn, _data.replyId, undefined, `${_data.name} handler not found`)
         }
       }
 

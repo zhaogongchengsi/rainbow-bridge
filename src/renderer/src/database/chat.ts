@@ -41,6 +41,10 @@ class ChatDatabase extends MessageDatabase {
     return (await this.completeMessage([newChat])).at(0)!
   }
 
+  public createChatId() {
+    return this.createUUID()
+  }
+
   async createChat(newChat: ChatOption) {
     return await this.createChatByCompleteInfo({
       ...newChat,

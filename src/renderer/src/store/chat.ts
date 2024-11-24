@@ -57,13 +57,11 @@ export const useChat = defineStore('app-chat', () => {
   const identity = useIdentity()
   const { registerHandler, sendMessage, on, invoke } = usePeerClientMethods()
 
-  async function init() {
+  async function chatInit() {
     const _chats = await chatDatabase.getChats()
 
     chats.value = await map(_chats, resolveChatState)
   }
-
-  once(init)()
 
   const currentChat = computed(() => {
     return chats.value.find(chat => chat.id === currentChatId.value)
@@ -107,6 +105,7 @@ export const useChat = defineStore('app-chat', () => {
     const selfId = await getClientUniqueId()
     const current = identity.getCurrentIdentity()
     const newUser = await user.createUser(userinfo)
+    const id = chatDatabase.createChatId()
 
     if (!newUser) {
       return
@@ -118,7 +117,7 @@ export const useChat = defineStore('app-chat', () => {
       owner: selfId,
       avatar: newUser.avatar,
       isGroup: false,
-      id: userinfo.connectID,
+      id,
     })
 
     if (!chat) {
@@ -129,7 +128,6 @@ export const useChat = defineStore('app-chat', () => {
       ...omit(chat, 'messages'),
       title: current.name,
       avatar: current.avatar,
-      id: selfId,
       messages: [],
     }])
 
@@ -174,5 +172,6 @@ export const useChat = defineStore('app-chat', () => {
     createNewPrivateChat,
     currentChat,
     sendTextMessage,
+    init: once(chatInit),
   }
 })
