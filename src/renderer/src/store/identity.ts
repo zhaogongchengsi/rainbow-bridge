@@ -3,6 +3,7 @@ import { usePeerClientMethods } from '@renderer/client/use'
 import { identityDatabase } from '@renderer/database/identit'
 import { decryptClientID, getClientUniqueId } from '@renderer/utils/id'
 import { readBufferFromStore } from '@renderer/utils/ky'
+import { isEmpty } from 'lodash'
 import once from 'lodash/once'
 
 const max_identity_count = 10
@@ -68,6 +69,18 @@ export const useIdentity = defineStore('identity', () => {
     return await invokeIdentity(_id)
   }
 
+  function getCurrentIdentity() {
+    if (!currentIdentityId.value || isEmpty(identitys.value)) {
+      throw new Error('Current identity not found')
+    }
+    const current = identitys.value.find(identity => identity.id === currentIdentityId.value)
+    if (!current) {
+      throw new Error('Current identity not found')
+    }
+
+    return current
+  }
+
   return {
     currentIdentityId,
     currentIdentity,
@@ -76,6 +89,7 @@ export const useIdentity = defineStore('identity', () => {
     createIdentity,
     canCreateIdentity,
     setCurrentIdentity,
+    getCurrentIdentity,
     reset: init,
     searchFriend,
   }

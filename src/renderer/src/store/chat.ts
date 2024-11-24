@@ -2,12 +2,14 @@ import type { Chat, ChatData } from '@renderer/database/chat'
 import type { Message } from '@renderer/database/message'
 import { usePeerClientMethods } from '@renderer/client/use'
 import { chatDatabase } from '@renderer/database/chat'
+import { ChatType } from '@renderer/database/enums'
 import { type ExchangeUser, type User, userDatabase } from '@renderer/database/user'
 import { map } from '@renderer/utils/async'
 import { getClientUniqueId } from '@renderer/utils/id'
 import { logger } from '@renderer/utils/logger'
 import omit from 'lodash/omit'
 import once from 'lodash/once'
+import { useIdentity } from './identity'
 import { useUser } from './user'
 
 export interface MessageState extends Omit<Message, 'senderId' | 'receiverId'> {
@@ -20,8 +22,9 @@ export interface ChatState extends Omit<ChatData, 'messages' | 'lastMessage'> {
   newMessages: MessageState[]
   messages: MessageState[]
   lastMessage?: MessageState
-
 }
+
+export type CreateChatRequest = Omit<Chat, 'messages'>
 
 export async function resolveMessageState(message: Message): Promise<MessageState> {
   const selfId = await getClientUniqueId()
@@ -51,6 +54,7 @@ export const useChat = defineStore('app-chat', () => {
   const currentChatId = useStorage<string>('current-chat-id', '')
 
   const user = useUser()
+  const identity = useIdentity()
   const { registerHandler, sendMessage, on, invoke } = usePeerClientMethods()
 
   async function init() {
@@ -101,7 +105,7 @@ export const useChat = defineStore('app-chat', () => {
 
   async function createNewPrivateChat(userinfo: ExchangeUser) {
     const selfId = await getClientUniqueId()
-
+    const current = identity.getCurrentIdentity()
     const newUser = await user.createUser(userinfo)
 
     if (!newUser) {
@@ -122,7 +126,10 @@ export const useChat = defineStore('app-chat', () => {
     }
 
     await invoke(userinfo.connectID, 'chat:create-private-chat', [{
-      ...omit(chat, 'messages', 'lastMessage'),
+      ...omit(chat, 'messages'),
+      title: current.name,
+      avatar: current.avatar,
+      id: selfId,
       messages: [],
     }])
 
