@@ -2,7 +2,6 @@ import type { Chat, ChatData } from '@renderer/database/chat'
 import type { Message } from '@renderer/database/message'
 import { usePeerClientMethods } from '@renderer/client/use'
 import { chatDatabase } from '@renderer/database/chat'
-import { ChatType } from '@renderer/database/enums'
 import { type ExchangeUser, type User, userDatabase } from '@renderer/database/user'
 import { map } from '@renderer/utils/async'
 import { getClientUniqueId } from '@renderer/utils/id'
@@ -12,9 +11,8 @@ import once from 'lodash/once'
 import { useIdentity } from './identity'
 import { useUser } from './user'
 
-export interface MessageState extends Omit<Message, 'senderId' | 'receiverId'> {
-  senderId: User
-  receiverId: User
+export interface MessageState extends Omit<Message, 'from'> {
+  from: User
   isSelfSend: boolean
 }
 
@@ -28,15 +26,13 @@ export type CreateChatRequest = Omit<Chat, 'messages'>
 
 export async function resolveMessageState(message: Message): Promise<MessageState> {
   const selfId = await getClientUniqueId()
-  const [sender, receiver] = await Promise.all([
-    userDatabase.getUserById(message.senderId),
-    userDatabase.getUserById(message.receiverId),
-  ])
+
+  const from = (await userDatabase.getUserById(message.from))!
+
   return {
     ...message,
-    senderId: sender!,
-    receiverId: receiver!,
-    isSelfSend: message.senderId === selfId,
+    from,
+    isSelfSend: message.from === selfId,
   }
 }
 
@@ -55,7 +51,7 @@ export const useChat = defineStore('app-chat', () => {
 
   const user = useUser()
   const identity = useIdentity()
-  const { registerHandler, sendMessage, on, invoke } = usePeerClientMethods()
+  const { registerHandler, sendMessage, on, invoke, invokeIdentity } = usePeerClientMethods()
 
   async function chatInit() {
     const _chats = await chatDatabase.getChats()
@@ -73,19 +69,32 @@ export const useChat = defineStore('app-chat', () => {
 
   registerHandler('chat:create-private-chat', async (chat: Chat): Promise<boolean> => {
     logger.log('chat:create-private-chat')
+
     const newChat = await chatDatabase.createChatByCompleteInfo(chat)
+
     if (!newChat) {
       logger.error('passive create new chat failed')
       return false
     }
 
+    await Promise.all(
+      chat.participants.map(async (id) => {
+        const hasUser = await userDatabase.getUserById(id)
+        if (!hasUser) {
+          const newUser = await invokeIdentity(id)
+          newUser && await user.createUser(newUser)
+        }
+      }),
+    )
+
     await appNewChat(newChat)
+
     return true
   })
 
   on('chat:message', async (message: Message) => {
     logger.log('chat:message')
-    const chat = chats.value.find(chat => chat.id === message.chatId)
+    const chat = chats.value.find(chat => chat.id === message.to)
     if (!chat) {
       logger.error('Chat not found')
       return
@@ -142,18 +151,28 @@ export const useChat = defineStore('app-chat', () => {
       logger.warn('Chat not found')
       return
     }
+    const selfId = await getClientUniqueId()
+
+    const receiverIds = chat.participants.filter(participant => participant !== selfId)
 
     const newMessage = await chatDatabase.createTextMessage({
       content: text,
-      senderId: await getClientUniqueId(),
-      receiverId: id,
-      chatId: chat.id,
+      from: selfId,
+      to: chat.id,
+      isImage: false,
+      isText: true,
     })
 
     if (!newMessage) {
       logger.error('Create new message failed')
       return
     }
+
+    await Promise.all(
+      receiverIds.map(async (id) => {
+        await sendMessage(id, newMessage)
+      }),
+    )
 
     await sendMessage(id, newMessage)
 

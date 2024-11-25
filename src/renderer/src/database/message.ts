@@ -3,12 +3,13 @@ import { MessageState } from './enums'
 
 export interface Message {
   id: string
-  senderId: string
-  receiverId: string
+  from: string
+  to: string // chatId
   content: string
   timestamp: number
   status: MessageState
-  chatId: string
+  isText: boolean
+  isImage: boolean
 }
 
 export class MessageDatabase extends RainbowBridgeDatabase {
@@ -32,6 +33,6 @@ export class MessageDatabase extends RainbowBridgeDatabase {
   }
 
   async getMessagesByChatId(chatId: string) {
-    return await this.messages.where('chatId').equals(chatId).toArray()
+    return await this.messages.where('to').equals(chatId).toArray()
   }
 }

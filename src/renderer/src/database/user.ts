@@ -1,4 +1,3 @@
-import type { EntityTable } from 'dexie'
 import { RainbowBridgeDatabase } from '@renderer/database/base'
 import { type BufferFile, uploadBufferToStore } from '@renderer/utils/ky'
 

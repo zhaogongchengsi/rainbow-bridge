@@ -416,8 +416,8 @@ export class Manager {
   }
 
   async invokeIdentity(id: string) {
-    const conn = await this.connect(id)
     try {
+      const conn = await this.lazyConnect(id)
       return (await this.invoke<Metadata>(conn, 'request:identity')).info
     }
     catch (err) {
