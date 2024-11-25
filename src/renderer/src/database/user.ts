@@ -25,7 +25,7 @@ export class UserDatabase extends RainbowBridgeDatabase {
     super()
   }
 
-  async createUser(newUser: ExchangeUser) {
+  async addUser(newUser: ExchangeUser) {
     const avatar = await uploadBufferToStore(newUser.avatar)
 
     const index = await this.users.add({
@@ -58,6 +58,27 @@ export class UserDatabase extends RainbowBridgeDatabase {
       this.cache.set(id, { user, timestamp: now })
     }
     return user
+  }
+
+  async updateUser(user: ExchangeUser): Promise<void> {
+    const avatar = await uploadBufferToStore(user.avatar)
+    await this.users.update(user.id, {
+      name: user.name,
+      avatar,
+      email: user.email,
+      connectID: user.connectID,
+    })
+  }
+
+  async upsertUser(user: ExchangeUser): Promise<User | undefined> {
+    const existingUser = await this.getUserById(user.id)
+    if (existingUser) {
+      await this.updateUser(user)
+    }
+    else {
+      await this.addUser(user)
+    }
+    return await this.getUserById(user.id)
   }
 }
 

@@ -51,7 +51,7 @@ export const useChat = defineStore('app-chat', () => {
 
   const user = useUser()
   const identity = useIdentity()
-  const { registerHandler, sendMessage, on, invoke, invokeIdentity } = usePeerClientMethods()
+  const { registerHandler, sendMessage, on, invoke } = usePeerClientMethods()
 
   async function chatInit() {
     const _chats = await chatDatabase.getChats()
@@ -79,11 +79,7 @@ export const useChat = defineStore('app-chat', () => {
 
     await Promise.all(
       chat.participants.map(async (id) => {
-        const hasUser = await userDatabase.getUserById(id)
-        if (!hasUser) {
-          const newUser = await invokeIdentity(id)
-          newUser && await user.createUser(newUser)
-        }
+        await user.requestAndCreateNewUser(id)
       }),
     )
 
@@ -100,6 +96,7 @@ export const useChat = defineStore('app-chat', () => {
       return
     }
     try {
+      await user.requestAndCreateNewUser(message.from)
       chatDatabase.createOriginalMessage(message)
       chat.lastMessage = await resolveMessageState(message)
       chat.newMessages.push(await resolveMessageState(message))
@@ -113,7 +110,7 @@ export const useChat = defineStore('app-chat', () => {
   async function createNewPrivateChat(userinfo: ExchangeUser) {
     const selfId = await getClientUniqueId()
     const current = identity.getCurrentIdentity()
-    const newUser = await user.createUser(userinfo)
+    const newUser = await user.requestAndCreateNewUser(userinfo.id)
     const id = chatDatabase.createChatId()
 
     if (!newUser) {

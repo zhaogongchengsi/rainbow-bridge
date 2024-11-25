@@ -43,14 +43,15 @@ export const useIdentity = defineStore('identity', () => {
     if (!currentIdentity.value) {
       throw new Error('Current identity not found')
     }
+    const id = await getClientUniqueId()
     setMetadata({
-      id: await getClientUniqueId(),
+      id,
       info: {
         name: currentIdentity.value.name,
         avatar: await readBufferFromStore(currentIdentity.value.avatar),
         email: currentIdentity.value.email,
-        id: await getClientUniqueId(),
-        connectID: await getClientUniqueId(),
+        id,
+        connectID: id,
       },
     })
   })
