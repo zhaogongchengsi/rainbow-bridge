@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { ExchangeUser } from '@renderer/database/user'
 import { useChat } from '@renderer/store/chat'
-import { useIdentity } from '@renderer/store/identity'
+import { useUser } from '@renderer/store/user'
 import { debounce } from 'perfect-debounce'
 import Menu from 'primevue/menu'
 
-const identity = useIdentity()
 const chat = useChat()
+const userStore = useUser()
 
 const menu = ref<InstanceType<typeof Menu> | null>(null)
 const visible = ref(false)
@@ -44,7 +44,7 @@ const onSearch = debounce(async () => {
   searchIng.value = true
 
   try {
-    const user = await identity.searchFriend(friendId.value)
+    const user = await userStore.searchFriend(friendId.value)
 
     if (!user) {
       return
