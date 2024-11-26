@@ -165,13 +165,9 @@ export const useChat = defineStore('app-chat', () => {
       return
     }
 
-    await Promise.all(
-      receiverIds.map(async (id) => {
-        await sendMessage(id, newMessage)
-      }),
-    )
-
-    await sendMessage(id, newMessage)
+    await map(receiverIds, async (id) => {
+      return await sendMessage(id, newMessage)
+    })
 
     chat.messages.push(await resolveMessageState(newMessage))
     chat.lastMessage = await resolveMessageState(newMessage)
