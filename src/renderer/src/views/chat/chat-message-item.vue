@@ -4,8 +4,6 @@ import type { MessageState } from '@renderer/store/chat'
 const props = defineProps<{
   message: MessageState
 }>()
-
-console.log('message', props.message)
 </script>
 
 <template>

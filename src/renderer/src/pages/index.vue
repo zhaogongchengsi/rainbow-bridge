@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { Identity } from '@renderer/database/identit'
+import type { User } from '@renderer/database/user'
 import systemUpload from '@renderer/components/system/system-upload.vue'
 import { isDark } from '@renderer/composables/dark'
-import { useIdentity } from '@renderer/store/identity'
+import { useUser } from '@renderer/store/user'
 import { dateFromNow } from '@renderer/utils/date'
 import SystemClientState from '@renderer/views/system/system-client-state.vue'
 import SystemClose from '@renderer/views/system/system-close.vue'
@@ -16,10 +16,10 @@ const username = ref('')
 const email = ref('')
 const comment = ref('')
 const toast = useToast()
-const identity = useIdentity()
 const router = useRouter()
 const visible = ref(false)
 const isMacos = window.is.isMacOS
+const userStore = useUser()
 
 function onError(content: string) {
   toast.add({
@@ -37,10 +37,6 @@ function clearFrom() {
 }
 
 function showDialog() {
-  if (!identity.canCreateIdentity()) {
-    onError('You have reached the maximum number of identities')
-    return
-  }
   clearFrom()
   visible.value = true
 }
@@ -57,13 +53,12 @@ async function onSave() {
   }
 
   try {
-    await identity.createIdentity({
+    await userStore.createSelf({
       avatar: avatar.value,
       name: username.value,
       email: email.value,
       comment: comment.value,
     })
-    await identity.reset()
   }
   catch (error: any) {
     onError(error.message)
@@ -73,8 +68,8 @@ async function onSave() {
   }
 }
 
-function onIdentityClick(identit: Identity) {
-  identity.setCurrentIdentity(identit)
+function onIdentityClick(user: User) {
+  userStore.setCurrentUser(user.id)
   router.push('/main')
 }
 </script>
@@ -99,29 +94,29 @@ function onIdentityClick(identit: Identity) {
       </p>
     </div>
     <div class="flex flex-col gap-6">
-      <div v-if="!identity.identitys.length">
+      <div v-if="!userStore.selfUsers.length">
         <p class="text-lg dark:text-gray-500">
           No identity found
         </p>
       </div>
       <CardSpotlight
-        v-for="identit in identity.identitys" v-else :key="identit.id" class="cursor-pointer"
-        :gradient-color="isDark ? '#363636' : '#C9C9C9'" slot-class="w-100 h-25" @click="onIdentityClick(identit)"
+        v-for="user in userStore.selfUsers" v-else :key="user.id" class="cursor-pointer"
+        :gradient-color="isDark ? '#363636' : '#C9C9C9'" slot-class="w-100 h-25" @click="onIdentityClick(user)"
       >
         <div class="h-full w-full flex items-center gap-5 px-4 py-2">
           <Avatar
-            :image="identit.avatar.startsWith('file://') ? identit.avatar : `file://${identit.avatar}`
-            " :label="identit.avatar ? undefined : identit.name.at(0)" size="xlarge" shape="circle"
+            :image="user.avatar.startsWith('file://') ? user.avatar : `file://${identit.avatar}`
+            " :label="user.avatar ? undefined : user.name.at(0)" size="xlarge" shape="circle"
           />
           <div class="h-full min-w-0 flex flex-1 flex-col justify-around">
             <div class="flex items-center">
-              <span class="text-sm font-bold sm:text-lg">{{ identit.name }}</span>
+              <span class="text-sm font-bold sm:text-lg">{{ user.name }}</span>
               <span class="ml-auto text-xs text-gray-500">{{
-                dateFromNow(identit.lastLoginTime)
+                dateFromNow(user.lastLoginTime)
               }}</span>
             </div>
             <p class="text-sm font-normal dark:text-white/60">
-              {{ identit.comment }}
+              {{ user.comment }}
             </p>
           </div>
         </div>

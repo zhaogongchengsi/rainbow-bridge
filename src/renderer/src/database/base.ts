@@ -1,6 +1,5 @@
 import type { EntityTable } from 'dexie'
 import type { Chat } from './chat'
-import type { Identity } from './identit'
 import type { Message } from './message'
 import type { User } from './user'
 import Dexie from 'dexie'
@@ -9,7 +8,6 @@ import { randomUUID } from 'uncrypto'
 export class RainbowBridgeDatabase extends Dexie {
   chats!: EntityTable<Chat, 'id'>
   messages!: EntityTable<Message, 'id'>
-  identitys!: EntityTable<Identity, 'id'>
   users!: EntityTable<User, 'id'>
   constructor() {
     super('rainbow-bridge-db')
@@ -20,14 +18,12 @@ export class RainbowBridgeDatabase extends Dexie {
         isHide, isGroup
       `,
 
-      identitys: `id, name, email, chats, comment, lastLoginTime, create_by, avatar`,
-
       messages: `
         id, from, to, content, timestamp, status, chatId, isText, isImage
       `,
 
       users: `
-        id, name, email, isContact, connectID, lastLoginTime, create_by, avatar,
+        id, name, email, isContact, connectID, lastLoginTime, create_by, avatar, comment, isMe,
         [name+email], [name+connectID], [email+connectID], [name+email+connectID]
       `,
     })

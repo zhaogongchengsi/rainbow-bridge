@@ -1,4 +1,5 @@
 import { RainbowBridgeDatabase } from '@renderer/database/base'
+import { getClientUniqueId } from '@renderer/utils/id'
 import { type BufferFile, uploadBufferToStore } from '@renderer/utils/ky'
 
 export interface BaseUserInfo {
@@ -13,9 +14,12 @@ export interface User extends BaseUserInfo {
   create_by: number
   isContact: boolean
   connectID: string
+  isMe: boolean
+  comment?: string
 }
 
 export type ExchangeUser = Omit<BaseUserInfo, 'avatar'> & { avatar: BufferFile, connectID: string }
+export type SelfUser = Omit<BaseUserInfo, 'id'> & { comment?: string }
 
 export class UserDatabase extends RainbowBridgeDatabase {
   private cache: Map<string, { user: User, timestamp: number }> = new Map()
@@ -23,6 +27,25 @@ export class UserDatabase extends RainbowBridgeDatabase {
 
   constructor() {
     super()
+  }
+
+  async createMe(info: SelfUser) {
+    const uuid = this.createUUID()
+
+    const connectID = await getClientUniqueId()
+
+    const index = await this.users.add({
+      id: uuid,
+      create_by: Date.now(),
+      isContact: false,
+      name: info.name,
+      avatar: info.avatar,
+      email: info.email,
+      connectID,
+      isMe: true,
+    })
+
+    return await this.users.get(index)
   }
 
   async addUser(newUser: ExchangeUser) {
@@ -36,6 +59,7 @@ export class UserDatabase extends RainbowBridgeDatabase {
       avatar,
       email: newUser.email,
       connectID: newUser.connectID,
+      isMe: false,
     })
 
     return await this.users.get(index)
