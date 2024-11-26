@@ -1,9 +1,11 @@
 <script setup lang='ts'>
 import type { MessageState } from '@renderer/store/chat'
 
-defineProps<{
+const props = defineProps<{
   message: MessageState
 }>()
+
+console.log('message', props.message)
 </script>
 
 <template>

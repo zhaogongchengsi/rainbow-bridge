@@ -29,10 +29,12 @@ export async function resolveMessageState(message: Message): Promise<MessageStat
 
   const from = (await userDatabase.getUserById(message.from))!
 
+  const isSelfSend = message.from === selfId
+
   return {
     ...message,
     from,
-    isSelfSend: message.from === selfId,
+    isSelfSend,
   }
 }
 

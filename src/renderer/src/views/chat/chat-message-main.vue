@@ -3,6 +3,7 @@ import Editor from '@renderer/components/editor'
 import { useChat } from '@renderer/store/chat'
 import { debounce } from 'perfect-debounce'
 import { VirtList } from 'vue-virt-list'
+import chatMessageItem from './chat-message-item.vue'
 
 const chatStore = useChat()
 const router = useRoute()
@@ -56,11 +57,12 @@ const onSend = debounce(async () => {
       <span>{{ chatStore.currentChat?.title }}</span>
     </div>
     <div class="chat-main-body">
-      <VirtList ref="virtListRef" :list="chatStore.currentChat?.messages" item-key="id" :min-size="60" :buffer="10" @to-top="toTop">
+      <VirtList
+        ref="virtListRef" :list="chatStore.currentChat?.messages" item-key="id" :min-size="60" :buffer="10"
+        @to-top="toTop"
+      >
         <template #default="{ itemData }">
-          <div style="height: 60px;">
-            {{ itemData.content }}
-          </div>
+          <chat-message-item :message="itemData" />
         </template>
         <template v-if="page > 1" #header>
           <div
