@@ -9,7 +9,7 @@ defineProps<{
 <template>
   <div class="chat-message-item">
     <div class="chat-message-item-left">
-      <ui-avatar :src="message.senderId.avatar" />
+      <ui-avatar :src="message.from.avatar" />
     </div>
     <div class="chat-message-item-body">
       <span>{{ message.content }}</span>

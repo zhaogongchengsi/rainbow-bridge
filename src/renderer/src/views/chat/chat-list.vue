@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ChatData } from '@renderer/database/chat'
+import type { ChatState } from '@renderer/store/chat'
 import { useChat } from '@renderer/store/chat'
 import { formatDateShort } from '@renderer/utils/date'
 
@@ -41,7 +41,7 @@ const items = ref([
   },
 ])
 
-function onRightClick(event, _: ChatData) {
+function onRightClick(event, _: ChatState) {
   menu.value.show(event)
 }
 </script>

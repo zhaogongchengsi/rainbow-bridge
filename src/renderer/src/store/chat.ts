@@ -46,7 +46,7 @@ async function resolveChatState(chat: ChatData): Promise<ChatState> {
 }
 
 export const useChat = defineStore('app-chat', () => {
-  const chats = ref<ChatState[]>([])
+  const chats = reactive<ChatState[]>([])
   const currentChatId = useStorage<string>('current-chat-id', '')
 
   const user = useUser()
@@ -54,17 +54,20 @@ export const useChat = defineStore('app-chat', () => {
   const { registerHandler, sendMessage, on, invoke } = usePeerClientMethods()
 
   async function chatInit() {
-    const _chats = await chatDatabase.getChats()
-
-    chats.value = await map(_chats, resolveChatState)
+    const _chats = await chatDatabase.getChats();
+    (await map(_chats, resolveChatState)).forEach(c => chats.push(c))
   }
 
   const currentChat = computed(() => {
-    return chats.value.find(chat => chat.id === currentChatId.value)
+    return chats.find(chat => chat.id === currentChatId.value)
   })
 
   async function appNewChat(chat: ChatData) {
-    chats.value.unshift(await resolveChatState(chat))
+    chats.unshift(await resolveChatState(chat))
+  }
+
+  function findChatById(id: string) {
+    return chats.find(c => c.id === id)
   }
 
   registerHandler('chat:create-private-chat', async (chat: Chat): Promise<boolean> => {
@@ -90,7 +93,7 @@ export const useChat = defineStore('app-chat', () => {
 
   on('chat:message', async (message: Message) => {
     logger.log('chat:message')
-    const chat = chats.value.find(chat => chat.id === message.to)
+    const chat = findChatById(message.to)
     if (!chat) {
       logger.error('Chat not found')
       return
@@ -143,7 +146,7 @@ export const useChat = defineStore('app-chat', () => {
   }
 
   async function sendTextMessage(id: string, text: string) {
-    const chat = chats.value.find(chat => chat.id === id)
+    const chat = findChatById(id)
     if (!chat) {
       logger.warn('Chat not found')
       return
