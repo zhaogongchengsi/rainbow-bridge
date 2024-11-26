@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ExchangeUser } from '@renderer/database/user'
+import type { SelfUser } from '@renderer/database/user'
 import { useChat } from '@renderer/store/chat'
 import { useUser } from '@renderer/store/user'
 import { debounce } from 'perfect-debounce'
@@ -14,7 +14,7 @@ const visible = ref(false)
 const value = ref('')
 const friendId = ref('')
 const searchIng = ref(false)
-const searchUser = ref<ExchangeUser>()
+const searchUser = ref<SelfUser>()
 
 const items = [
   {
@@ -98,7 +98,7 @@ const onSeyHello = debounce(async () => {
             </p>
           </div>
           <div v-else-if="!searchIng && searchUser" class="w-full flex flex-1 flex-col items-center justify-center gap-6 py-4">
-            <ui-buffer-avatar v-if="searchUser.avatar" :src="searchUser.avatar" class="block size-20" />
+            <ui-avatar v-if="searchUser.avatar" :src="searchUser.avatar" class="block size-20" />
             <div class="flex flex-col gap-4">
               <span class="text-lg font-bold">{{ searchUser?.name }}</span>
               <span class="text-sm text-gray-500">{{ searchUser?.email }}</span>

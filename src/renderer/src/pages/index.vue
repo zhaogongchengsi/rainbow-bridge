@@ -105,7 +105,7 @@ function onIdentityClick(user: User) {
       >
         <div class="h-full w-full flex items-center gap-5 px-4 py-2">
           <Avatar
-            :image="user.avatar.startsWith('file://') ? user.avatar : `file://${identit.avatar}`
+            :image="user.avatar.startsWith('file://') ? user.avatar : `file://${user.avatar}`
             " :label="user.avatar ? undefined : user.name.at(0)" size="xlarge" shape="circle"
           />
           <div class="h-full min-w-0 flex flex-1 flex-col justify-around">

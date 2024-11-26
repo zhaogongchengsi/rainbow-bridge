@@ -1,8 +1,7 @@
-import type { BaseUserInfo, ExchangeUser, SelfUser, User } from '@renderer/database/user'
+import type { SelfUser, User } from '@renderer/database/user'
 import { usePeerClientMethods } from '@renderer/client/use'
 import { userDatabase } from '@renderer/database/user'
 import { decryptClientID, getClientUniqueId } from '@renderer/utils/id'
-import { readBufferFromStore } from '@renderer/utils/ky'
 import once from 'lodash/once'
 
 export const useUser = defineStore('app-user', () => {
@@ -30,18 +29,17 @@ export const useUser = defineStore('app-user', () => {
     const id = await getClientUniqueId()
     setMetadata({
       id,
-      info: {
-        name: currentUser.value.name,
-        avatar: await readBufferFromStore(currentUser.value.avatar),
-        email: currentUser.value.email,
-        id,
-        connectID: id,
-      },
+      info: currentUser.value,
     })
   })
 
-  async function upsertUser(newUser: ExchangeUser) {
-    const user = await userDatabase.upsertUser(newUser)
+  async function upsertUser(newUser: SelfUser) {
+    const user = await userDatabase.upsertUser({
+      id: newUser.id,
+      name: newUser.name,
+      avatar: newUser.avatar,
+      connectID: newUser.connectID,
+    })
     if (!user) {
       return
     }
@@ -58,7 +56,7 @@ export const useUser = defineStore('app-user', () => {
     return user
   }
 
-  async function createSelf(info: SelfUser) {
+  async function createSelf(info: Omit<SelfUser, 'id' | 'connectID'>) {
     return await userDatabase.createMe(info)
   }
 

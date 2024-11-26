@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import type { MessageState } from '@renderer/store/chat'
 
-const props = defineProps<{
+defineProps<{
   message: MessageState
 }>()
 </script>

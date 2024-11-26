@@ -1,8 +1,9 @@
 import type { Chat, ChatData } from '@renderer/database/chat'
 import type { Message } from '@renderer/database/message'
+import type { SelfUser, User } from '@renderer/database/user'
 import { usePeerClientMethods } from '@renderer/client/use'
 import { chatDatabase } from '@renderer/database/chat'
-import { type ExchangeUser, type User, userDatabase } from '@renderer/database/user'
+import { userDatabase } from '@renderer/database/user'
 import { map } from '@renderer/utils/async'
 import { getClientUniqueId } from '@renderer/utils/id'
 import { logger } from '@renderer/utils/logger'
@@ -110,7 +111,7 @@ export const useChat = defineStore('app-chat', () => {
     }
   })
 
-  async function createNewPrivateChat(userinfo: ExchangeUser) {
+  async function createNewPrivateChat(userinfo: SelfUser) {
     const selfId = await getClientUniqueId()
     const current = userStore.currentUser!
     const newUser = await userStore.requestAndCreateNewUser(userinfo.id)

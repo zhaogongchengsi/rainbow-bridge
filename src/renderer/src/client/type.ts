@@ -1,7 +1,7 @@
 import type { ClientEvent, ClientHandler, Events } from '@renderer/client/event'
 import type { MessageState } from '@renderer/database/enums'
 import type { Message } from '@renderer/database/message'
-import type { ExchangeUser } from '@renderer/database/user'
+import type { ExchangeUser, SelfUser, User } from '@renderer/database/user'
 import type { BufferFile } from '@renderer/utils/ky'
 import type Peer from 'peerjs'
 import type { DataConnection, PeerError, PeerErrorType } from 'peerjs'
@@ -33,7 +33,7 @@ export interface ClientProviderMethods {
   sendBinary: (conn: DataConnection, data: ArrayBuffer | Uint8Array | Blob) => Promise<void>
   invoke: <T>(id: string, name: string, argv?: any[]) => Promise<T>
   setMetadata: (metadata: Metadata) => void
-  invokeIdentity: (id: string) => Promise<ExchangeUser | undefined>
+  invokeIdentity: (id: string) => Promise<SelfUser | undefined>
   sendMessage: (id: string, message: Message) => Promise<void>
   on: <Key extends keyof Events>(type: Key, handler: ClientHandler<Key>) => void
 }
@@ -47,7 +47,7 @@ export type OpponentError = PeerError<'not-open-yet' | 'message-too-big' | 'nego
 
 export interface Metadata {
   id: string
-  info: ExchangeUser
+  info: SelfUser
 }
 
 export interface CommonData {

@@ -1,11 +1,11 @@
 import { RainbowBridgeDatabase } from '@renderer/database/base'
 import { getClientUniqueId } from '@renderer/utils/id'
-import { type BufferFile, uploadBufferToStore } from '@renderer/utils/ky'
 
 export interface BaseUserInfo {
   id: string
   name: string
   avatar: string
+  connectID: string
   email?: string
 }
 
@@ -13,13 +13,12 @@ export interface User extends BaseUserInfo {
   lastLoginTime?: number
   create_by: number
   isContact: boolean
-  connectID: string
   isMe: boolean
   comment?: string
 }
 
-export type ExchangeUser = Omit<BaseUserInfo, 'avatar'> & { avatar: BufferFile, connectID: string }
-export type SelfUser = Omit<BaseUserInfo, 'id'> & { comment?: string }
+export type ExchangeUser = BaseUserInfo
+export type SelfUser = Pick<User, 'id' | 'avatar' | 'email' | 'name' | 'comment' | 'connectID'>
 
 export class UserDatabase extends RainbowBridgeDatabase {
   private cache: Map<string, { user: User, timestamp: number }> = new Map()
@@ -29,7 +28,7 @@ export class UserDatabase extends RainbowBridgeDatabase {
     super()
   }
 
-  async createMe(info: SelfUser) {
+  async createMe(info: Omit<SelfUser, 'id' | 'connectID'>) {
     const uuid = this.createUUID()
 
     const connectID = await getClientUniqueId()
@@ -49,16 +48,12 @@ export class UserDatabase extends RainbowBridgeDatabase {
   }
 
   async addUser(newUser: ExchangeUser) {
-    const avatar = await uploadBufferToStore(newUser.avatar)
+    // const avatar = await uploadBufferToStore(newUser.avatar)
 
     const index = await this.users.add({
-      id: newUser.id,
+      ...newUser,
       create_by: Date.now(),
       isContact: false,
-      name: newUser.name,
-      avatar,
-      email: newUser.email,
-      connectID: newUser.connectID,
       isMe: false,
     })
 
@@ -85,13 +80,7 @@ export class UserDatabase extends RainbowBridgeDatabase {
   }
 
   async updateUser(user: ExchangeUser): Promise<void> {
-    const avatar = await uploadBufferToStore(user.avatar)
-    await this.users.update(user.id, {
-      name: user.name,
-      avatar,
-      email: user.email,
-      connectID: user.connectID,
-    })
+    await this.users.update(user.id, user)
   }
 
   async upsertUser(user: ExchangeUser): Promise<User | undefined> {
