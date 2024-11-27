@@ -26,7 +26,7 @@ const onCopy = debounce(() => {
   }, 1000)
 }, 300)
 
-function toggle(event) {
+function toggle(event: MouseEvent) {
   menuRef.value.toggle(event)
 }
 
