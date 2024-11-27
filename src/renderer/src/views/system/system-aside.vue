@@ -7,7 +7,9 @@ import { debounce } from 'perfect-debounce'
 
 const menuStore = useAsideMenu()
 const userStore = useUser()
+const router = useRouter()
 
+const menuRef = ref()
 const copied = ref(false)
 
 const id = ref('')
@@ -23,6 +25,24 @@ const onCopy = debounce(() => {
     copied.value = false
   }, 1000)
 }, 300)
+
+function toggle(event) {
+  menuRef.value.toggle(event)
+}
+
+const items = [
+  {
+    label: 'Settings',
+    icon: 'pi pi-cog',
+  },
+  {
+    label: 'Logout',
+    icon: 'pi pi-sign-out',
+    command: () => {
+      router.push('/')
+    },
+  },
+]
 </script>
 
 <template>
@@ -42,11 +62,11 @@ const onCopy = debounce(() => {
     </ul>
     <div class="system-aside-footer mt-auto flex flex-col items-center justify-center gap-5">
       <VDropdown
-        v-if="userStore.currentUser" :arrow-padding="0" :triggers="['click']" :auto-hide="false"
-        placement="right" :distance="6" theme="app-menu"
+        v-if="userStore.currentUser" :arrow-padding="0" :triggers="['click']" placement="right" :distance="6"
+        theme="app-menu"
       >
         <button class="system-aside-bar-item-button">
-          <i class="pi pi-cog" />
+          <i class="pi pi-user" />
         </button>
         <template #popper>
           <div class="w-60 p-2">
@@ -71,6 +91,10 @@ const onCopy = debounce(() => {
           </div>
         </template>
       </VDropdown>
+      <button class="system-aside-bar-item-button" @click="toggle">
+        <i class="pi pi-cog" />
+      </button>
+      <Menu ref="menuRef" :model="items" :popup="true" />
     </div>
   </aside>
 </template>
