@@ -1,4 +1,3 @@
-import type { WebHandlers } from '@common-types/web/handle'
 import type { IpcRendererEvent } from 'electron'
 import { off, on, once, send } from '@renderer/utils/ipc'
 import { logger } from '@renderer/utils/logger'
