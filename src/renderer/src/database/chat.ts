@@ -14,7 +14,7 @@ export interface Chat {
   owner: string
   title: string
   avatar: string
-  description: string
+  description?: string
   isMuted: boolean
   isTop: boolean
   isHide: boolean
@@ -26,7 +26,7 @@ export interface ChatData extends Omit<Chat, 'messages'> {
   lastMessage?: Message
 }
 
-export type ChatOption = Omit<Chat, 'createdAt' | 'updatedAt' | 'messages' | 'isMuted' | 'isTop' | 'isHide' | 'description'>
+export type ChatOption = Omit<Chat, 'createdAt' | 'updatedAt' | 'messages' | 'isMuted' | 'isTop' | 'isHide'>
 
 class ChatDatabase extends MessageDatabase {
   constructor() {

@@ -1,5 +1,6 @@
 import type { Chat, ChatData } from '@renderer/database/chat'
 import type { Message } from '@renderer/database/message'
+import type { ID } from '@renderer/database/type'
 import type { SelfUser, User } from '@renderer/database/user'
 import { usePeerClientMethods } from '@renderer/client/use'
 import { chatDatabase } from '@renderer/database/chat'
@@ -25,16 +26,12 @@ export interface ChatState extends Omit<ChatData, 'messages' | 'lastMessage'> {
 export type CreateChatRequest = Omit<Chat, 'messages'>
 
 export async function resolveMessageState(message: Message): Promise<MessageState> {
-  const selfId = await getClientUniqueId()
-
   const from = (await userDatabase.getUserById(message.from))!
-
-  const isSelfSend = message.from === selfId
 
   return {
     ...message,
     from,
-    isSelfSend,
+    isSelfSend: from.isMe,
   }
 }
 
@@ -64,7 +61,7 @@ export const useChat = defineStore('app-chat', () => {
   })
 
   async function appNewChat(chat: ChatData) {
-    chats.unshift(await resolveChatState(chat))
+    chats.push(await resolveChatState(chat))
   }
 
   function findChatById(id: string) {
@@ -113,8 +110,8 @@ export const useChat = defineStore('app-chat', () => {
 
   async function createNewPrivateChat(userinfo: SelfUser) {
     const selfId = await getClientUniqueId()
-    const current = userStore.currentUser!
-    const newUser = await userStore.requestAndCreateNewUser(userinfo.id)
+    const current = userStore.getCurrentUser()
+    const newUser = await userStore.upsertUser(userinfo)
     const id = chatDatabase.createChatId()
 
     if (!newUser) {
@@ -125,6 +122,7 @@ export const useChat = defineStore('app-chat', () => {
       title: newUser.name,
       participants: [newUser.id, current.id],
       owner: selfId,
+      description: newUser.comment,
       avatar: newUser.avatar,
       isGroup: false,
       id,
@@ -138,6 +136,7 @@ export const useChat = defineStore('app-chat', () => {
       ...omit(chat, 'messages'),
       title: current.name,
       avatar: current.avatar,
+      description: current.comment,
       messages: [],
     }])
 
@@ -146,7 +145,7 @@ export const useChat = defineStore('app-chat', () => {
     return chat
   }
 
-  async function sendTextMessage(id: string, text: string) {
+  async function sendTextMessage(id: ID, text: string) {
     const chat = findChatById(id)
 
     if (!chat) {
@@ -154,7 +153,7 @@ export const useChat = defineStore('app-chat', () => {
       return
     }
 
-    const current = userStore.currentUser!
+    const current = userStore.getCurrentUser()
 
     const receiverIds = chat.participants.filter(participant => participant !== current.id)
 
@@ -172,7 +171,10 @@ export const useChat = defineStore('app-chat', () => {
     }
 
     await map(receiverIds, async (id) => {
-      return await sendMessage(id, newMessage)
+      const user = await userDatabase.getUserById(id)
+      if (user) {
+        return await sendMessage(user.connectID, newMessage)
+      }
     })
 
     chat.messages.push(await resolveMessageState(newMessage))

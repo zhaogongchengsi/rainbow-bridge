@@ -56,7 +56,7 @@ const onSend = debounce(async () => {
     <div class="chat-main-header">
       <span>{{ chatStore.currentChat?.title }}</span>
     </div>
-    <div class="chat-main-body">
+    <div class="chat-main-body py-5">
       <VirtList
         ref="virtListRef" :list="chatStore.currentChat?.messages" item-key="id" :min-size="60" :buffer="10"
         @to-top="toTop"
