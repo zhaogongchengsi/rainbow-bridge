@@ -1,12 +1,13 @@
 import type { Message } from '@renderer/database/message'
+import type { ID } from './type'
 import { MessageDatabase } from '@renderer/database/message'
 import { map } from '@renderer/utils/async'
 import { ChatType } from './enums'
 
 export interface Chat {
-  id: string
+  id: ID
   type: ChatType
-  participants: string[]
+  participants: ID[]
   messages: string[]
   createdAt: Date
   updatedAt: Date

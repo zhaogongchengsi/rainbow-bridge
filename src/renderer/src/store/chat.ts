@@ -123,7 +123,7 @@ export const useChat = defineStore('app-chat', () => {
 
     const chat = await chatDatabase.createPrivateChatChat({
       title: newUser.name,
-      participants: [newUser.id, selfId],
+      participants: [newUser.id, current.id],
       owner: selfId,
       avatar: newUser.avatar,
       isGroup: false,
@@ -148,17 +148,19 @@ export const useChat = defineStore('app-chat', () => {
 
   async function sendTextMessage(id: string, text: string) {
     const chat = findChatById(id)
+
     if (!chat) {
       logger.warn('Chat not found')
       return
     }
-    const selfId = await getClientUniqueId()
 
-    const receiverIds = chat.participants.filter(participant => participant !== selfId)
+    const current = userStore.currentUser!
+
+    const receiverIds = chat.participants.filter(participant => participant !== current.id)
 
     const newMessage = await chatDatabase.createTextMessage({
       content: text,
-      from: selfId,
+      from: current.id,
       to: chat.id,
       isImage: false,
       isText: true,

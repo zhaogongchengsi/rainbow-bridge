@@ -1,10 +1,11 @@
+import type { ID } from './type'
 import { RainbowBridgeDatabase } from '@renderer/database/base'
 import { MessageState } from './enums'
 
 export interface Message {
   id: string
-  from: string
-  to: string // chatId
+  from: ID
+  to: ID // chatId
   content: string
   timestamp: number
   status: MessageState

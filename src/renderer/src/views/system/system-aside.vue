@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import Avatar from '@renderer/components/ui/ui-avatar.vue'
 import { useAsideMenu } from '@renderer/composables/aside'
-import { useIdentity } from '@renderer/store/identity'
+import { useUser } from '@renderer/store/user'
 import { getClientID } from '@renderer/utils/id'
 import { debounce } from 'perfect-debounce'
 
 const menuStore = useAsideMenu()
-const appIdentity = useIdentity()
+const userStore = useUser()
 
 const copied = ref(false)
 
@@ -42,7 +42,7 @@ const onCopy = debounce(() => {
     </ul>
     <div class="system-aside-footer mt-auto flex flex-col items-center justify-center gap-5">
       <VDropdown
-        v-if="appIdentity.currentIdentity" :arrow-padding="0" :triggers="['click']" :auto-hide="false"
+        v-if="userStore.currentUser" :arrow-padding="0" :triggers="['click']" :auto-hide="false"
         placement="right" :distance="6" theme="app-menu"
       >
         <button class="system-aside-bar-item-button">
@@ -52,12 +52,12 @@ const onCopy = debounce(() => {
           <div class="w-60 p-2">
             <div class="w-full flex gap-2">
               <Avatar
-                v-if="appIdentity.currentIdentity.avatar" :src="appIdentity.currentIdentity.avatar"
+                v-if="userStore.currentUser.avatar" :src="userStore.currentUser.avatar"
                 class="size-[var(--system-aside-bar-item-button-size)] cursor-pointer"
               />
               <div class="min-w-0 flex flex-1 flex-col justify-between">
-                <span class="text-sm font-bold">{{ appIdentity.currentIdentity.name }}</span>
-                <span class="text-xs text-gray-500">{{ appIdentity.currentIdentity.lastLoginTime }}</span>
+                <span class="text-sm font-bold">{{ userStore.currentUser.name }}</span>
+                <span class="text-xs text-gray-500">{{ userStore.currentUser.lastLoginTime }}</span>
               </div>
             </div>
             <Divider />

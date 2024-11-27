@@ -1,3 +1,4 @@
+import type { ID } from '@renderer/database/type'
 import type { SelfUser, User } from '@renderer/database/user'
 import { usePeerClientMethods } from '@renderer/client/use'
 import { userDatabase } from '@renderer/database/user'
@@ -9,6 +10,7 @@ export const useUser = defineStore('app-user', () => {
   const currentUserId = useStorage<string>('current-identity', null)
 
   const { setMetadata, invokeIdentity, hasServerConnection } = usePeerClientMethods()
+  const router = useRouter()
 
   async function init() {
     users.value = await userDatabase.getUsers()
@@ -57,14 +59,24 @@ export const useUser = defineStore('app-user', () => {
   }
 
   async function createSelf(info: Omit<SelfUser, 'id' | 'connectID'>) {
-    return await userDatabase.createMe(info)
+    await userDatabase.createMe(info)
+    await init()
   }
 
-  function setCurrentUser(id: string) {
+  function setCurrentUser(id: ID) {
     currentUserId.value = id
   }
 
-  async function requestAndCreateNewUser(id: string) {
+  function getCurrentUser() {
+    if (!currentUser.value) {
+      router.push('/')
+      throw new Error('Current identity not found')
+    }
+
+    return currentUser.value
+  }
+
+  async function requestAndCreateNewUser(id: ID) {
     let hasUser = await userDatabase.getUserById(id)
     if (!hasUser) {
       const newUser = await invokeIdentity(id)
@@ -94,6 +106,7 @@ export const useUser = defineStore('app-user', () => {
     searchFriend,
     currentUser,
     setCurrentUser,
+    getCurrentUser,
     createSelf,
     selfUsers,
     init: once(init),

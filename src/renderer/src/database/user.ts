@@ -1,8 +1,9 @@
+import type { ID } from './type'
 import { RainbowBridgeDatabase } from '@renderer/database/base'
 import { getClientUniqueId } from '@renderer/utils/id'
 
 export interface BaseUserInfo {
-  id: string
+  id: ID
   name: string
   avatar: string
   connectID: string
@@ -64,7 +65,7 @@ export class UserDatabase extends RainbowBridgeDatabase {
     return (await this.users.toArray()).sort((a, b) => b.create_by - a.create_by)
   }
 
-  async getUserById(id: string): Promise<User | undefined> {
+  async getUserById(id: ID): Promise<User | undefined> {
     const now = Date.now()
     const cached = this.cache.get(id)
 
