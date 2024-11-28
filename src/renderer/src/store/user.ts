@@ -3,14 +3,13 @@ import type { SelfUser, User } from '@renderer/database/user'
 import { usePeerClientMethods } from '@renderer/client/use'
 import { userDatabase } from '@renderer/database/user'
 import { decryptClientID, getClientUniqueId } from '@renderer/utils/id'
-import { logger } from '@renderer/utils/logger'
 import once from 'lodash/once'
 
 export const useUser = defineStore('app-user', () => {
   const users = ref<User[]>([])
   const currentUserId = useStorage<string>('current-identity', null)
 
-  const { setMetadata, invokeIdentity, hasServerConnection, on } = usePeerClientMethods()
+  const { setMetadata, invokeIdentity, hasServerConnection, registerHandler, invoke } = usePeerClientMethods()
 
   const router = useRouter()
 
@@ -101,11 +100,14 @@ export const useUser = defineStore('app-user', () => {
     return await invokeIdentity(_id)
   }
 
-  on('peer:connection', async ([metadata]) => {
-    logger.silly(`create user ${metadata.info}`)
-    const newUser = metadata.info
-    await upsertUser(newUser)
+  registerHandler('clone:user', async (user: SelfUser) => {
+    await upsertUser(user)
+    return 'ok'
   })
+
+  async function cloneUser(id: string) {
+    return await invoke(id, 'clone:user', [getCurrentUser()])
+  }
 
   return {
     users,
@@ -117,6 +119,7 @@ export const useUser = defineStore('app-user', () => {
     getCurrentUser,
     createSelf,
     selfUsers,
+    cloneUser,
     init: once(init),
   }
 })

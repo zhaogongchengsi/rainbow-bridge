@@ -132,6 +132,8 @@ export const useChat = defineStore('app-chat', () => {
       return
     }
 
+    await userStore.cloneUser(userinfo.connectID)
+
     await invoke(userinfo.connectID, 'chat:create-private-chat', [{
       ...omit(chat, 'messages'),
       title: current.name,

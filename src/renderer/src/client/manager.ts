@@ -172,6 +172,7 @@ export class Manager {
             }
 
             const result = await Promise.resolve(handler(...argv))
+
             await this.sendReply(conn, _data.replyId, cloneDeep(result), undefined)
           }
           catch (error: any) {

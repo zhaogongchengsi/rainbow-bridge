@@ -1,4 +1,5 @@
 import type { Message } from '@renderer/database/message'
+import type { SelfUser } from '@renderer/database/user'
 import type { Emitter, Handler } from 'mitt'
 import type { DataConnection } from 'peerjs'
 import type { BinaryData, ClientError, Data, JsonData, JsonMessageStatusContent, Metadata } from './type'
