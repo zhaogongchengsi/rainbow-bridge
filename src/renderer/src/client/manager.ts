@@ -215,6 +215,8 @@ export class Manager {
 
       this.connectionMap.set(metadata.id, conn)
 
+      this.event.emit('peer:connection', [metadata, conn])
+
       logger.info(`[peer] opponent open ${metadata.id} ${metadata.info.name} ${metadata.info.email}`)
     }
   }

@@ -1,7 +1,7 @@
 import type { Message } from '@renderer/database/message'
 import type { Emitter, Handler } from 'mitt'
 import type { DataConnection } from 'peerjs'
-import type { BinaryData, ClientError, Data, JsonData, JsonMessage, JsonMessageStatusContent } from './type'
+import type { BinaryData, ClientError, Data, JsonData, JsonMessageStatusContent, Metadata } from './type'
 import mitt from 'mitt'
 
 // eslint-disable-next-line ts/consistent-type-definitions
@@ -9,7 +9,8 @@ export type Events = {
   'server:open': string
   'server:error': ClientError
   'server:close': undefined
-  'peer:connection': DataConnection
+
+  'peer:connection': [Metadata, DataConnection]
   'peer:data': Data
   'peer:json': JsonData
   'peer:binary': BinaryData

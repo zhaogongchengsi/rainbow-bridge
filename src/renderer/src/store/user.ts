@@ -9,7 +9,8 @@ export const useUser = defineStore('app-user', () => {
   const users = ref<User[]>([])
   const currentUserId = useStorage<string>('current-identity', null)
 
-  const { setMetadata, invokeIdentity, hasServerConnection } = usePeerClientMethods()
+  const { setMetadata, invokeIdentity, hasServerConnection, on } = usePeerClientMethods()
+
   const router = useRouter()
 
   async function init() {
@@ -98,6 +99,11 @@ export const useUser = defineStore('app-user', () => {
 
     return await invokeIdentity(_id)
   }
+
+  on('peer:connection', async ([metadata]) => {
+    const newUser = metadata.info
+    await upsertUser(newUser)
+  })
 
   return {
     users,
