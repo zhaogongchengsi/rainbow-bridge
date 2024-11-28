@@ -2,6 +2,7 @@
 import type { SelfUser } from '@renderer/database/user'
 import { useChat } from '@renderer/store/chat'
 import { useUser } from '@renderer/store/user'
+import { logger } from '@renderer/utils/logger'
 import { debounce } from 'perfect-debounce'
 import Menu from 'primevue/menu'
 
@@ -62,15 +63,21 @@ const onSearch = debounce(async () => {
 })
 
 const onSeyHello = debounce(async () => {
-  if (!searchUser.value)
-    return
+  try {
+    if (!searchUser.value)
+      return
 
-  const newChat = await chat.createNewPrivateChat(searchUser.value)
-  if (!newChat) {
-    console.error('create chat failed')
-    return
+    const newChat = await chat.createNewPrivateChat(searchUser.value)
+    if (!newChat) {
+      console.error('create chat failed')
+      return
+    }
+    await chat.sendTextMessage(newChat.id, 'Hello')
   }
-  chat.sendTextMessage(newChat.id, 'Hello')
+  catch (err: any) {
+    logger.error(`sey hello error : ${err?.message}`)
+    visible.value = false
+  }
 })
 </script>
 
@@ -97,7 +104,10 @@ const onSeyHello = debounce(async () => {
               No user found
             </p>
           </div>
-          <div v-else-if="!searchIng && searchUser" class="w-full flex flex-1 flex-col items-center justify-center gap-6 py-4">
+          <div
+            v-else-if="!searchIng && searchUser"
+            class="w-full flex flex-1 flex-col items-center justify-center gap-6 py-4"
+          >
             <ui-avatar v-if="searchUser.avatar" :src="searchUser.avatar" class="block size-20" />
             <div class="flex flex-col gap-4">
               <span class="text-lg font-bold">{{ searchUser?.name }}</span>
