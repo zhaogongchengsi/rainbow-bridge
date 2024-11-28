@@ -106,7 +106,7 @@ body,
 
 .splitpanes__splitter {
   background-color: var(--rainbow-border-color);
-  z-index: 999999;
+  z-index: 999;
 }
 
 .splitpanes--vertical .splitpanes__pane {
