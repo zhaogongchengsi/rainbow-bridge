@@ -21,7 +21,7 @@ function onTextChange() {
 
 watch(textValue, (newTextValue) => {
   if (!newTextValue) {
-    quillRef.value?.setText('/n')
+    quillRef.value?.setText('')
   }
   else if (quillRef.value?.getText() !== newTextValue) {
     quillRef.value?.setText(newTextValue)
