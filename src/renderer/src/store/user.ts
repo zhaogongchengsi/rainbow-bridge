@@ -3,6 +3,7 @@ import type { SelfUser, User } from '@renderer/database/user'
 import { usePeerClientMethods } from '@renderer/client/use'
 import { userDatabase } from '@renderer/database/user'
 import { decryptClientID, getClientUniqueId } from '@renderer/utils/id'
+import { logger } from '@renderer/utils/logger'
 import once from 'lodash/once'
 
 export const useUser = defineStore('app-user', () => {
@@ -101,6 +102,7 @@ export const useUser = defineStore('app-user', () => {
   }
 
   on('peer:connection', async ([metadata]) => {
+    logger.silly(`create user ${metadata.info}`)
     const newUser = metadata.info
     await upsertUser(newUser)
   })
