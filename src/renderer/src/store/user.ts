@@ -77,9 +77,9 @@ export const useUser = defineStore('app-user', () => {
     return currentUser.value
   }
 
-  async function requestAndCreateNewUser(id: ID) {
+  async function requestAndCreateNewUser(id: ID, needUpdate: boolean = true) {
     let hasUser = await userDatabase.getUserById(id)
-    if (!hasUser) {
+    if (!hasUser && needUpdate) {
       const newUser = await invokeIdentity(id)
       hasUser = newUser && await upsertUser(newUser)
     }

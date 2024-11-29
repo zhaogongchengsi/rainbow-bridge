@@ -27,6 +27,10 @@ export class MessageDatabase extends RainbowBridgeDatabase {
     })
   }
 
+  sortMessage(messages: Message[]) {
+    return messages.sort((a, b) => a.timestamp - b.timestamp)
+  }
+
   async createOriginalMessage(message: Message) {
     const index = await this.messages.add(message)
 
@@ -34,6 +38,31 @@ export class MessageDatabase extends RainbowBridgeDatabase {
   }
 
   async getMessagesByChatId(chatId: string) {
-    return await this.messages.where('to').equals(chatId).toArray()
+    return this.sortMessage(await this.messages.where('to').equals(chatId).toArray())
+  }
+
+  async getMessagesByChatIdWithPagination(chatId: string, page: number = 1, pageSize: number = 50) {
+    const offset = (page - 1) * pageSize
+    const totalMessages = await this.messages.where('to').equals(chatId).count()
+    const totalPage = Math.ceil(totalMessages / pageSize)
+    const messages = await this.messages
+      .where('to')
+      .equals(chatId)
+      .reverse()
+      .offset(offset)
+      .limit(pageSize)
+      .toArray()
+
+    return {
+      page,
+      pageSize,
+      totalPage,
+      totalMessages,
+      messages: this.sortMessage(messages),
+    }
+  }
+
+  async getMessageCountByChatId(chatId: string) {
+    return await this.messages.where('to').equals(chatId).count()
   }
 }

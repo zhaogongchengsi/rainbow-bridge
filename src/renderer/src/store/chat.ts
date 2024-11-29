@@ -97,7 +97,6 @@ export const useChat = defineStore('app-chat', () => {
       return
     }
     try {
-      await userStore.requestAndCreateNewUser(message.from)
       chatDatabase.createOriginalMessage(message)
       chat.lastMessage = await resolveMessageState(message)
       chat.newMessages.push(await resolveMessageState(message))
@@ -187,6 +186,22 @@ export const useChat = defineStore('app-chat', () => {
     currentChatId.value = id
   }
 
+  async function loadPreviousMessages(chatId: string) {
+    const chat = findChatById(chatId)
+
+    if (!chat) {
+      logger.warn('Chat not found')
+      return
+    }
+
+    const { messages, page, pageSize, totalPage } = await chatDatabase.getMessagesByChatIdWithPagination(chat.id, chat.page, chat.pageSize)
+
+    chat.messages = (await map(messages, resolveMessageState)).concat(chat.messages)
+    chat.page = page
+    chat.pageSize = pageSize
+    chat.totalPage = totalPage
+  }
+
   return {
     chats,
     currentChatId,
@@ -194,6 +209,7 @@ export const useChat = defineStore('app-chat', () => {
     createNewPrivateChat,
     currentChat,
     sendTextMessage,
+    loadPreviousMessages,
     init: once(chatInit),
   }
 })

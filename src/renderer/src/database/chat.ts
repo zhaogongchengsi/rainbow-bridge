@@ -24,6 +24,10 @@ export interface Chat {
 export interface ChatData extends Omit<Chat, 'messages'> {
   messages: Message[]
   lastMessage?: Message
+  page: number // 当前页码
+  pageSize: number // 每页消息数量
+  totalPage: number // 消息总页数
+  totalMessages: number // 消息的总数量
 }
 
 export type ChatOption = Omit<Chat, 'createdAt' | 'updatedAt' | 'messages' | 'isMuted' | 'isTop' | 'isHide'>
@@ -84,9 +88,11 @@ class ChatDatabase extends MessageDatabase {
 
   async completeMessage(chats: Chat[]): Promise<ChatData[]> {
     return await map(chats, async (chat) => {
-      const messages = await this.getMessagesByChatId(chat.id)
+      const { messages, totalMessages, totalPage, pageSize, page } = await this.getMessagesByChatIdWithPagination(chat.id, 1, 20)
+
       const lastMessage = messages.length > 0 ? messages.at(messages.length - 1) : undefined
-      return { ...chat, messages, lastMessage }
+
+      return { ...chat, messages, lastMessage, page, pageSize, totalPage, totalMessages }
     })
   }
 }
