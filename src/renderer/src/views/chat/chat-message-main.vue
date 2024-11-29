@@ -43,10 +43,10 @@ async function toTop() {
 }
 
 const onSend = debounce(async () => {
-  if (!value.value)
+  if (!value.value.trim())
     return
 
-  await chatStore.sendTextMessage(currentChatId.value, value.value)
+  await chatStore.sendTextMessage(currentChatId.value, value.value.trim())
   value.value = ''
 })
 </script>
