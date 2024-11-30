@@ -99,7 +99,7 @@ export const useChat = defineStore('app-chat', () => {
           }
 
           try {
-            const pong = await invoke(user.connectID, 'chat:ping', [user.connectID])
+            const pong = await invoke<'pong'>(user.connectID, 'chat:ping', [chat.id, user.connectID])
             if (pong !== 'pong') {
               chat.isOnline = false
               return
