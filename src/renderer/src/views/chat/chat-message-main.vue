@@ -1,4 +1,5 @@
 <script setup lang='ts'>
+import type { MessageState } from '@renderer/store/chat'
 import Editor from '@renderer/components/editor'
 import { useChat } from '@renderer/store/chat'
 import { debounce } from 'perfect-debounce'
@@ -11,20 +12,23 @@ const router = useRoute()
 const virtListRef = useTemplateRef('virtListRef')
 
 const value = ref('')
-const page = ref(1)
 
 const currentChatId = computed(() => (router.params as any).id)
 
 chatStore.setCurrentChatId(currentChatId.value)
 
-onMounted(() => {
+onMounted(async () => {
   if (virtListRef.value) {
+    await nextTick()
     virtListRef.value.scrollToBottom()
   }
 })
 
 async function toTop() {
-  if (page.value <= 1)
+  const currentChat = chatStore.currentChat
+  if (!currentChat)
+    return
+  if (currentChat.totalPage === 1)
     return
   const messages = await chatStore.loadPreviousMessages(currentChatId.value)
   if (messages) {
@@ -32,6 +36,12 @@ async function toTop() {
     virtListRef.value?.addedList2Top(messages)
   }
 }
+
+watch(() => chatStore.currentChat?.lastMessage, () => {
+  if (virtListRef.value) {
+    virtListRef.value.scrollToBottom()
+  }
+})
 
 const onSend = debounce(async () => {
   if (!value.value.trim())
@@ -49,13 +59,13 @@ const onSend = debounce(async () => {
     </div>
     <div class="chat-main-body py-5">
       <VirtList
-        ref="virtListRef" :list="chatStore.currentChat?.messages" item-key="id" :min-size="60" :buffer="10"
+        ref="virtListRef" :list="chatStore.currentChat.messages" item-key="id" :min-size="60" :buffer="10"
         @to-top="toTop"
       >
         <template #default="{ itemData }">
           <chat-message-item :message="itemData" />
         </template>
-        <template v-if="chatStore.currentChat.page > 1" #header>
+        <template v-if="chatStore.currentChat.page < chatStore.currentChat.totalPage " #header>
           <div class="h-4 w-full flex items-center justify-center">
             <i class="pi pi-spin pi-spinner size-4 origin-center" />
           </div>

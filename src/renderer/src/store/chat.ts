@@ -194,11 +194,13 @@ export const useChat = defineStore('app-chat', () => {
       return
     }
 
-    if (chat.page <= 1) {
+    const currentPage = chat.page
+
+    if (chat.totalPage <= currentPage) {
       return
     }
 
-    const { messages, page, pageSize, totalPage } = await chatDatabase.getMessagesByChatIdWithPagination(chat.id, chat.page, chat.pageSize)
+    const { messages, page, pageSize, totalPage } = await chatDatabase.getMessagesByChatIdWithPagination(chat.id, currentPage + 1, chat.pageSize)
 
     chat.messages = (await map(messages, resolveMessageState)).concat(chat.messages)
     chat.page = page

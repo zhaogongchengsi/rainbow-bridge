@@ -42,9 +42,12 @@ export class MessageDatabase extends RainbowBridgeDatabase {
   }
 
   async getMessagesByChatIdWithPagination(chatId: string, page: number = 1, pageSize: number = 50) {
-    const offset = (page - 1) * pageSize
     const totalMessages = await this.messages.where('to').equals(chatId).count()
     const totalPage = Math.ceil(totalMessages / pageSize)
+    // if (page > totalPage) {
+    //   page = totalPage
+    // }
+    const offset = (page - 1) * pageSize
     const messages = await this.messages
       .where('to')
       .equals(chatId)
