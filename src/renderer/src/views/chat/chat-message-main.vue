@@ -10,6 +10,7 @@ const chatStore = useChat()
 const router = useRoute()
 
 const virtListRef = useTemplateRef('virtListRef')
+const isFirstRender = ref(true)
 
 const value = ref('')
 
@@ -37,6 +38,13 @@ async function toTop() {
   }
 }
 
+function itemResize() {
+  if (isFirstRender.value) {
+    isFirstRender.value = false
+    virtListRef.value?.scrollToBottom()
+  }
+}
+
 watch(() => chatStore.currentChat?.lastMessage, () => {
   if (virtListRef.value) {
     virtListRef.value.scrollToBottom()
@@ -60,12 +68,12 @@ const onSend = debounce(async () => {
     <div class="chat-main-body py-5">
       <VirtList
         ref="virtListRef" :list="chatStore.currentChat.messages" item-key="id" :min-size="60" :buffer="10"
-        @to-top="toTop"
+        @to-top="toTop" @item-resize="itemResize"
       >
         <template #default="{ itemData }">
           <chat-message-item :message="itemData" />
         </template>
-        <template v-if="chatStore.currentChat.page < chatStore.currentChat.totalPage " #header>
+        <template v-if="chatStore.currentChat.page < chatStore.currentChat.totalPage" #header>
           <div class="h-4 w-full flex items-center justify-center">
             <i class="pi pi-spin pi-spinner size-4 origin-center" />
           </div>
