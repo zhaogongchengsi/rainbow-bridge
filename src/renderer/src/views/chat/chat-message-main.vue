@@ -17,29 +17,20 @@ const currentChatId = computed(() => (router.params as any).id)
 
 chatStore.setCurrentChatId(currentChatId.value)
 
-function mock(length: number) {
-  return Array.from({ length }).map((_, i) => ({ value: `Item #${i}` }))
-}
-
-const items = ref(mock(100))
-
 onMounted(() => {
   if (virtListRef.value) {
     virtListRef.value.scrollToBottom()
   }
 })
 
-const sleep = () => new Promise(resolve => setTimeout(resolve, 1000))
-
 async function toTop() {
   if (page.value <= 1)
     return
-  await sleep()
-  const list = mock(100)
-  items.value = list.concat(items.value)
-  await nextTick()
-  virtListRef.value?.addedList2Top(list)
-  page.value = page.value - 1
+  const messages = await chatStore.loadPreviousMessages(currentChatId.value)
+  if (messages) {
+    await nextTick()
+    virtListRef.value?.addedList2Top(messages)
+  }
 }
 
 const onSend = debounce(async () => {
@@ -52,9 +43,9 @@ const onSend = debounce(async () => {
 </script>
 
 <template>
-  <div class="chat-message-contianer">
+  <div v-if="chatStore.currentChat" class="chat-message-contianer">
     <div class="chat-main-header">
-      <span>{{ chatStore.currentChat?.title }}</span>
+      <span>{{ chatStore.currentChat.title }}</span>
     </div>
     <div class="chat-main-body py-5">
       <VirtList
@@ -64,18 +55,9 @@ const onSend = debounce(async () => {
         <template #default="{ itemData }">
           <chat-message-item :message="itemData" />
         </template>
-        <template v-if="page > 1" #header>
-          <div
-            style="
-              width: 100%;
-              height: 20px;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              background-color: chocolate;
-            "
-          >
-            loading...
+        <template v-if="chatStore.currentChat.page > 1" #header>
+          <div class="h-4 w-full flex items-center justify-center">
+            <i class="pi pi-spin pi-spinner size-4 origin-center" />
           </div>
         </template>
       </VirtList>
@@ -91,6 +73,11 @@ const onSend = debounce(async () => {
         </div>
       </div>
     </div>
+  </div>
+  <div v-else>
+    <p class="text-center text-gray-500">
+      No chat selected
+    </p>
   </div>
 </template>
 
