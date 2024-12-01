@@ -69,10 +69,10 @@ export const useChat = defineStore('app-chat', () => {
     return chats.find(c => c.id === id)
   }
 
-  function mapPrivateChat<T>(cb: (chat: ChatState) => T) {
+  async function mapPrivateChat<T>(cb: (chat: ChatState) => T | Promise<T>) {
     const privateChats = chats.filter(chat => !chat.isGroup)
-    return privateChats.map((chat) => {
-      return cb(chat)
+    return await map(privateChats, async (chat) => {
+      return await cb(chat)
     })
   }
 
@@ -97,33 +97,25 @@ export const useChat = defineStore('app-chat', () => {
     })
   })
 
-  // once(async () => {
-  //   const selfId = await getClientUniqueId()
-  //   setInterval(async () => {
-  //     await map(chats, async (chat) => {
-  //       const receiverIds = chat.participants.filter(participant => participant !== selfId)
-  //       await map(receiverIds, async (id) => {
-  //         const user = await userDatabase.getUserById(id)
-  //         if (!user) {
-  //           return
-  //         }
+  once(async () => {
+    const selfId = await getClientUniqueId()
+    mapPrivateChat(async (chat) => {
+      const receiverIds = chat.participants.filter(participant => participant !== selfId)
+      await map(receiverIds, async (id) => {
+        const user = await userDatabase.getUserById(id)
+        if (!user) {
+          return
+        }
 
-  //         try {
-  //           const pong = await invoke<'pong'>(user.connectID, 'chat:ping', [chat.id, user.connectID])
-  //           if (pong !== 'pong') {
-  //             chat.isOnline = false
-  //             return
-  //           }
-  //           chat.isOnline = true
-  //         }
-  //         catch (error: any) {
-  //           chat.isOnline = false
-  //           logger.error(`Ping user failed: ${error.message}`)
-  //         }
-  //       })
-  //     })
-  //   }, 3000)
-  // })
+        try {
+          await invoke<'pong'>(user.connectID, 'chat:ping', [chat.id, user.connectID])
+        }
+        catch (error: any) {
+          logger.error(`Ping user failed: ${error.message}`)
+        }
+      })
+    })
+  })()
 
   registerHandler('chat:create-private-chat', async (chat: Chat): Promise<boolean> => {
     logger.log('chat:create-private-chat')
