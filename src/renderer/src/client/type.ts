@@ -35,6 +35,7 @@ export interface ClientProviderMethods {
   setMetadata: (metadata: Metadata) => void
   invokeIdentity: (id: string) => Promise<SelfUser | undefined>
   sendMessage: (id: string, message: Message) => Promise<void>
+  ping: (id: string) => Promise<void>
   on: <Key extends keyof Events>(type: Key, handler: ClientHandler<Key>) => void
 }
 

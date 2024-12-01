@@ -1,5 +1,6 @@
 import type { ID } from './type'
 import { RainbowBridgeDatabase } from '@renderer/database/base'
+import { logger } from '@renderer/utils/logger'
 import { MessageState } from './enums'
 
 export interface Message {
@@ -18,20 +19,22 @@ export class MessageDatabase extends RainbowBridgeDatabase {
     super()
   }
 
-  async createTextMessage(message: Omit<Message, 'id' | 'timestamp' | 'status'>) {
-    return this.createOriginalMessage({
+  createTextMessage(message: Omit<Message, 'id' | 'timestamp' | 'status'>) {
+    const newMessage = {
       ...message,
       id: this.createUUID(),
       timestamp: Date.now(),
       status: MessageState.SENT,
-    })
+    }
+    logger.info(`Create text message: ${JSON.stringify(newMessage)}`)
+    return newMessage
   }
 
   sortMessage(messages: Message[]) {
     return messages.sort((a, b) => a.timestamp - b.timestamp)
   }
 
-  async createOriginalMessage(message: Message) {
+  async saveMessage(message: Message) {
     const index = await this.messages.add(message)
 
     return await this.messages.get(index)

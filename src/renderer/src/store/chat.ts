@@ -8,7 +8,7 @@ import { userDatabase } from '@renderer/database/user'
 import { map } from '@renderer/utils/async'
 import { getClientUniqueId } from '@renderer/utils/id'
 import { logger } from '@renderer/utils/logger'
-import { compact, omit, once } from 'lodash'
+import { omit, once } from 'lodash'
 import { useUser } from './user'
 
 export interface MessageState extends Omit<Message, 'from'> {
@@ -97,26 +97,6 @@ export const useChat = defineStore('app-chat', () => {
     })
   })
 
-  on('server:open', async () => {
-    const selfId = await getClientUniqueId()
-    mapPrivateChat(async (chat) => {
-      const receiverIds = chat.participants.filter(participant => participant !== selfId)
-      await map(receiverIds, async (id) => {
-        const user = await userDatabase.getUserById(id)
-        if (!user) {
-          return
-        }
-
-        try {
-          await invoke<'pong'>(user.connectID, 'chat:ping', [chat.id, user.connectID])
-        }
-        catch (error: any) {
-          logger.error(`Ping user failed: ${error.message}`)
-        }
-      })
-    })
-  })
-
   registerHandler('chat:create-private-chat', async (chat: Chat): Promise<boolean> => {
     logger.log('chat:create-private-chat')
 
@@ -146,7 +126,7 @@ export const useChat = defineStore('app-chat', () => {
       return
     }
     try {
-      chatDatabase.createOriginalMessage(message)
+      chatDatabase.saveMessage(message)
       chat.lastMessage = await resolveMessageState(message)
       chat.newMessages.push(await resolveMessageState(message))
       chat.messages.push(await resolveMessageState(message))
@@ -203,16 +183,11 @@ export const useChat = defineStore('app-chat', () => {
       return
     }
 
-    if (!chat.isOnline) {
-      logger.warn('User is offline')
-      return
-    }
-
     const current = userStore.getCurrentUser()
 
     const receiverIds = chat.participants.filter(participant => participant !== current.id)
 
-    const newMessage = await chatDatabase.createTextMessage({
+    const newMessage = chatDatabase.createTextMessage({
       content: text,
       from: current.id,
       to: chat.id,
@@ -220,20 +195,20 @@ export const useChat = defineStore('app-chat', () => {
       isText: true,
     })
 
-    if (!newMessage) {
-      logger.error('Create new message failed')
-      return
+    try {
+      await map(receiverIds, async (id) => {
+        const user = await userDatabase.getUserById(id)
+        if (user) {
+          return await sendMessage(user.connectID, newMessage)
+        }
+      })
+      chatDatabase.saveMessage(newMessage)
+      chat.messages.push(await resolveMessageState(newMessage))
+      chat.lastMessage = await resolveMessageState(newMessage)
     }
-
-    await map(receiverIds, async (id) => {
-      const user = await userDatabase.getUserById(id)
-      if (user) {
-        return await sendMessage(user.connectID, newMessage)
-      }
-    })
-
-    chat.messages.push(await resolveMessageState(newMessage))
-    chat.lastMessage = await resolveMessageState(newMessage)
+    catch (error: any) {
+      logger.error(`Send message failed: ${error.message}`)
+    }
   }
 
   function setCurrentChatId(id: string) {

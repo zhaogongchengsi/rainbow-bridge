@@ -30,6 +30,15 @@ export class Connect extends Manager {
     return await this.invoke<T>(conn, name, argv)
   }
 
+  async ping(id: string) {
+    const serverHas = await this.hasServerConnection(id)
+    if (!serverHas) {
+      return undefined
+    }
+
+    return await this.lazyInvoke<void>(id, 'ping', [id])
+  }
+
   async sendMessageData(id: string, message: JsonMessage) {
     const conn = await this.lazyConnect(id)
     await this.sendJson(conn, message)

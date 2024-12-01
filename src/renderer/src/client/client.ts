@@ -97,10 +97,12 @@ export function createClientSingle(app: App) {
 
   function onPeerError(error: ClientError) {
     logger.error('[peer server] error', `${error.type}: ${error.message}`)
+    event.emit('server:error', error)
+
     connecting.value = false
     connected.value = false
     connectError.value = true
-    event.emit('server:error', error)
+
     if (
       retryCount.value < maxRetries
       && ['socket-error', 'server-error', 'network'].includes(error.type)
@@ -126,11 +128,11 @@ export function createClientSingle(app: App) {
   function opConnection(conn: DataConnection) {
     const meta = conn.metadata as Metadata
 
-    logger.info(`[peer] connection ${meta.id} ${meta}`)
+    logger.info(`[peer] connection ${meta.id} ${meta}`, { color: 'red' })
 
     manager.register(conn)
 
-    event.emit('peer:connection', [meta, conn])
+    event.emit('server:connection')
   }
 
   async function connect(id: string) {
@@ -199,6 +201,7 @@ export function createClientSingle(app: App) {
     invokeIdentity: manager.invokeIdentity.bind(manager),
     sendMessage: manager.sendMessage.bind(manager),
     on: event.on.bind(event),
+    ping: manager.ping.bind(manager),
   })
 
   app.onUnmount(unmount)

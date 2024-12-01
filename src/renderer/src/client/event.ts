@@ -10,6 +10,7 @@ export type Events = {
   'server:open': string
   'server:error': ClientError
   'server:close': undefined
+  'server:connection': undefined
 
   'peer:connection': [Metadata, DataConnection]
   'peer:data': Data

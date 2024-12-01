@@ -479,7 +479,7 @@ export class Manager {
   }
 
   async lazyConnect(id: string) {
-    if (!await this.hasServerConnection(id)) {
+    if (!(await this.hasServerConnection(id))) {
       throw new Error(`Server connection not found: ${id}`)
     }
 
