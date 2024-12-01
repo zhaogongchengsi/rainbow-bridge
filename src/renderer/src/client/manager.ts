@@ -217,14 +217,16 @@ export class Manager {
       this.connectionMap.set(metadata.id, conn)
 
       this.event.emit('peer:connection', [metadata, conn])
+      this.event.emit('user:login', metadata.info)
 
       logger.info(`[peer] opponent open ${metadata.id} ${metadata.info.name} ${metadata.info.email}`)
     }
   }
 
   registerOpponentClose(conn: DataConnection) {
+    const metadata = this.getMetadata(conn)
     return () => {
-      const metadata = this.getMetadata(conn)
+      this.event.emit('user:logout', metadata.info)
       logger.silly(`opponent close :${metadata.id}`)
       this.connectionMap.delete(metadata.id)
     }

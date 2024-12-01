@@ -18,6 +18,9 @@ export type Events = {
 
   'chat:message': Message
   'chat:message-state': JsonMessageStatusContent
+
+  'user:login': SelfUser
+  'user:logout': SelfUser
 }
 
 export type ClientEvent = Emitter<Events>

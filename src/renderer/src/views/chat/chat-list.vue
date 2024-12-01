@@ -53,7 +53,7 @@ function onRightClick(event, _: ChatState) {
         <router-link class="chat-list-item-link block size-full" :to="`/main/chat/${chat.id}`">
           <div class="size-full flex gap-2">
             <div class="chat-avatar">
-              <ui-avatar class="size-full" :src="chat.avatar" />
+              <ui-avatar class="size-full" :class="{ 'grayscale ': !chat.isOnline }" :src="chat.avatar" />
             </div>
             <div class="min-w-0 flex flex-1 flex-col justify-between">
               <span class="block w-full truncate text-lg">{{ chat.title }}</span>

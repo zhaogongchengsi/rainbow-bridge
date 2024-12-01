@@ -69,51 +69,61 @@ export const useChat = defineStore('app-chat', () => {
     return chats.find(c => c.id === id)
   }
 
-  // const allUsers = computedAsync<User[]>(async () => {
-  //   const selfId = await getClientUniqueId()
-
-  //   const list = (await map(chats, async (chat) => {
-  //     const receiverIds = chat.participants.filter(participant => participant !== selfId)
-  //     return compact(await map(receiverIds, async (id) => {
-  //       return await userDatabase.getUserById(id)
-  //     }))
-  //   })).flat()
-
-  //   return compact(list)
-  // })
+  function mapPrivateChat<T>(cb: (chat: ChatState) => T) {
+    const privateChats = chats.filter(chat => !chat.isGroup)
+    return privateChats.map((chat) => {
+      return cb(chat)
+    })
+  }
 
   registerHandler('chat:ping', async (chatId: string, id: string) => {
     logger.silly(`chat:ping ${chatId} ${id}`)
     return 'pong'
   })
 
-  once(async () => {
-    const selfId = await getClientUniqueId()
-    setInterval(async () => {
-      await map(chats, async (chat) => {
-        const receiverIds = chat.participants.filter(participant => participant !== selfId)
-        await map(receiverIds, async (id) => {
-          const user = await userDatabase.getUserById(id)
-          if (!user) {
-            return
-          }
-
-          try {
-            const pong = await invoke<'pong'>(user.connectID, 'chat:ping', [chat.id, user.connectID])
-            if (pong !== 'pong') {
-              chat.isOnline = false
-              return
-            }
-            chat.isOnline = true
-          }
-          catch (error: any) {
-            chat.isOnline = false
-            logger.error(`Ping user failed: ${error.message}`)
-          }
-        })
-      })
-    }, 3000)
+  on('user:login', async (user: SelfUser) => {
+    mapPrivateChat((chat) => {
+      if (chat.participants.includes(user.id)) {
+        chat.isOnline = true
+      }
+    })
   })
+
+  on('user:logout', async (user: SelfUser) => {
+    mapPrivateChat((chat) => {
+      if (chat.participants.includes(user.id)) {
+        chat.isOnline = false
+      }
+    })
+  })
+
+  // once(async () => {
+  //   const selfId = await getClientUniqueId()
+  //   setInterval(async () => {
+  //     await map(chats, async (chat) => {
+  //       const receiverIds = chat.participants.filter(participant => participant !== selfId)
+  //       await map(receiverIds, async (id) => {
+  //         const user = await userDatabase.getUserById(id)
+  //         if (!user) {
+  //           return
+  //         }
+
+  //         try {
+  //           const pong = await invoke<'pong'>(user.connectID, 'chat:ping', [chat.id, user.connectID])
+  //           if (pong !== 'pong') {
+  //             chat.isOnline = false
+  //             return
+  //           }
+  //           chat.isOnline = true
+  //         }
+  //         catch (error: any) {
+  //           chat.isOnline = false
+  //           logger.error(`Ping user failed: ${error.message}`)
+  //         }
+  //       })
+  //     })
+  //   }, 3000)
+  // })
 
   registerHandler('chat:create-private-chat', async (chat: Chat): Promise<boolean> => {
     logger.log('chat:create-private-chat')
@@ -198,6 +208,11 @@ export const useChat = defineStore('app-chat', () => {
 
     if (!chat) {
       logger.warn('Chat not found')
+      return
+    }
+
+    if (!chat.isOnline) {
+      logger.warn('User is offline')
       return
     }
 
