@@ -1,23 +1,37 @@
 # Rainbow Client
 
-end-to-end file synchronization
+WebRTC-based file synchronizer and chat room
 
-## Recommended IDE Setup
+## Features
 
-- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin)
-
-## Project Setup
+- [ ] Sync files across devices
+- [X] Text private chat
+- [ ] text group chat
 
 ### Install
 
 ```bash
-$ pnpm install
+pnpm install
+```
+
+### Setting environment variables
+
+.env file
+
+```env
+RENDERER_VITE_PEER_PORT=6789
+RENDERER_VITE_PEER_PATH=/bridge
+RENDERER_VITE_PEER_KEY=BnfPKyiLx3
+RENDERER_VITE_PEER_URL=http://xxxx.com/bridge
+RENDERER_VITE_SALT=rainbow
+VITE_KEY_PROTOCOL_NAME=rainbow
+VITE_KEY_HOST=app
 ```
 
 ### Development
 
 ```bash
-$ pnpm dev
+pnpm dev
 ```
 
 ### Build
