@@ -97,7 +97,7 @@ export const useChat = defineStore('app-chat', () => {
     })
   })
 
-  once(async () => {
+  on('server:open', async () => {
     const selfId = await getClientUniqueId()
     mapPrivateChat(async (chat) => {
       const receiverIds = chat.participants.filter(participant => participant !== selfId)
@@ -115,7 +115,7 @@ export const useChat = defineStore('app-chat', () => {
         }
       })
     })
-  })()
+  })
 
   registerHandler('chat:create-private-chat', async (chat: Chat): Promise<boolean> => {
     logger.log('chat:create-private-chat')

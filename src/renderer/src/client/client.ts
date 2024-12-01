@@ -130,7 +130,7 @@ export function createClientSingle(app: App) {
 
     manager.register(conn)
 
-    event.emit('peer:connection', conn)
+    event.emit('peer:connection', [meta, conn])
   }
 
   async function connect(id: string) {
