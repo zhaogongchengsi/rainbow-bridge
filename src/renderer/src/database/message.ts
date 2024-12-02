@@ -4,14 +4,50 @@ import { logger } from '@renderer/utils/logger'
 import { MessageState } from './enums'
 
 export interface Message {
+  /**
+   * Message ID (UUID)
+   */
   id: string
+  /**
+   * Sender ID
+   */
   from: ID
-  to: ID // chatId
+  /**
+   * Receiver ID chatId
+   */
+  to: ID
+  /**
+   * Message content
+   */
   content: string
+  /**
+   * Message timestamp
+   */
   timestamp: number
+  /**
+   * Message status
+   */
   status: MessageState
+  /**
+   * isText flag 文本消息
+   */
   isText: boolean
+  /**
+   * 图片消息
+   */
   isImage: boolean
+  /**
+   * isAudio flag 音频消息
+   */
+  isAudio: boolean
+  /**
+   * isVideo flag 视频消息
+   */
+  isVideo: boolean
+  /**
+   *  引用了其他的消息 值为引用消息的id (uuid)
+   */
+  reference?: string
 }
 
 export class MessageDatabase extends RainbowBridgeDatabase {
@@ -47,9 +83,6 @@ export class MessageDatabase extends RainbowBridgeDatabase {
   async getMessagesByChatIdWithPagination(chatId: string, page: number = 1, pageSize: number = 50) {
     const totalMessages = await this.messages.where('to').equals(chatId).count()
     const totalPage = Math.ceil(totalMessages / pageSize)
-    // if (page > totalPage) {
-    //   page = totalPage
-    // }
     const offset = (page - 1) * pageSize
     const messages = await this.messages
       .where('to')
