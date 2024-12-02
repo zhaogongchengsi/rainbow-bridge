@@ -4,6 +4,7 @@ import { useAsideMenu } from '@renderer/composables/aside'
 import { useUser } from '@renderer/store/user'
 import { getClientID } from '@renderer/utils/id'
 import { debounce } from 'perfect-debounce'
+import Menu from 'primevue/menu'
 
 const menuStore = useAsideMenu()
 const userStore = useUser()
@@ -47,54 +48,37 @@ const items = [
 
 <template>
   <aside class="system-aside-bar">
+    <div v-if="userStore.currentUser" class="system-aside-footer flex items-center justify-center">
+      <button aria-haspopup="true" aria-controls="overlay_menu" @click="toggle">
+        <Avatar
+          :src="userStore.currentUser?.avatar" class="size-10 cursor-pointer" :name="userStore.currentUser?.name"
+        />
+      </button>
+      <Menu id="overlay_menu" ref="menuRef" :model="items" :popup="true">
+        <template #start>
+          <div class="flex items-center justify-between gap-2 px-2 py-1">
+            <span>ID:</span>
+            <span class="block max-w-35 min-w-0 flex-1 truncate text-sm">{{ id }}</span>
+            <button class="ml-2" @click="onCopy">
+              <i class="pi" :class="[copied ? 'pi-check' : 'pi-copy']" />
+            </button>
+          </div>
+        </template>
+      </Menu>
+    </div>
+    <Divider />
     <ul class="system-aside-bar-list">
-      <li v-for="menu of menuStore.asideMenu" :key="menu.id" class="system-aside-bar-item">
+      <li v-for="menuItem of menuStore.asideMenu" :key="menuItem.id" class="system-aside-bar-item">
         <component
           v-bind="{
-            to: menu.route ? menu.route : undefined,
-            class: ['system-aside-bar-item-button', { 'system-aside-bar-item-button-link': menu.route, 'system-aside-bar-item-button-active': menuStore.currentMenu && (menu.id === menuStore.currentMenu.id) }],
-          }" :is="menu.route ? 'router-link' : 'button'" class="system-aside-bar-item-button"
+            to: menuItem.route ? menuItem.route : undefined,
+            class: ['system-aside-bar-item-button', { 'system-aside-bar-item-button-link': menuItem.route, 'system-aside-bar-item-button-active': menuStore.currentMenu && (menuItem.id === menuStore.currentMenu.id) }],
+          }" :is="menuItem.route ? 'router-link' : 'button'" class="system-aside-bar-item-button"
         >
-          <i v-if="menu.icon" :class="menu.icon" />
-          <span v-else>{{ menu.title }}</span>
+          <i v-if="menuItem.icon" :class="menuItem.icon" />
+          <span v-else>{{ menuItem.title }}</span>
         </component>
       </li>
     </ul>
-    <div class="system-aside-footer mt-auto flex flex-col items-center justify-center gap-5">
-      <VDropdown
-        v-if="userStore.currentUser" :arrow-padding="0" :triggers="['click']" placement="right" :distance="6"
-        theme="app-menu"
-      >
-        <button class="system-aside-bar-item-button">
-          <i class="pi pi-user" />
-        </button>
-        <template #popper>
-          <div class="w-60 p-2">
-            <div class="w-full flex gap-2">
-              <Avatar
-                v-if="userStore.currentUser.avatar" :src="userStore.currentUser.avatar"
-                class="size-[var(--system-aside-bar-item-button-size)] cursor-pointer"
-              />
-              <div class="min-w-0 flex flex-1 flex-col justify-between">
-                <span class="text-sm font-bold">{{ userStore.currentUser.name }}</span>
-                <span class="text-xs text-gray-500">{{ userStore.currentUser.lastLoginTime }}</span>
-              </div>
-            </div>
-            <Divider />
-            <div class="flex items-center justify-between">
-              <span>ID:</span>
-              <p class="max-w-40 truncate" :title="id">
-                {{ id }}
-              </p>
-              <i :class="{ 'pi-copy': !copied, 'pi-check': copied }" class="pi cursor-pointer" @click="onCopy" />
-            </div>
-          </div>
-        </template>
-      </VDropdown>
-      <button class="system-aside-bar-item-button" @click="toggle">
-        <i class="pi pi-cog" />
-      </button>
-      <Menu ref="menuRef" :model="items" :popup="true" />
-    </div>
   </aside>
 </template>

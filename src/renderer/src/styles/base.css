@@ -29,10 +29,7 @@ body,
   width: var(--system-aside-bar-width);
   height: var(--system-container-box-height);
   border-right: var(--system-aside-bar-right-border);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 20px 0;
+  padding: 20px 10px;
 }
 
 .system-main {

@@ -9,6 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     AnimatedList: typeof import('./src/components/ui/animated-list.vue')['default']
     Avatar: typeof import('primevue/avatar')['default']
+    Badge: typeof import('primevue/badge')['default']
     Button: typeof import('primevue/button')['default']
     CardSpotlight: typeof import('./src/components/ui/card-spotlight.vue')['default']
     Checkbox: typeof import('primevue/checkbox')['default']
@@ -42,5 +43,8 @@ declare module 'vue' {
     UiBuuferAvatar: typeof import('./src/components/ui/ui-buufer-avatar.vue')['default']
     UiTimestamp: typeof import('./src/components/ui/ui-timestamp.vue')['default']
     VirtualScroller: typeof import('primevue/virtualscroller')['default']
+  }
+  export interface ComponentCustomProperties {
+    Ripple: typeof import('primevue/ripple')['default']
   }
 }
