@@ -11,17 +11,21 @@ const userStore = useUser()
 
 const menu = ref<InstanceType<typeof Menu> | null>(null)
 const visible = ref(false)
+const groupVisible = ref(false)
 
 const value = ref('')
+
 const friendId = ref('')
 const searchIng = ref(false)
 const searchUser = ref<SelfUser>()
+const selectedUsers = ref()
 
 const items = [
   {
     label: 'Create Group',
     icon: 'pi pi-users',
     command: () => {
+      groupVisible.value = true
       // console.log('Light')
     },
   },
@@ -116,6 +120,26 @@ const onSeyHello = debounce(async () => {
           </div>
           <Button label="say hello" class="mt-auto w-full" raised severity="contrast" @click="onSeyHello" />
         </div>
+      </div>
+    </Dialog>
+    <Dialog v-model:visible="groupVisible" modal header="Create Group Chat">
+      <div class="h-100 w-150 flex flex-col">
+        <Listbox
+          v-model="selectedUsers" :options="userStore.users.filter(u => !u.isMe)" option-label="name"
+          class="h-100 w-full m-0! border-none! bg-transparent! p-0!" multiple filter
+        >
+          <template #option="slotProps">
+            <div class="flex items-center gap-2">
+              <ui-avatar v-if="slotProps.option.avatar" :src="slotProps.option.avatar" class="block size-10" />
+              <div class="h-full flex flex-1 justify-between">
+                <div>{{ slotProps.option.name }}</div>
+                <div v-if="slotProps.option.lastLoginTime">
+                  {{ slotProps.option.lastLoginTime }}
+                </div>
+              </div>
+            </div>
+          </template>
+        </Listbox>
       </div>
     </Dialog>
   </div>
