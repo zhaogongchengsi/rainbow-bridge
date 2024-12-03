@@ -35,13 +35,13 @@ export async function resolveMessageState(message: Message): Promise<MessageStat
   }
 }
 
-async function resolveChatState(chat: ChatData): Promise<ChatState> {
+async function resolveChatState(chat: ChatData, isOnline: boolean = false): Promise<ChatState> {
   return {
     ...chat,
     newMessages: [],
     messages: await map(chat.messages, resolveMessageState),
     lastMessage: chat.lastMessage ? await resolveMessageState(chat.lastMessage) : undefined,
-    isOnline: false,
+    isOnline,
   }
 }
 
@@ -54,15 +54,15 @@ export const useChat = defineStore('app-chat', () => {
 
   async function chatInit() {
     const _chats = await chatDatabase.getChats();
-    (await map(_chats, resolveChatState)).forEach(c => chats.push(c))
+    (await map(_chats, chat => resolveChatState(chat))).forEach(c => chats.push(c))
   }
 
   const currentChat = computed(() => {
     return chats.find(chat => chat.id === currentChatId.value)
   })
 
-  async function appNewChat(chat: ChatData) {
-    chats.push(await resolveChatState(chat))
+  async function appNewChat(chat: ChatData, isOnline: boolean = false) {
+    chats.push(await resolveChatState(chat, isOnline))
   }
 
   function findChatById(id: string) {
@@ -170,7 +170,7 @@ export const useChat = defineStore('app-chat', () => {
       messages: [],
     }])
 
-    await appNewChat(chat)
+    await appNewChat(chat, true)
 
     return chat
   }
@@ -193,6 +193,8 @@ export const useChat = defineStore('app-chat', () => {
       to: chat.id,
       isImage: false,
       isText: true,
+      isAudio: false,
+      isVideo: false,
     })
 
     try {
