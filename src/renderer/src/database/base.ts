@@ -19,7 +19,8 @@ export class RainbowBridgeDatabase extends Dexie {
       `,
 
       messages: `
-        id, from, to, content, timestamp, status, chatId, isText, isImage
+        id, from, to, content, timestamp, status, chatId, isText, isImage, isAudio,
+        isVideo, reference
       `,
 
       users: `
