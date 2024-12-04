@@ -17,4 +17,8 @@ export interface FolderSpace {
    * 同步的文件夹大小
    */
   size: number
+  /**
+   * 忽略同步的文件
+   */
+  ignore: string[]
 }
