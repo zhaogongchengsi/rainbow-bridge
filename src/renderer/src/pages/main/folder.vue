@@ -3,9 +3,7 @@
 </script>
 
 <template>
-  <div>folder</div>
+  <div class="size-full">
+    <RouterView />
+  </div>
 </template>
-
-<style scoped>
-
-</style>
