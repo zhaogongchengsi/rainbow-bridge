@@ -1,6 +1,8 @@
 import type { ID } from './type'
+import { RainbowBridgeDatabase } from './base'
 
 export interface FolderSpace {
+  id: ID
   /**
    * 同步的目标客户
    */
@@ -21,4 +23,10 @@ export interface FolderSpace {
    * 忽略同步的文件
    */
   ignore: string[]
+}
+
+export class Folder extends RainbowBridgeDatabase {
+  constructor() {
+    super()
+  }
 }

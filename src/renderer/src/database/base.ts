@@ -1,5 +1,6 @@
 import type { EntityTable } from 'dexie'
 import type { Chat } from './chat'
+import type { FolderSpace } from './folder'
 import type { Message } from './message'
 import type { User } from './user'
 import Dexie from 'dexie'
@@ -9,6 +10,7 @@ export class RainbowBridgeDatabase extends Dexie {
   chats!: EntityTable<Chat, 'id'>
   messages!: EntityTable<Message, 'id'>
   users!: EntityTable<User, 'id'>
+  folders!: EntityTable<FolderSpace, 'id'>
   constructor() {
     super('rainbow-bridge-db')
     this.version(1).stores({
@@ -27,6 +29,8 @@ export class RainbowBridgeDatabase extends Dexie {
         id, name, email, isContact, connectID, lastLoginTime, create_by, avatar, comment, isMe,
         [name+email], [name+connectID], [email+connectID], [name+email+connectID]
       `,
+
+      folder: `id, user, root, lastSyncTime, size, ignore`,
     })
   }
 
