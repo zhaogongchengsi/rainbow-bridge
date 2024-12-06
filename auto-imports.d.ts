@@ -36,6 +36,7 @@ declare global {
   const decryptBufferToObject: typeof import('./src/renderer/src/utils/decrypt')['decryptBufferToObject']
   const decryptClientID: typeof import('./src/renderer/src/utils/id')['decryptClientID']
   const decryptString: typeof import('./src/renderer/src/utils/decrypt')['decryptString']
+  const deepMerge: typeof import('./src/renderer/src/utils/object')['deepMerge']
   const defineAsyncComponent: typeof import('vue')['defineAsyncComponent']
   const defineComponent: typeof import('vue')['defineComponent']
   const defineStore: typeof import('pinia')['defineStore']

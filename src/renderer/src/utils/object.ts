@@ -46,3 +46,24 @@ export function findFileKeys(obj: any): string[] {
 
   return Array.from(fileKeys)
 }
+
+export function deepMerge(origin: any, target: any): any {
+  if (typeof target !== 'object' || target === null) {
+    return target
+  }
+
+  const result = { ...origin }
+
+  for (const key in target) {
+    if (Object.hasOwnProperty.call(target, key)) {
+      if (typeof target[key] === 'object' && target[key] !== null) {
+        result[key] = deepMerge(origin[key], target[key])
+      }
+      else {
+        result[key] = target[key]
+      }
+    }
+  }
+
+  return result
+}

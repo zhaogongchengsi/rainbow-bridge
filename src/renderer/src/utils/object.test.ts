@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { findFileKeys, isFilePath } from './object'
+import { deepMerge, findFileKeys, isFilePath } from './object'
 
 describe('object', () => {
   it('path to all file protocols should be found', async () => {
@@ -28,5 +28,63 @@ describe('object', () => {
     expect(isFilePath('')).toBe(false)
     expect(isFilePath(null)).toBe(false)
     expect(isFilePath(undefined)).toBe(false)
+  })
+
+  it('should deeply merge two objects', () => {
+    const origin = {
+      a: 1,
+      b: {
+        c: 2,
+        d: 3,
+      },
+      e: 4,
+    }
+    const target = {
+      b: {
+        c: 5,
+        f: 6,
+      },
+      e: null,
+      g: 7,
+    }
+    const result = deepMerge(origin, target)
+    expect(result).toEqual({
+      a: 1,
+      b: {
+        c: 5,
+        d: 3,
+        f: 6,
+      },
+      e: null,
+      g: 7,
+    })
+  })
+
+  it('should return target if target is not an object', () => {
+    const origin = { a: 1, b: 2 }
+    const target = 3
+    const result = deepMerge(origin, target)
+    expect(result).toBe(3)
+  })
+
+  it('should handle null values in target', () => {
+    const origin = { a: 1, b: { c: 2 } }
+    const target = { b: null }
+    const result = deepMerge(origin, target)
+    expect(result).toEqual({ a: 1, b: null })
+  })
+
+  it('should handle undefined values in target', () => {
+    const origin = { a: 1, b: { c: 2 } }
+    const target = { b: undefined }
+    const result = deepMerge(origin, target)
+    expect(result).toEqual({ a: 1, b: undefined })
+  })
+
+  it('should handle empty objects', () => {
+    const origin = {}
+    const target = {}
+    const result = deepMerge(origin, target)
+    expect(result).toEqual({})
   })
 })

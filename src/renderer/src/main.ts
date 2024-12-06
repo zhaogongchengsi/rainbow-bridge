@@ -10,7 +10,9 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import { routes } from 'vue-router/auto-routes'
 import App from './App.vue'
 import { clientPlugin } from './client/plugin'
+import theme from './theme'
 import { logger } from './utils/logger'
+import { deepMerge } from './utils/object'
 import './styles/config.css'
 import 'virtual:uno.css'
 import '@unocss/reset/tailwind.css'
@@ -37,7 +39,7 @@ app.use(pinia)
 app.use(MotionPlugin)
 app.use(PrimeVue, {
   theme: {
-    preset: Aura,
+    preset: deepMerge(Aura, theme),
   },
 })
 app.use(ToastService)

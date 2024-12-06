@@ -37,6 +37,6 @@ describe('editor.vue', () => {
     expect(wrapper.vm.textValue).toBe(`123\n`)
     await wrapper.setProps({ text: '' })
     // @ts-expect-error
-    expect(wrapper.vm.textValue.trim()).toBe(`/n`)
+    expect(wrapper.vm.textValue.trim()).toBe(``)
   })
 })
