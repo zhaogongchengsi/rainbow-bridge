@@ -1,13 +1,80 @@
 <script setup lang='ts'>
+import uiButton from '@renderer/components/ui/ui-button.vue'
 
+const home = ref({
+  icon: 'pi pi-home',
+  label: 'home',
+})
+
+const items = ref([
+  { label: 'Components' },
+  { label: 'Form' },
+  { label: 'InputText' },
+])
 </script>
 
 <template>
   <div class="h-12 w-full px-2">
     <div class="size-full flex items-center">
-      <button class="size-8 rounded-md hover:bg-zinc-300 dark:hover:bg-zinc-700">
-        <span class="pi pi-plus" />
-      </button>
+      <div class="flex gap-3">
+        <ui-button>
+          <span class="pi pi-angle-left" />
+        </ui-button>
+        <ui-button>
+          <span class="pi pi-angle-right" />
+        </ui-button>
+        <ui-button>
+          <span class="pi pi-plus" />
+        </ui-button>
+        <ui-button>
+          <span class="pi pi-refresh" />
+        </ui-button>
+      </div>
+      <Divider layout="vertical" />
+      <div class="h-full min-w-0 flex flex-1 items-center">
+        <Breadcrumb :home="home" :model="items" class="p-1!">
+          <template #item="{ item, props }">
+            <router-link v-if="item.route" v-slot="{ href, navigate }" :to="item.route" custom>
+              <a :href="href" v-bind="props.action" @click="navigate">
+                <span :class="[item.icon]" />
+                <span class="text-primary font-semibold">{{ item.label }}</span>
+              </a>
+            </router-link>
+            <a v-else :href="item.url" :target="item.target" v-bind="props.action">
+              <span class="text-surface-700 dark:text-surface-0">{{ item.label }}</span>
+            </a>
+          </template>
+        </Breadcrumb>
+      </div>
+      <Divider layout="vertical" />
+      <div class="folder-header-search-wrapper">
+        <span class="pi pi-search size-5" />
+        <input class="folder-header-search-input" placeholder="Search">
+      </div>
     </div>
   </div>
 </template>
+
+<style>
+  .folder-header-search-wrapper {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    width: 450px;
+  }
+
+  .folder-header-search-input {
+    height: 100%;
+    width: 100%;
+    border: none;
+    background-color: transparent !important;
+    color: var(--text-color);
+    outline: none;
+  }
+
+  .folder-header-search-wrapper:focus-within {
+    outline: none;
+  }
+</style>
