@@ -1,5 +1,7 @@
 <script setup lang='ts'>
+import { zodResolver } from '@primevue/forms/resolvers/zod'
 import uiButton from '@renderer/components/ui/ui-button.vue'
+import { z } from 'zod'
 
 const visible = ref(false)
 
@@ -13,6 +15,20 @@ const items = ref([
   { label: 'Form' },
   { label: 'InputText' },
 ])
+
+const initialValues = ref({
+  username: '',
+})
+
+function onFormSubmit({ valid }) {
+  console.log('Form submitted', valid)
+}
+
+const resolver = zodResolver(
+  z.object({
+    username: z.string().min(1, { message: 'Username is required via Zod.' }),
+  }),
+)
 </script>
 
 <template>
@@ -55,16 +71,27 @@ const items = ref([
       </div>
     </div>
 
-    <Dialog v-model:visible="visible" modal header="Edit Profile" class="w-100">
-      <span class="text-surface-500 dark:text-surface-400 mb-8 block">Update your information.</span>
-      <div class="mb-4 flex items-center gap-4">
-        <label for="username" class="w-24 font-semibold">Username</label>
-        <InputText id="username" class="flex-auto" autocomplete="off" />
-      </div>
-      <div class="mb-8 flex items-center gap-4">
-        <label for="email" class="w-24 font-semibold">Email</label>
-        <InputText id="email" class="flex-auto" autocomplete="off" />
-      </div>
+    <Dialog v-model:visible="visible" modal header="Edit Profile" class="w-150">
+      <Form class="w-full flex flex-col gap-3 py-2" :initial-values :resolver @submit="onFormSubmit">
+        <FormField v-slot="$field" name="user" initial-value="" class="flex flex-col gap-1">
+          <InputText type="text" placeholder="user" />
+          <Message v-if="$field?.invalid" severity="error" size="small" variant="simple">
+            {{ $field.error?.message }}
+          </Message>
+        </FormField>
+        <FormField v-slot="$field" name="root" initial-value="" class="flex flex-col gap-1">
+          <InputText type="text" placeholder="root" />
+          <Message v-if="$field?.invalid" severity="error" size="small" variant="simple">
+            {{ $field.error?.message }}
+          </Message>
+        </FormField>
+        <FormField v-slot="$field" name="ignore" initial-value="" class="flex flex-col gap-1">
+          <Textarea rows="5" cols="30" auto-resize type="text" placeholder="ignore" />
+          <Message v-if="$field?.invalid" severity="error" size="small" variant="simple">
+            {{ $field.error?.message }}
+          </Message>
+        </FormField>
+      </Form>
       <div class="flex justify-end gap-2">
         <Button type="button" label="Cancel" severity="secondary" @click="visible = false" />
         <Button type="button" label="Save" @click="visible = false" />
