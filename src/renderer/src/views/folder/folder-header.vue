@@ -1,9 +1,20 @@
 <script setup lang='ts'>
 import { zodResolver } from '@primevue/forms/resolvers/zod'
 import uiButton from '@renderer/components/ui/ui-button.vue'
+import { useUser } from '@renderer/store/user'
 import { z } from 'zod'
 
+const userStore = useUser()
+
+console.log(userStore.otherUsers)
+
 const visible = ref(false)
+
+const formValue = reactive({
+  user: '',
+  root: '',
+  ignore: '',
+})
 
 const home = ref({
   icon: 'pi pi-home',
@@ -15,10 +26,6 @@ const items = ref([
   { label: 'Form' },
   { label: 'InputText' },
 ])
-
-const initialValues = ref({
-  username: '',
-})
 
 function onFormSubmit({ valid }) {
   console.log('Form submitted', valid)
@@ -71,22 +78,25 @@ const resolver = zodResolver(
       </div>
     </div>
 
-    <Dialog v-model:visible="visible" modal header="Edit Profile" class="w-150">
-      <Form class="w-full flex flex-col gap-3 py-2" :initial-values :resolver @submit="onFormSubmit">
+    <Dialog v-model:visible="visible" modal header="Create workspace" class="w-150">
+      <Form class="w-full flex flex-col gap-3 py-2" :initial-values="formValue" :resolver @submit="onFormSubmit">
         <FormField v-slot="$field" name="user" initial-value="" class="flex flex-col gap-1">
-          <InputText type="text" placeholder="user" />
+          <Select
+            v-model="formValue.user" :options="userStore.otherUsers" option-label="name"
+            placeholder="Select a user" name="user" class="w-full"
+          />
           <Message v-if="$field?.invalid" severity="error" size="small" variant="simple">
             {{ $field.error?.message }}
           </Message>
         </FormField>
         <FormField v-slot="$field" name="root" initial-value="" class="flex flex-col gap-1">
-          <InputText type="text" placeholder="root" />
+          <InputText v-model="formValue.root" type="text" placeholder="root" />
           <Message v-if="$field?.invalid" severity="error" size="small" variant="simple">
             {{ $field.error?.message }}
           </Message>
         </FormField>
         <FormField v-slot="$field" name="ignore" initial-value="" class="flex flex-col gap-1">
-          <Textarea rows="5" cols="30" auto-resize type="text" placeholder="ignore" />
+          <Textarea v-model="formValue.ignore" rows="5" cols="30" auto-resize type="text" placeholder="ignore" />
           <Message v-if="$field?.invalid" severity="error" size="small" variant="simple">
             {{ $field.error?.message }}
           </Message>

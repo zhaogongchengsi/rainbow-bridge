@@ -28,6 +28,7 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     ScrollPanel: typeof import('primevue/scrollpanel')['default']
+    Select: typeof import('primevue/select')['default']
     SystemUpload: typeof import('./src/components/system/system-upload.vue')['default']
     Textarea: typeof import('primevue/textarea')['default']
     Toast: typeof import('primevue/toast')['default']

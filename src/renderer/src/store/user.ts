@@ -21,6 +21,10 @@ export const useUser = defineStore('app-user', () => {
     return users.value.filter(use => use.isMe)
   })
 
+  const otherUsers = computed((): User[] => {
+    return users.value.filter(use => !use.isMe)
+  })
+
   const currentUser = computed((): User | undefined => {
     return users.value.find(user => user.id === currentUserId.value && user.isMe)
   })
@@ -112,6 +116,7 @@ export const useUser = defineStore('app-user', () => {
   return {
     users,
     upsertUser,
+    otherUsers,
     requestAndCreateNewUser,
     searchFriend,
     currentUser,
