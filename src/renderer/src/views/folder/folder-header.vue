@@ -6,8 +6,6 @@ import { z } from 'zod'
 
 const userStore = useUser()
 
-console.log(userStore.otherUsers)
-
 const visible = ref(false)
 
 const formValue = reactive({
@@ -29,6 +27,10 @@ const items = ref([
 
 function onFormSubmit({ valid }) {
   console.log('Form submitted', valid)
+}
+
+async function open() {
+  // const dir = await window.showDirectoryPicker()
 }
 
 const resolver = zodResolver(
@@ -90,7 +92,10 @@ const resolver = zodResolver(
           </Message>
         </FormField>
         <FormField v-slot="$field" name="root" initial-value="" class="flex flex-col gap-1">
-          <InputText v-model="formValue.root" type="text" placeholder="root" />
+          <InputGroup>
+            <InputText v-model="formValue.root" placeholder="root" />
+            <Button icon="pi pi-folder-open" severity="secondary" variant="text" @click="open" />
+          </InputGroup>
           <Message v-if="$field?.invalid" severity="error" size="small" variant="simple">
             {{ $field.error?.message }}
           </Message>

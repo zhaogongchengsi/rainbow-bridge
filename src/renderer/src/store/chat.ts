@@ -31,7 +31,7 @@ export async function resolveMessageState(message: Message): Promise<MessageStat
   return {
     ...message,
     from,
-    isSelfSend: from.isMe,
+    isSelfSend: from?.isMe || false,
   }
 }
 
