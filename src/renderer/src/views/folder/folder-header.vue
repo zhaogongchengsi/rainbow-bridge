@@ -1,13 +1,13 @@
 <script setup lang='ts'>
+import type { User } from '@renderer/database/user'
 import uiButton from '@renderer/components/ui/ui-button.vue'
 import { useUser } from '@renderer/store/user'
 
 const userStore = useUser()
-
 const visible = ref(false)
 
-const formValue = reactive({
-  user: '',
+const formValue = reactive<{ user: User | undefined, root: string, ignore: string }>({
+  user: undefined,
   root: '',
   ignore: '',
 })
@@ -23,9 +23,28 @@ const items = ref([
   { label: 'InputText' },
 ])
 
+function clearFormValue() {
+  formValue.user = undefined
+  formValue.root = ''
+  formValue.ignore = ''
+}
+
 async function open() {
   const dir = await window.system.showDirectoryPicker()
-  console.log(dir)
+  if (dir) {
+    formValue.root = dir
+  }
+}
+
+function onSave() {
+  console.log('formValue', formValue)
+  // clearFormValue()
+  visible.value = false
+}
+
+function onCancel() {
+  clearFormValue()
+  visible.value = false
 }
 </script>
 
@@ -79,18 +98,21 @@ async function open() {
         </div>
         <div class="w-full">
           <InputGroup>
-            <InputText v-model="formValue.root" placeholder="root" />
+            <InputText v-model="formValue.root" disabled placeholder="root" />
             <Button icon="pi pi-folder-open" severity="secondary" variant="text" @click="open" />
           </InputGroup>
         </div>
 
         <div class="w-full">
-          <Textarea v-model="formValue.ignore" class="w-full" rows="5" cols="30" auto-resize type="text" placeholder="ignore" />
+          <Textarea
+            v-model="formValue.ignore" class="w-full" rows="5" cols="30" auto-resize type="text"
+            placeholder="ignore"
+          />
         </div>
       </div>
       <div class="flex justify-end gap-2">
-        <Button type="button" label="Cancel" severity="secondary" @click="visible = false" />
-        <Button type="button" label="Save" @click="visible = false" />
+        <Button type="button" label="Cancel" severity="secondary" @click="onCancel" />
+        <Button type="button" label="Save" @click="onSave" />
       </div>
     </Dialog>
   </div>
