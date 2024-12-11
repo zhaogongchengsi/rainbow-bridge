@@ -24,7 +24,8 @@ const items = ref([
 ])
 
 async function open() {
-  // const dir = await window.showDirectoryPicker()
+  const dir = await window.system.showDirectoryPicker()
+  console.log(dir)
 }
 </script>
 
