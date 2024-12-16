@@ -49,6 +49,7 @@ declare global {
   const findFileKeys: typeof import('./src/renderer/src/utils/object')['findFileKeys']
   const formatDate: typeof import('./src/renderer/src/utils/date')['formatDate']
   const formatDateShort: typeof import('./src/renderer/src/utils/date')['formatDateShort']
+  const generateFileTree: typeof import('./src/renderer/src/utils/fileTree')['generateFileTree']
   const getActivePinia: typeof import('pinia')['getActivePinia']
   const getClientID: typeof import('./src/renderer/src/utils/id')['getClientID']
   const getClientUniqueId: typeof import('./src/renderer/src/utils/id')['getClientUniqueId']

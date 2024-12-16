@@ -33,7 +33,6 @@ async function open() {
   const dir = await window.system.showDirectoryPicker()
   if (dir) {
     const files = await window.system.scanDirectory(dir)
-    console.log('files', files)
     formValue.root = dir
   }
 }

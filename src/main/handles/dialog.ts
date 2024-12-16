@@ -16,6 +16,6 @@ export const showDirectoryPicker = defineHandle(async () => {
 })
 
 export const scanDirectory = defineHandle(async (directory: string, pattern: string = '**/*') => {
-  const dirs = await glob(pattern, { cwd: directory, absolute: true })
+  const dirs = await glob(pattern, { cwd: directory })
   return dirs.map(dir => normalize(dir))
 })
