@@ -13,6 +13,7 @@ declare global {
       getTheme: () => Promise<'light' | 'dark' | 'system'>
       getID: () => Promise<string>
       showDirectoryPicker: () => Promise<string | null>
+      scanDirectory: (directory: string, pattern?: string) => Promise<string[]>
     }
   }
 }

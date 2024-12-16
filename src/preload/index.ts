@@ -16,6 +16,7 @@ const system = {
   getTheme: (): Promise<'light' | 'dark' | 'system'> => electronAPI.ipcRenderer.invoke('getTheme'),
   getID: (): Promise<string> => electronAPI.ipcRenderer.invoke('getId'),
   showDirectoryPicker: (): Promise<string | null> => electronAPI.ipcRenderer.invoke('showDirectoryPicker'),
+  scanDirectory: (directory: string, pattern: string = '**/*'): Promise<string[]> => electronAPI.ipcRenderer.invoke('scanDirectory', directory, pattern),
 }
 
 if (process.contextIsolated) {
