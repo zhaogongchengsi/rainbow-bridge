@@ -12,6 +12,11 @@ const formValue = reactive<{ user: User | undefined, root: string, ignore: strin
   ignore: '',
 })
 
+const errors = reactive({
+  user: '',
+  root: '',
+})
+
 const home = ref({
   icon: 'pi pi-home',
   label: 'home',
@@ -32,14 +37,25 @@ function clearFormValue() {
 async function open() {
   const dir = await window.system.showDirectoryPicker()
   if (dir) {
-    const files = await window.system.scanDirectory(dir)
     formValue.root = dir
+  }
+  else {
+    errors.root = 'Please select a directory'
   }
 }
 
 function onSave() {
-  console.log('formValue', formValue)
-  // clearFormValue()
+  if (!formValue.user) {
+    errors.user = 'Please select a user'
+    return
+  }
+
+  if (!formValue.root) {
+    errors.root = 'Please select a directory'
+    return
+  }
+
+  clearFormValue()
   visible.value = false
 }
 
@@ -96,12 +112,14 @@ function onCancel() {
             v-model="formValue.user" :options="userStore.otherUsers" option-label="name"
             placeholder="Select a user" name="user" class="w-full"
           />
+          <span v-if="errors.user" class="text-sm text-red">{{ errors.user }}</span>
         </div>
         <div class="w-full">
           <InputGroup>
             <InputText v-model="formValue.root" disabled placeholder="root" />
             <Button icon="pi pi-folder-open" severity="secondary" variant="text" @click="open" />
           </InputGroup>
+          <span v-if="errors.root" class="text-sm text-red">{{ errors.root }}</span>
         </div>
 
         <div class="w-full">
