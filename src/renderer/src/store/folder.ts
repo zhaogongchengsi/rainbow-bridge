@@ -14,7 +14,7 @@ export const useFolder = defineStore('app-folder', () => {
     return folders.find(folder => folder.id === currentFolderId.value)
   })
 
-  async function createFolder(folder: FolderSpaceOptions) {
+  async function createWorkspace(folder: FolderSpaceOptions) {
     const newFolder = await folderDatabase.addFolder(folder)
     folders.push(newFolder)
   }
@@ -27,7 +27,7 @@ export const useFolder = defineStore('app-folder', () => {
     folders,
     currentFolder,
     folderInit,
-    createFolder,
+    createWorkspace,
     findFolderById,
   }
 })

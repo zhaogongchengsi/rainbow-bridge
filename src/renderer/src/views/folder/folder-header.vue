@@ -1,9 +1,11 @@
 <script setup lang='ts'>
 import type { User } from '@renderer/database/user'
 import uiButton from '@renderer/components/ui/ui-button.vue'
+import { useFolder } from '@renderer/store/folder'
 import { useUser } from '@renderer/store/user'
 
 const userStore = useUser()
+const folderStore = useFolder()
 const visible = ref(false)
 
 const formValue = reactive<{ user: User | undefined, root: string, ignore: string }>({
@@ -44,7 +46,7 @@ async function open() {
   }
 }
 
-function onSave() {
+async function onSave() {
   if (!formValue.user) {
     errors.user = 'Please select a user'
     return
@@ -54,6 +56,12 @@ function onSave() {
     errors.root = 'Please select a directory'
     return
   }
+
+  await folderStore.createWorkspace({
+    id: userStore.currentUser!.id,
+    user: formValue.user.id,
+    root: formValue.root,
+  })
 
   clearFormValue()
   visible.value = false

@@ -30,7 +30,7 @@ export class RainbowBridgeDatabase extends Dexie {
         [name+email], [name+connectID], [email+connectID], [name+email+connectID]
       `,
 
-      folder: `uuid, id, user, root, lastSyncTime, size, ignore`,
+      folders: `uuid, id, user, root, lastSyncTime, size, ignore`,
     })
   }
 
